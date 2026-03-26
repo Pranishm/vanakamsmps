@@ -1,0 +1,1331 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { createPortal } from 'react-dom';
+import { FaBullhorn, FaCalendarAlt, FaCrown, FaTag } from 'react-icons/fa';
+import { Badge, Button, Card, Input, Select, Textarea } from '@/components/ui';
+import { getDateLocale } from '@/lib/i18n';
+import { useClientLang } from '@/lib/useClientLang';
+import { formatDateTime, formatPrice } from '@/lib/utils';
+import { PARTNER_MAX_DAYS, PARTNER_PAID_MAX_SLOT, PARTNER_SLOTS, type PartnerPricingConfig } from '@/lib/partnerPricing';
+
+type AdminAd = {
+  _id: string;
+  userId: string;
+  ownerUsername: string;
+  serverName: string;
+  address: string;
+  version?: string;
+  description: string;
+  website?: string;
+  discord?: string;
+  banner?: string;
+  status: 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  rejectionReason?: string;
+  submissionNote?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type AdminBooking = {
+  _id: string;
+  adId: string;
+  userId: string;
+  slot: number;
+  kind: 'CUSTOM' | 'MONTHLY';
+  days: number;
+  currency: string;
+  totalPrice: number;
+  provider: 'PAYPAL' | 'STRIPE' | 'FREE';
+  status: 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'CANCELED';
+  requestNote?: string;
+  paidAt?: string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  createdAt: string;
+  ad?: { serverName: string; ownerUsername: string; status: string } | null;
+};
+
+function slotLabel(slot: number, lang: 'es' | 'en'): string {
+  return Number(slot) === 0 ? 'VIP' : `#${slot}`;
+}
+
+function adBadge(status: AdminAd['status'], lang: 'es' | 'en') {
+  if (status === 'APPROVED') return <Badge variant="success">{lang === 'es' ? 'APROBADO' : 'APPROVED'}</Badge>;
+  if (status === 'REJECTED') return <Badge variant="danger">{lang === 'es' ? 'RECHAZADO' : 'REJECTED'}</Badge>;
+  return <Badge variant="warning">{lang === 'es' ? 'PENDIENTE' : 'PENDING'}</Badge>;
+}
+
+function bookingBadge(status: AdminBooking['status'], lang: 'es' | 'en') {
+  if (status === 'ACTIVE') return <Badge variant="success">{lang === 'es' ? 'ACTIVO' : 'ACTIVE'}</Badge>;
+  if (status === 'PENDING') return <Badge variant="warning">{lang === 'es' ? 'PENDIENTE' : 'PENDING'}</Badge>;
+  if (status === 'EXPIRED') return <Badge variant="default">{lang === 'es' ? 'EXPIRADO' : 'EXPIRED'}</Badge>;
+  return <Badge variant="default">{lang === 'es' ? 'CANCELADO' : 'CANCELED'}</Badge>;
+}
+
+function Modal({
+  open,
+  title,
+  closeLabel,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  title: string;
+  closeLabel: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!open || !mounted) return null;
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50">
+      <button
+        type="button"
+        aria-label={closeLabel}
+        className="absolute inset-0 bg-black/50"
+        onClick={onClose}
+      />
+      <div className="absolute inset-0 overflow-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/95">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="min-w-0">
+                <div className="text-gray-900 dark:text-white font-bold truncate">{title}</div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={onClose}>{closeLabel}</Button>
+            </div>
+            {children}
+          </Card>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+export default function PartnerAdminPage() {
+  const { data: session, status: sessionStatus } = useSession();
+  const role = session?.user?.role;
+
+  const [tab, setTab] = useState<'ADS' | 'BOOKINGS' | 'PRICING' | 'OWNER'>('ADS');
+
+  const lang = useClientLang();
+  const dateLocale = getDateLocale(lang);
+
+  const [adsStatus, setAdsStatus] = useState<AdminAd['status']>('PENDING_REVIEW');
+  const [adsLoading, setAdsLoading] = useState(false);
+  const [adsError, setAdsError] = useState<string | null>(null);
+  const [ads, setAds] = useState<AdminAd[]>([]);
+  const [selectedAdId, setSelectedAdId] = useState<string>('');
+  const [actionLoading, setActionLoading] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+
+  const [editAdSaving, setEditAdSaving] = useState(false);
+  const [editAdError, setEditAdError] = useState<string | null>(null);
+  const [editBannerUploading, setEditBannerUploading] = useState(false);
+  const [editAdForm, setEditAdForm] = useState({
+    ownerUsername: '',
+    serverName: '',
+    address: '',
+    version: '',
+    description: '',
+    website: '',
+    discord: '',
+    banner: '',
+  });
+
+  const [bookingsStatus, setBookingsStatus] = useState<AdminBooking['status'] | 'PENDING_OR_ACTIVE'>('PENDING_OR_ACTIVE');
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<AdminBooking[]>([]);
+
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingSaving, setPricingSaving] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
+  const [pricing, setPricing] = useState<PartnerPricingConfig | null>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
+  const [pricingDay, setPricingDay] = useState<number>(7);
+
+  const [overridesOpen, setOverridesOpen] = useState(false);
+  const [systemAdOpen, setSystemAdOpen] = useState(false);
+  const [editAdOpen, setEditAdOpen] = useState(false);
+
+  const [overridesLoading, setOverridesLoading] = useState(false);
+  const [overridesSaving, setOverridesSaving] = useState(false);
+  const [overridesError, setOverridesError] = useState<string | null>(null);
+  const [slotOverrides, setSlotOverrides] = useState<string[]>(Array(PARTNER_SLOTS).fill(''));
+  const [vipOverride, setVipOverride] = useState<string>('');
+  const [approvedAds, setApprovedAds] = useState<AdminAd[]>([]);
+
+  const [systemAdCreating, setSystemAdCreating] = useState(false);
+  const [systemAdError, setSystemAdError] = useState<string | null>(null);
+  const [systemAdForm, setSystemAdForm] = useState({
+    ownerUsername: String(session?.user?.name || session?.user?.email || 'Owner'),
+    serverName: '',
+    address: '',
+    version: '',
+    description: '',
+    website: '',
+    discord: '',
+    banner: '',
+  });
+
+  const canAccess = role === 'ADMIN' || role === 'OWNER';
+
+  const canOverrideSlots = role === 'OWNER';
+
+  const loadOverrides = async () => {
+    setOverridesLoading(true);
+    setOverridesError(null);
+    try {
+      const res = await fetch('/api/admin/partner/slots', { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      const slots = Array.isArray((data as any)?.overrides?.slots) ? ((data as any).overrides.slots as any[]) : [];
+      const next = Array.from({ length: PARTNER_SLOTS }, (_, i) => String(slots[i] ?? '').trim());
+      setSlotOverrides(next);
+
+      const vipAdId = String((data as any)?.overrides?.vipAdId || '').trim();
+      setVipOverride(vipAdId);
+    } catch (e: any) {
+      setOverridesError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+      setSlotOverrides(Array(PARTNER_SLOTS).fill(''));
+      setVipOverride('');
+    } finally {
+      setOverridesLoading(false);
+    }
+  };
+
+  const loadApprovedAds = async () => {
+    try {
+      const qp = new URLSearchParams();
+      qp.set('status', 'APPROVED');
+      const res = await fetch(`/api/admin/partner/ads?${qp.toString()}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      const items = Array.isArray((data as any).items) ? ((data as any).items as AdminAd[]) : [];
+      setApprovedAds(items);
+    } catch {
+      setApprovedAds([]);
+    }
+  };
+
+  const saveOverrides = async () => {
+    setOverridesSaving(true);
+    setOverridesError(null);
+    try {
+      const res = await fetch('/api/admin/partner/slots', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots: slotOverrides, vipAdId: vipOverride }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || 'Error'));
+      await loadOverrides();
+      setOverridesOpen(false);
+    } catch (e: any) {
+      setOverridesError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setOverridesSaving(false);
+    }
+  };
+
+  const createSystemAd = async () => {
+    setSystemAdCreating(true);
+    setSystemAdError(null);
+    try {
+      const res = await fetch('/api/admin/partner/ads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(systemAdForm),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      setSystemAdForm((p) => ({ ...p, serverName: '', address: '', version: '', description: '', website: '', discord: '', banner: '' }));
+      await loadApprovedAds();
+      setSystemAdOpen(false);
+    } catch (e: any) {
+      setSystemAdError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setSystemAdCreating(false);
+    }
+  };
+
+  const loadPricing = async () => {
+    setPricingLoading(true);
+    setPricingError(null);
+    try {
+      const res = await fetch('/api/admin/partner/pricing', { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      const cfg = (data as any)?.config as PartnerPricingConfig | undefined;
+      if (!cfg) throw new Error(lang === 'es' ? 'Configuración inválida' : 'Invalid config');
+      setPricing({
+        slotTotalsEur: Array.isArray((cfg as any).slotTotalsEur)
+          ? ((cfg as any).slotTotalsEur as any[]).map((row) =>
+              Array.isArray(row)
+                ? row.map((n) => {
+                    const v = Number(n);
+                    return Number.isFinite(v) ? Math.max(0, Math.round(v * 100) / 100) : 0;
+                  })
+                : []
+            )
+          : [],
+
+        vipTotalsEur: Array.isArray((cfg as any).vipTotalsEur)
+          ? ((cfg as any).vipTotalsEur as any[]).map((n) => {
+              const v = Number(n);
+              return Number.isFinite(v) ? Math.max(0, Math.round(v * 100) / 100) : 0;
+            })
+          : [],
+      });
+    } catch (e: any) {
+      setPricingError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+      setPricing(null);
+    } finally {
+      setPricingLoading(false);
+    }
+  };
+
+  const savePricing = async () => {
+    if (!pricing) return;
+    const ok =
+      Array.isArray(pricing.slotTotalsEur) &&
+      pricing.slotTotalsEur.length === PARTNER_SLOTS &&
+      pricing.slotTotalsEur.every((row) => Array.isArray(row) && row.length === PARTNER_MAX_DAYS) &&
+      Array.isArray(pricing.vipTotalsEur) &&
+      pricing.vipTotalsEur.length === PARTNER_MAX_DAYS;
+    if (!ok) {
+      setPricingError(
+        lang === 'es'
+          ? `Debes rellenar los precios para ${PARTNER_SLOTS} slots y ${PARTNER_MAX_DAYS} días.`
+          : `You must fill prices for ${PARTNER_SLOTS} slots and ${PARTNER_MAX_DAYS} days.`
+      );
+      return;
+    }
+
+    setPricingSaving(true);
+    setPricingError(null);
+    try {
+      const res = await fetch('/api/admin/partner/pricing', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slotTotalsEur: pricing.slotTotalsEur,
+          vipTotalsEur: pricing.vipTotalsEur,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      await loadPricing();
+      setPricingOpen(false);
+    } catch (e: any) {
+      setPricingError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setPricingSaving(false);
+    }
+  };
+
+  const loadAds = async () => {
+    setAdsLoading(true);
+    setAdsError(null);
+    try {
+      const qp = new URLSearchParams();
+      qp.set('status', adsStatus);
+      const res = await fetch(`/api/admin/partner/ads?${qp.toString()}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      const nextAds = Array.isArray((data as any).items) ? ((data as any).items as AdminAd[]) : [];
+      setAds(nextAds);
+      setSelectedAdId((prev) => {
+        if (prev && nextAds.some((a) => a._id === prev)) return prev;
+        return nextAds[0]?._id || '';
+      });
+    } catch (e: any) {
+      setAdsError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+      setAds([]);
+      setSelectedAdId('');
+    } finally {
+      setAdsLoading(false);
+    }
+  };
+
+  const loadBookings = async () => {
+    setBookingsLoading(true);
+    setBookingsError(null);
+    try {
+      const qp = new URLSearchParams();
+      if (bookingsStatus !== 'PENDING_OR_ACTIVE') qp.set('status', bookingsStatus);
+      const res = await fetch(`/api/admin/partner/bookings?${qp.toString()}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      setBookings(Array.isArray((data as any).items) ? ((data as any).items as AdminBooking[]) : []);
+    } catch (e: any) {
+      setBookingsError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+      setBookings([]);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (sessionStatus !== 'authenticated' || !canAccess) return;
+    void loadAds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStatus, canAccess, adsStatus]);
+
+  useEffect(() => {
+    if (sessionStatus !== 'authenticated' || !canAccess) return;
+    void loadBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStatus, canAccess, bookingsStatus]);
+
+  useEffect(() => {
+    if (sessionStatus !== 'authenticated' || !canAccess) return;
+    void loadPricing();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStatus, canAccess]);
+
+  useEffect(() => {
+    if (sessionStatus !== 'authenticated' || !canOverrideSlots) return;
+    void loadOverrides();
+    void loadApprovedAds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStatus, canOverrideSlots]);
+
+  const decide = async (adId: string, action: 'APPROVE' | 'REJECT') => {
+    const reason = action === 'REJECT' ? String(rejectReason || '').trim() : '';
+    if (action === 'REJECT' && !reason) return;
+
+    setActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/partner/ads', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adId, action, reason }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      await loadAds();
+      await loadBookings();
+    } catch (e: any) {
+      alert(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const stats = useMemo(() => {
+    const pending = ads.filter((a) => a.status === 'PENDING_REVIEW').length;
+    const approved = ads.filter((a) => a.status === 'APPROVED').length;
+    const rejected = ads.filter((a) => a.status === 'REJECTED').length;
+    return { pending, approved, rejected };
+  }, [ads]);
+
+  const bookingStats = useMemo(() => {
+    const pending = bookings.filter((b) => b.status === 'PENDING').length;
+    const active = bookings.filter((b) => b.status === 'ACTIVE').length;
+    const expired = bookings.filter((b) => b.status === 'EXPIRED').length;
+    return { pending, active, expired };
+  }, [bookings]);
+
+  const selectedAd = useMemo(() => {
+    return ads.find((a) => a._id === selectedAdId) || null;
+  }, [ads, selectedAdId]);
+
+  useEffect(() => {
+    setRejectReason(String(selectedAd?.rejectionReason || ''));
+  }, [selectedAd]);
+
+  useEffect(() => {
+    if (!selectedAd) return;
+    setEditAdError(null);
+    setEditAdForm({
+      ownerUsername: String(selectedAd.ownerUsername || ''),
+      serverName: String(selectedAd.serverName || ''),
+      address: String(selectedAd.address || ''),
+      version: String(selectedAd.version || ''),
+      description: String(selectedAd.description || ''),
+      website: String(selectedAd.website || ''),
+      discord: String(selectedAd.discord || ''),
+      banner: String(selectedAd.banner || ''),
+    });
+  }, [selectedAdId]);
+
+  const saveSelectedAd = async () => {
+    if (!selectedAd) return;
+    setEditAdSaving(true);
+    setEditAdError(null);
+    try {
+      const res = await fetch('/api/admin/partner/ads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adId: selectedAd._id,
+          ownerUsername: editAdForm.ownerUsername,
+          serverName: editAdForm.serverName,
+          address: editAdForm.address,
+          version: editAdForm.version,
+          description: editAdForm.description,
+          website: editAdForm.website,
+          discord: editAdForm.discord,
+          banner: editAdForm.banner,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      await loadAds();
+      await loadBookings();
+      setEditAdOpen(false);
+    } catch (e: any) {
+      setEditAdError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setEditAdSaving(false);
+    }
+  };
+
+  const uploadEditBanner = async (file: File) => {
+    setEditBannerUploading(true);
+    setEditAdError(null);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/uploads/partner-banner', { method: 'POST', body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      const url = String((data as any)?.url || '').trim();
+      if (!url) throw new Error(lang === 'es' ? 'Error al subir imagen' : 'Image upload error');
+      setEditAdForm((p) => ({ ...p, banner: url }));
+    } catch (e: any) {
+      setEditAdError(String(e?.message || (lang === 'es' ? 'Error al subir imagen' : 'Image upload error')));
+    } finally {
+      setEditBannerUploading(false);
+    }
+  };
+
+  const deleteSelectedAd = async () => {
+    if (!selectedAd) return;
+    const ok = window.confirm(
+      lang === 'es'
+        ? '¿Eliminar este anuncio? Si está activo, se quitará del ranking.'
+        : 'Delete this ad? If it is active, it will be removed from the ranking.'
+    );
+    if (!ok) return;
+
+    setEditAdSaving(true);
+    setEditAdError(null);
+    try {
+      const res = await fetch(`/api/admin/partner/ads?adId=${encodeURIComponent(selectedAd._id)}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error' : 'Error')));
+      setSelectedAdId('');
+      await loadAds();
+      await loadBookings();
+      setEditAdOpen(false);
+    } catch (e: any) {
+      setEditAdError(String(e?.message || (lang === 'es' ? 'Error' : 'Error')));
+    } finally {
+      setEditAdSaving(false);
+    }
+  };
+
+  if (sessionStatus === 'loading') {
+    return (
+      <main className="max-w-6xl mx-auto py-10 px-4">
+        <div className="text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Cargando…' : 'Loading…'}</div>
+      </main>
+    );
+  }
+
+  if (sessionStatus !== 'authenticated' || !canAccess) {
+    return (
+      <main className="max-w-6xl mx-auto py-10 px-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{lang === 'es' ? 'Moderación de Partners' : 'Partner Moderation'}</h1>
+        <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+          <div className="text-gray-700 dark:text-gray-300">{lang === 'es' ? 'No autorizado.' : 'Not authorized.'}</div>
+          <div className="mt-4">
+            <Link href="/" className="inline-flex">
+              <Button variant="secondary" size="sm">{lang === 'es' ? 'Volver' : 'Back'}</Button>
+            </Link>
+          </div>
+        </Card>
+      </main>
+    );
+  }
+
+  return (
+    <main className="max-w-6xl mx-auto py-10 px-4">
+      <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25 mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0">
+            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Panel' : 'Panel'}</div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate">{lang === 'es' ? 'Moderación de Partners' : 'Partner Moderation'}</h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mt-2">
+              {lang === 'es'
+                ? `Gestiona anuncios, reservas y precios • Top ${PARTNER_SLOTS} slots`
+                : `Manage ads, bookings and pricing • Top ${PARTNER_SLOTS} slots`}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="secondary" size="sm" onClick={loadAds} disabled={adsLoading}>
+              {adsLoading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : (lang === 'es' ? 'Recargar anuncios' : 'Reload ads')}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={loadBookings} disabled={bookingsLoading}>
+              {bookingsLoading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : (lang === 'es' ? 'Recargar reservas' : 'Reload bookings')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                void loadPricing();
+                setPricingOpen(true);
+              }}
+              disabled={pricingLoading}
+            >
+              {pricingLoading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : (lang === 'es' ? 'Editar precios' : 'Edit pricing')}
+            </Button>
+            {canOverrideSlots ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  void loadOverrides();
+                  void loadApprovedAds();
+                  setOverridesOpen(true);
+                }}
+                disabled={overridesLoading}
+              >
+                {lang === 'es' ? 'Asignación manual' : 'Manual assignment'}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Anuncios pendientes' : 'Pending ads'}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{stats.pending}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Reservas pendientes' : 'Pending bookings'}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{bookingStats.pending}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Reservas activas' : 'Active bookings'}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{bookingStats.active}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
+            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Reservas expiradas' : 'Expired bookings'}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{bookingStats.expired}</div>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 mb-6">
+        <div className="space-y-3">
+          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Secciones' : 'Sections'}</div>
+
+          {([
+            {
+              k: 'ADS' as const,
+              title: lang === 'es' ? 'Anuncios' : 'Ads',
+              desc: lang === 'es' ? 'Revisión, edición y aprobación' : 'Review, edit and approval',
+              icon: FaBullhorn,
+              meta: `${
+                adsStatus === 'PENDING_REVIEW'
+                  ? lang === 'es'
+                    ? 'Pendientes'
+                    : 'Pending'
+                  : adsStatus === 'APPROVED'
+                    ? lang === 'es'
+                      ? 'Aprobados'
+                      : 'Approved'
+                    : lang === 'es'
+                      ? 'Rechazados'
+                      : 'Rejected'
+              }: ${ads.length}`,
+            },
+            {
+              k: 'BOOKINGS' as const,
+              title: lang === 'es' ? 'Reservas' : 'Bookings',
+              desc: lang === 'es' ? 'Pagos, estado y duración' : 'Payments, status and duration',
+              icon: FaCalendarAlt,
+              meta: `${bookingsStatus === 'PENDING_OR_ACTIVE' ? (lang === 'es' ? 'Pend./Act.' : 'Pend./Act.') : bookingsStatus}: ${bookings.length}`,
+            },
+            {
+              k: 'PRICING' as const,
+              title: lang === 'es' ? 'Precios' : 'Pricing',
+              desc: lang === 'es' ? 'Precio por slot y días' : 'Price per slot and days',
+              icon: FaTag,
+              meta: pricing
+                ? lang === 'es'
+                  ? 'Configurado'
+                  : 'Configured'
+                : pricingLoading
+                  ? lang === 'es'
+                    ? 'Cargando…'
+                    : 'Loading…'
+                  : lang === 'es'
+                    ? 'Sin config'
+                    : 'No config',
+            },
+            ...(canOverrideSlots
+              ? ([
+                  {
+                    k: 'OWNER' as const,
+                    title: 'Owner',
+                    desc: lang === 'es' ? 'Overrides y anuncio interno' : 'Overrides and internal ad',
+                    icon: FaCrown,
+                    meta: lang === 'es' ? 'Acciones avanzadas' : 'Advanced actions',
+                  },
+                ] as const)
+              : ([] as const)),
+          ] as const).map((s) => {
+            const Icon = s.icon;
+            const active = tab === s.k;
+            return (
+              <button
+                key={s.k}
+                type="button"
+                onClick={() => setTab(s.k)}
+                className={`w-full text-left rounded-2xl border p-4 transition-colors ${
+                  active
+                    ? 'border-minecraft-grass/30 bg-minecraft-grass/10'
+                    : 'border-gray-200 bg-white hover:bg-gray-50 dark:border-white/10 dark:bg-gray-950/25 dark:hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`h-11 w-11 rounded-xl grid place-items-center border ${
+                      active
+                        ? 'bg-minecraft-grass/15 text-minecraft-grass border-minecraft-grass/30'
+                        : 'bg-gray-50 text-gray-800 border-gray-200 dark:bg-white/5 dark:text-gray-200 dark:border-white/10'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <Icon />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-gray-900 dark:text-white font-bold truncate">{s.title}</div>
+                      {active ? <Badge variant="success">{lang === 'es' ? 'Abierto' : 'Open'}</Badge> : null}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{s.desc}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">{s.meta}</div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="min-w-0 space-y-4">
+
+      {tab === 'ADS' ? (
+        <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div>
+              <div className="text-gray-900 dark:text-white font-bold">{lang === 'es' ? 'Anuncios' : 'Ads'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Aprobar / rechazar solicitudes' : 'Approve / reject requests'}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-44">
+                <Select value={adsStatus} onChange={(e) => setAdsStatus(e.target.value as any)}>
+                  <option value="PENDING_REVIEW">{lang === 'es' ? 'Pendientes' : 'Pending'}</option>
+                  <option value="APPROVED">{lang === 'es' ? 'Aprobados' : 'Approved'}</option>
+                  <option value="REJECTED">{lang === 'es' ? 'Rechazados' : 'Rejected'}</option>
+                </Select>
+              </div>
+              <Button variant="secondary" size="sm" onClick={loadAds} disabled={adsLoading}>{lang === 'es' ? 'Recargar' : 'Reload'}</Button>
+            </div>
+          </div>
+
+          {adsError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{adsError}</div> : null}
+
+          {!ads.length ? (
+            <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Sin anuncios para este filtro.' : 'No ads for this filter.'}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-3">
+              <div className="rounded-xl border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-white/5 max-h-[560px] overflow-auto">
+                <div className="space-y-1">
+                  {ads.map((a) => {
+                    const active = a._id === selectedAdId;
+                    return (
+                      <button
+                        key={a._id}
+                        type="button"
+                        onClick={() => setSelectedAdId(a._id)}
+                        className={`w-full rounded-lg border px-3 py-2 text-left transition-colors ${
+                          active
+                            ? 'border-minecraft-grass/30 bg-minecraft-grass/10'
+                            : 'border-transparent hover:bg-gray-50 dark:hover:bg-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="font-semibold text-gray-900 dark:text-white truncate">{a.serverName}</div>
+                          {adBadge(a.status, lang)}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{a.address}{a.version ? ` • ${a.version}` : ''}</div>
+                        <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{a.ownerUsername}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/5">
+                {!selectedAd ? (
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Selecciona una solicitud.' : 'Select a request.'}</div>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <div className="font-semibold text-gray-900 dark:text-white truncate">{selectedAd.serverName}</div>
+                          {adBadge(selectedAd.status, lang)}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {selectedAd.address}{selectedAd.version ? ` • ${selectedAd.version}` : ''}
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Owner' : 'Owner'}: {selectedAd.ownerUsername}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">UserId: {selectedAd.userId}</div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => decide(selectedAd._id, 'APPROVE')}
+                          disabled={adsLoading || actionLoading || selectedAd.status === 'APPROVED'}
+                        >
+                          {actionLoading ? (lang === 'es' ? 'Procesando…' : 'Processing…') : (lang === 'es' ? 'Aprobar' : 'Approve')}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => decide(selectedAd._id, 'REJECT')}
+                          disabled={adsLoading || actionLoading || selectedAd.status === 'REJECTED' || !String(rejectReason || '').trim()}
+                        >
+                          {lang === 'es' ? 'Rechazar' : 'Reject'}
+                        </Button>
+                        {role === 'OWNER' ? (
+                          <Button variant="secondary" size="sm" onClick={() => setEditAdOpen(true)} disabled={!selectedAd}>
+                            {lang === 'es' ? 'Editar…' : 'Edit…'}
+                          </Button>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {selectedAd.status !== 'APPROVED' ? (
+                      <div className="mt-4">
+                        <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Motivo de rechazo (obligatorio para rechazar)' : 'Rejection reason (required to reject)'}</label>
+                        <Textarea
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          rows={3}
+                          maxLength={300}
+                          placeholder={lang === 'es' ? 'Ej: Banner inválido, faltan datos, etc.' : 'Ex: Invalid banner, missing data, etc.'}
+                        />
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{String(rejectReason || '').length}/300</div>
+                      </div>
+                    ) : null}
+
+                    {selectedAd.status === 'REJECTED' && selectedAd.rejectionReason ? (
+                      <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+                        <div className="font-semibold">{lang === 'es' ? 'Motivo de rechazo' : 'Rejection reason'}</div>
+                        <div className="opacity-90">{selectedAd.rejectionReason}</div>
+                      </div>
+                    ) : null}
+
+                    {String(selectedAd.submissionNote || '').trim() ? (
+                      <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+                        <div className="font-semibold">{lang === 'es' ? 'Nota de solicitud' : 'Request note'}</div>
+                        <div className="mt-1 whitespace-pre-wrap">{String(selectedAd.submissionNote || '').trim()}</div>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-4 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedAd.description}</div>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+                      {selectedAd.website ? (
+                        <a href={selectedAd.website} target="_blank" rel="noreferrer" className="text-minecraft-grass hover:underline">
+                          {lang === 'es' ? 'Web' : 'Web'}
+                        </a>
+                      ) : null}
+                      {selectedAd.discord ? (
+                        <a href={selectedAd.discord} target="_blank" rel="noreferrer" className="text-minecraft-grass hover:underline">
+                          Discord
+                        </a>
+                      ) : null}
+                      {selectedAd.banner ? (
+                        <a href={selectedAd.banner} target="_blank" rel="noreferrer" className="text-minecraft-grass hover:underline">
+                          {lang === 'es' ? 'Banner' : 'Banner'}
+                        </a>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                      {lang === 'es' ? 'Creado' : 'Created'}: {formatDateTime(selectedAd.createdAt, dateLocale)} • {lang === 'es' ? 'Actualizado' : 'Updated'}: {formatDateTime(selectedAd.updatedAt, dateLocale)}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </Card>
+      ) : null}
+
+      {tab === 'BOOKINGS' ? (
+        <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div className="text-gray-900 dark:text-white font-bold">{lang === 'es' ? 'Reservas' : 'Bookings'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Historial y estado de pagos' : 'Payment history and status'}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-44">
+                <Select value={bookingsStatus} onChange={(e) => setBookingsStatus(e.target.value as any)}>
+                  <option value="PENDING_OR_ACTIVE">{lang === 'es' ? 'Pendientes + Activas' : 'Pending + Active'}</option>
+                  <option value="PENDING">{lang === 'es' ? 'Pendientes' : 'Pending'}</option>
+                  <option value="ACTIVE">{lang === 'es' ? 'Activas' : 'Active'}</option>
+                  <option value="EXPIRED">{lang === 'es' ? 'Expiradas' : 'Expired'}</option>
+                  <option value="CANCELED">{lang === 'es' ? 'Canceladas' : 'Canceled'}</option>
+                </Select>
+              </div>
+              <Button variant="secondary" size="sm" onClick={loadBookings} disabled={bookingsLoading}>{lang === 'es' ? 'Recargar' : 'Reload'}</Button>
+            </div>
+          </div>
+
+          {bookingsError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{bookingsError}</div> : null}
+
+          {!bookings.length ? (
+            <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Sin reservas.' : 'No bookings.'}</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-gray-500 dark:text-gray-400">
+                    <th className="py-2 pr-4">{lang === 'es' ? 'Estado' : 'Status'}</th>
+                    <th className="py-2 pr-4">Slot</th>
+                    <th className="py-2 pr-4">{lang === 'es' ? 'Anuncio' : 'Ad'}</th>
+                    <th className="py-2 pr-4">User</th>
+                    <th className="py-2 pr-4">{lang === 'es' ? 'Pago' : 'Payment'}</th>
+                    <th className="py-2 pr-4">{lang === 'es' ? 'Nota' : 'Note'}</th>
+                    <th className="py-2 pr-4">{lang === 'es' ? 'Fin' : 'End'}</th>
+                    <th className="py-2">{lang === 'es' ? 'Creada' : 'Created'}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-white/10">
+                  {bookings.map((b) => (
+                    <tr key={b._id} className="text-gray-700 dark:text-gray-200">
+                      <td className="py-3 pr-4">{bookingBadge(b.status, lang)}</td>
+                      <td className="py-3 pr-4 font-semibold">{slotLabel(Number(b.slot), lang)}</td>
+                      <td className="py-3 pr-4">
+                        <div className="font-medium text-gray-900 dark:text-white">{b.ad?.serverName || '—'}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{b.ad?.ownerUsername || ''}</div>
+                      </td>
+                      <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400">{b.userId}</td>
+                      <td className="py-3 pr-4">
+                        {String(b.provider) === 'FREE'
+                          ? (lang === 'es' ? 'GRATIS' : 'FREE')
+                          : `${b.provider} • ${formatPrice(Number(b.totalPrice || 0), dateLocale, String(b.currency || 'EUR'))}`}
+                      </td>
+                      <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400 max-w-[360px]">
+                        {String(b.requestNote || '').trim() ? String(b.requestNote).trim() : '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400">{b.endsAt ? formatDateTime(b.endsAt, dateLocale) : '—'}</td>
+                      <td className="py-3 text-xs text-gray-500 dark:text-gray-400">{formatDateTime(b.createdAt, dateLocale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      ) : null}
+
+      {tab === 'PRICING' ? (
+        <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div>
+              <div className="text-gray-900 dark:text-white font-bold">{lang === 'es' ? 'Precios de Partner' : 'Partner Pricing'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Precios fijos por slot y duración' : 'Fixed prices by slot and duration'}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={loadPricing} disabled={pricingLoading || pricingSaving}>{lang === 'es' ? 'Recargar' : 'Reload'}</Button>
+              <Button variant="primary" size="sm" onClick={() => setPricingOpen(true)} disabled={pricingLoading || !pricing}>{lang === 'es' ? 'Editar…' : 'Edit…'}</Button>
+            </div>
+          </div>
+
+          {pricingError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{pricingError}</div> : null}
+
+          {!pricing ? (
+            <div className="text-sm text-gray-600 dark:text-gray-400">{pricingLoading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : (lang === 'es' ? 'No hay configuración.' : 'No configuration.')}</div>
+          ) : (
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+              <div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-semibold">{lang === 'es' ? 'Precios fijos por días' : 'Fixed daily prices'}</span> (1–{PARTNER_MAX_DAYS})
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Vista previa rápida' : 'Quick preview'}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-28">
+                  <Select value={String(pricingDay)} onChange={(e) => setPricingDay(Number(e.target.value || 1))}>
+                    {Array.from({ length: PARTNER_MAX_DAYS }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={String(d)}>{d}d</option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  VIP {Number(pricing.vipTotalsEur?.[pricingDay - 1] || 0)}€ • Slot #1 {Number(pricing.slotTotalsEur?.[0]?.[pricingDay - 1] || 0)}€ • Slot #10 {Number(pricing.slotTotalsEur?.[9]?.[pricingDay - 1] || 0)}€
+                </div>
+              </div>
+            </div>
+          )}
+        </Card>
+      ) : null}
+
+      {tab === 'OWNER' && canOverrideSlots ? (
+        <div className="space-y-4">
+          <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="text-gray-900 dark:text-white font-bold">{lang === 'es' ? 'Asignación manual de slots' : 'Manual slot assignment'}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Solo OWNER • Prioridad sobre reservas activas' : 'OWNER only • Priority over active bookings'}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" size="sm" onClick={loadOverrides} disabled={overridesLoading || overridesSaving}>{lang === 'es' ? 'Recargar' : 'Reload'}</Button>
+                <Button variant="primary" size="sm" onClick={() => setOverridesOpen(true)} disabled={overridesLoading}>{lang === 'es' ? 'Editar…' : 'Edit…'}</Button>
+              </div>
+            </div>
+
+            {overridesError ? <div className="mt-3 text-sm text-red-600 dark:text-red-300">{overridesError}</div> : null}
+          </Card>
+
+          <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="text-gray-900 dark:text-white font-bold">{lang === 'es' ? 'Crear anuncio interno' : 'Create internal ad'}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Solo OWNER • Para asignación manual' : 'OWNER only • For manual assignment'}</div>
+              </div>
+              <Button variant="primary" size="sm" onClick={() => setSystemAdOpen(true)}>{lang === 'es' ? 'Crear…' : 'Create…'}</Button>
+            </div>
+
+            {systemAdError ? <div className="mt-3 text-sm text-red-600 dark:text-red-300">{systemAdError}</div> : null}
+          </Card>
+        </div>
+      ) : null}
+
+        </div>
+      </div>
+
+      <Modal open={pricingOpen} title={lang === 'es' ? 'Editar precios' : 'Edit pricing'} closeLabel={lang === 'es' ? 'Cerrar' : 'Close'} onClose={() => setPricingOpen(false)}>
+        {pricingError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{pricingError}</div> : null}
+
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Día' : 'Day'}</label>
+              <Select value={String(pricingDay)} onChange={(e) => setPricingDay(Number(e.target.value || 1))}>
+                {Array.from({ length: PARTNER_MAX_DAYS }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={String(d)}>{d} {lang === 'es' ? `día${d === 1 ? '' : 's'}` : `day${d === 1 ? '' : 's'}`}</option>
+                ))}
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setPricingOpen(false)} disabled={pricingSaving}>{lang === 'es' ? 'Cancelar' : 'Cancel'}</Button>
+              <Button variant="primary" size="sm" onClick={savePricing} disabled={!pricing || pricingLoading || pricingSaving}>
+                {pricingSaving ? (lang === 'es' ? 'Guardando…' : 'Saving…') : (lang === 'es' ? 'Guardar' : 'Save')}
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {lang === 'es' ? 'Editas el precio total de ese día para VIP y para cada slot (EUR).' : 'You edit the total price of that day for VIP and each slot (EUR).'}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {(() => {
+              const dayIdx = Math.min(PARTNER_MAX_DAYS, Math.max(1, pricingDay)) - 1;
+              const v = Number(pricing?.vipTotalsEur?.[dayIdx] ?? 0);
+              return (
+                <div>
+                  <label className="text-xs text-gray-600 dark:text-gray-400">VIP</label>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    value={String(Number.isFinite(v) ? v : 0)}
+                    onChange={(e) => {
+                      const nextRaw = e.target.value;
+                      const cleaned = nextRaw.trim();
+                      const nextNum = cleaned === '' ? 0 : Number(cleaned.replace(',', '.'));
+                      const next = Number.isFinite(nextNum) ? Math.max(0, Math.round(nextNum * 100) / 100) : 0;
+                      setPricing((p) => {
+                        if (!p) return p;
+                        const vip = Array.isArray(p.vipTotalsEur) ? [...p.vipTotalsEur] : [];
+                        while (vip.length < PARTNER_MAX_DAYS) vip.push(0);
+                        vip[dayIdx] = next;
+                        return { ...p, vipTotalsEur: vip };
+                      });
+                    }}
+                    disabled={pricingSaving}
+                  />
+                </div>
+              );
+            })()}
+            {Array.from({ length: PARTNER_SLOTS }, (_, i) => i + 1).map((slot) => {
+              const slotIdx = slot - 1;
+              const dayIdx = Math.min(PARTNER_MAX_DAYS, Math.max(1, pricingDay)) - 1;
+              const v = Number(pricing?.slotTotalsEur?.[slotIdx]?.[dayIdx] ?? 0);
+              return (
+                <div key={slot}>
+                  <label className="text-xs text-gray-600 dark:text-gray-400">Slot #{slot}</label>
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    value={String(Number.isFinite(v) ? v : 0)}
+                    onChange={(e) => {
+                      const nextRaw = e.target.value;
+                      const cleaned = nextRaw.trim();
+                      const nextNum = cleaned === '' ? 0 : Number(cleaned.replace(',', '.'));
+                      const next = Number.isFinite(nextNum) ? Math.max(0, Math.round(nextNum * 100) / 100) : 0;
+                      setPricing((p) => {
+                        if (!p) return p;
+                        const totals = Array.isArray(p.slotTotalsEur) ? p.slotTotalsEur.map((r) => (Array.isArray(r) ? [...r] : [])) : [];
+                        while (totals.length < PARTNER_SLOTS) totals.push(Array(PARTNER_MAX_DAYS).fill(0));
+                        for (let si = 0; si < PARTNER_SLOTS; si++) {
+                          while (totals[si].length < PARTNER_MAX_DAYS) totals[si].push(0);
+                        }
+                        totals[slotIdx][dayIdx] = next;
+                        return { ...p, slotTotalsEur: totals };
+                      });
+                    }}
+                    disabled={pricingSaving}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </Modal>
+
+      <Modal open={overridesOpen} title={lang === 'es' ? 'Asignación manual de slots' : 'Manual slot assignment'} closeLabel={lang === 'es' ? 'Cerrar' : 'Close'} onClose={() => setOverridesOpen(false)}>
+        {overridesError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{overridesError}</div> : null}
+
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          {lang === 'es' ? `Solo afecta a destacados: VIP + #${PARTNER_PAID_MAX_SLOT}` : `Only affects featured placements: VIP + #${PARTNER_PAID_MAX_SLOT}`}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 mb-4">
+          <Button variant="secondary" size="sm" onClick={() => setOverridesOpen(false)} disabled={overridesSaving}>{lang === 'es' ? 'Cancelar' : 'Cancel'}</Button>
+          <Button variant="primary" size="sm" onClick={saveOverrides} disabled={overridesLoading || overridesSaving}>
+            {overridesSaving ? (lang === 'es' ? 'Guardando…' : 'Saving…') : (lang === 'es' ? 'Guardar' : 'Save')}
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'VIP (fijo arriba)' : 'VIP (fixed at top)'}</label>
+            <Select
+              value={String(vipOverride || '')}
+              onChange={(e) => setVipOverride(String(e.target.value || '').trim())}
+              disabled={overridesLoading || overridesSaving}
+            >
+              <option value="">{lang === 'es' ? '— Automático (reserva activa) —' : '— Automatic (active booking) —'}</option>
+              {approvedAds.map((a) => (
+                <option key={a._id} value={a._id}>
+                  {a.serverName} — {a.ownerUsername}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          {Array.from({ length: PARTNER_PAID_MAX_SLOT }, (_, i) => i + 1).map((slot) => {
+            const idx = slot - 1;
+            const value = String(slotOverrides[idx] || '');
+            return (
+              <div key={slot}>
+                <label className="text-xs text-gray-600 dark:text-gray-400">Slot #{slot}</label>
+                <Select
+                  value={value}
+                  onChange={(e) => {
+                    const nextId = String(e.target.value || '').trim();
+                    setSlotOverrides((prev) => {
+                      const copy = [...prev];
+                      copy[idx] = nextId;
+                      return copy;
+                    });
+                  }}
+                  disabled={overridesLoading || overridesSaving}
+                >
+                  <option value="">{lang === 'es' ? '— Automático (reserva activa) —' : '— Automatic (active booking) —'}</option>
+                  {approvedAds.map((a) => (
+                    <option key={a._id} value={a._id}>
+                      {a.serverName} — {a.ownerUsername}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            );
+          })}
+        </div>
+      </Modal>
+
+      <Modal open={systemAdOpen} title={lang === 'es' ? 'Crear anuncio (OWNER)' : 'Create ad (OWNER)'} closeLabel={lang === 'es' ? 'Cerrar' : 'Close'} onClose={() => setSystemAdOpen(false)}>
+        {systemAdError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{systemAdError}</div> : null}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Autor (ownerUsername)' : 'Author (ownerUsername)'}</label>
+            <Input value={systemAdForm.ownerUsername} onChange={(e) => setSystemAdForm((p) => ({ ...p, ownerUsername: e.target.value }))} />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Versión (opcional)' : 'Version (optional)'}</label>
+            <Input value={systemAdForm.version} onChange={(e) => setSystemAdForm((p) => ({ ...p, version: e.target.value }))} placeholder="1.20.x" />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Nombre del servidor' : 'Server name'}</label>
+            <Input value={systemAdForm.serverName} onChange={(e) => setSystemAdForm((p) => ({ ...p, serverName: e.target.value }))} placeholder={lang === 'es' ? 'Mi servidor' : 'My server'} />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'IP / Dominio' : 'IP / Domain'}</label>
+            <Input value={systemAdForm.address} onChange={(e) => setSystemAdForm((p) => ({ ...p, address: e.target.value }))} placeholder={lang === 'es' ? 'play.ejemplo.com' : 'play.example.com'} />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Banner (URL, opcional)' : 'Banner (URL, optional)'}</label>
+            <Input value={systemAdForm.banner} onChange={(e) => setSystemAdForm((p) => ({ ...p, banner: e.target.value }))} placeholder="https://..." />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Website (optional)' : 'Website (optional)'}</label>
+            <Input value={systemAdForm.website} onChange={(e) => setSystemAdForm((p) => ({ ...p, website: e.target.value }))} placeholder="https://..." />
+          </div>
+          <div>
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Discord (opcional)' : 'Discord (optional)'}</label>
+            <Input value={systemAdForm.discord} onChange={(e) => setSystemAdForm((p) => ({ ...p, discord: e.target.value }))} placeholder="https://discord.gg/..." />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Descripción' : 'Description'}</label>
+            <Textarea
+              value={systemAdForm.description}
+              onChange={(e) => setSystemAdForm((p) => ({ ...p, description: e.target.value }))}
+              placeholder={lang === 'es' ? 'Cuenta qué ofrece tu servidor, modalidad, comunidad...' : 'Describe what your server offers, game mode, community...'}
+              rows={4}
+              minLength={20}
+              maxLength={500}
+            />
+            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{systemAdForm.description.length}/500</div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setSystemAdOpen(false)} disabled={systemAdCreating}>{lang === 'es' ? 'Cancelar' : 'Cancel'}</Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={createSystemAd}
+            disabled={systemAdCreating || !systemAdForm.serverName.trim() || !systemAdForm.address.trim() || systemAdForm.description.trim().length < 20}
+          >
+            {systemAdCreating ? (lang === 'es' ? 'Creando…' : 'Creating…') : (lang === 'es' ? 'Crear' : 'Create')}
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal open={editAdOpen} title={lang === 'es' ? 'Editar anuncio' : 'Edit ad'} closeLabel={lang === 'es' ? 'Cerrar' : 'Close'} onClose={() => setEditAdOpen(false)}>
+        {!selectedAd ? (
+          <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Selecciona un anuncio para editar.' : 'Select an ad to edit.'}</div>
+        ) : (
+          <>
+            {editAdError ? <div className="text-sm text-red-600 dark:text-red-300 mb-3">{editAdError}</div> : null}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">Owner</label>
+                <Input value={editAdForm.ownerUsername} onChange={(e) => setEditAdForm((p) => ({ ...p, ownerUsername: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Nombre del servidor' : 'Server name'}</label>
+                <Input value={editAdForm.serverName} onChange={(e) => setEditAdForm((p) => ({ ...p, serverName: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'IP / Dominio' : 'IP / Domain'}</label>
+                <Input value={editAdForm.address} onChange={(e) => setEditAdForm((p) => ({ ...p, address: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Versión (opcional)' : 'Version (optional)'}</label>
+                <Input value={editAdForm.version} onChange={(e) => setEditAdForm((p) => ({ ...p, version: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Web (opcional)' : 'Website (optional)'}</label>
+                <Input value={editAdForm.website} onChange={(e) => setEditAdForm((p) => ({ ...p, website: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Discord (opcional)' : 'Discord (optional)'}</label>
+                <Input value={editAdForm.discord} onChange={(e) => setEditAdForm((p) => ({ ...p, discord: e.target.value }))} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Banner (archivo, opcional)' : 'Banner (file, optional)'}</label>
+                <Input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  disabled={editAdSaving || editBannerUploading}
+                  onChange={(e) => {
+                    const file = e.currentTarget.files?.[0];
+                    e.currentTarget.value = '';
+                    if (!file) return;
+                    void uploadEditBanner(file);
+                  }}
+                />
+                <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  {editBannerUploading ? <span>{lang === 'es' ? 'Subiendo…' : 'Uploading…'}</span> : null}
+                  {!editBannerUploading && String(editAdForm.banner || '').trim() ? (
+                    <>
+                      <a href={String(editAdForm.banner || '').trim()} target="_blank" rel="noreferrer" className="text-minecraft-grass hover:underline">{lang === 'es' ? 'Ver' : 'View'}</a>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        type="button"
+                        onClick={() => setEditAdForm((p) => ({ ...p, banner: '' }))}
+                        disabled={editAdSaving}
+                      >
+                        {lang === 'es' ? 'Quitar' : 'Remove'}
+                      </Button>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Descripción' : 'Description'}</label>
+                <Textarea value={editAdForm.description} onChange={(e) => setEditAdForm((p) => ({ ...p, description: e.target.value }))} rows={4} maxLength={500} />
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{editAdForm.description.length}/500</div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setEditAdOpen(false)} disabled={editAdSaving}>{lang === 'es' ? 'Cancelar' : 'Cancel'}</Button>
+              <Button variant="secondary" size="sm" onClick={deleteSelectedAd} disabled={editAdSaving || adsLoading || actionLoading}>
+                {lang === 'es' ? 'Eliminar' : 'Delete'}
+              </Button>
+              <Button variant="primary" size="sm" onClick={saveSelectedAd} disabled={editAdSaving || adsLoading || actionLoading}>
+                {editAdSaving ? (lang === 'es' ? 'Guardando…' : 'Saving…') : (lang === 'es' ? 'Guardar' : 'Save')}
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
+    </main>
+  );
+}
