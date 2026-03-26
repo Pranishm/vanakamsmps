@@ -1,8 +1,8 @@
 <p align="center">
-	<img src="public/icon.png" alt="999Wrld Network" width="96" height="96" />
+	<img src="public/icon.png" alt="Vanakamsmps" width="96" height="96" />
 </p>
 
-<h1 align="center">999Wrld Network</h1>
+<h1 align="center">Vanakamsmps</h1>
 
 <p align="center">
 	Full-featured website for a Minecraft server with a <strong>community / social network</strong> vibe:
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-	<a href="https://www.999wrldnetwork.es"><strong>Live site</strong></a>
+	<a href="https://vanakamsmps.gamer.gd"><strong>Live site</strong></a>
 	·
 	<a href="SETUP.md"><strong>Setup</strong></a>
 	·
@@ -466,4 +466,3 @@ Additional documentation:
 - If a secret leaks, rotate credentials immediately.
 - Vulnerability reporting: see [SECURITY.md](SECURITY.md).
 
-<p align="center">Made by KayXDev with ❤️</p>
