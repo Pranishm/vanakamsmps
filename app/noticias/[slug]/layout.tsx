@@ -25,8 +25,9 @@ function stripMarkdown(text: string) {
     .trim();
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
   if (!post) {
     return {
       title: 'Noticia no encontrada',
@@ -58,15 +59,16 @@ export default async function NoticiaSlugLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const post = await getPost(params.slug);
+  const { slug } = await params;
+  const post = await getPost(slug);
   if (!post) notFound();
 
   const url = absoluteUrl(`/noticias/${encodeURIComponent(String(post.slug))}`);
   const publishedAt = post.publishedAt ? new Date(post.publishedAt) : null;
   const modifiedAt = post.updatedAt ? new Date(post.updatedAt) : publishedAt;
-  const nonce = headers().get('x-csp-nonce') || undefined;
+  const nonce = (await headers()).get('x-csp-nonce') || undefined;
 
   const jsonLd = {
     '@context': 'https://schema.org',

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/session';
 import dbConnect from '@/lib/mongodb';
@@ -12,17 +12,18 @@ const replySchema = z.object({
 });
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
     const body = await request.json();
+    const { id } = await params;
     const validated = replySchema.parse(body);
 
     await dbConnect();
 
-    const ticket = await Ticket.findById(params.id);
+    const ticket = await Ticket.findById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket no encontrado' }, { status: 404 });
     }
@@ -38,7 +39,7 @@ export async function POST(
     }
 
     const reply = await TicketReply.create({
-      ticketId: params.id,
+      ticketId: id,
       userId: user.id,
       username: user.name,
       message: validated.message,
@@ -50,7 +51,7 @@ export async function POST(
         userId: String(ticket.userId),
         title: 'Respuesta en tu ticket',
         message: 'El staff respondió a tu ticket. Entra a soporte para ver el mensaje.',
-        href: `/soporte/${params.id}`,
+        href: `/soporte/${id}`,
         type: 'INFO',
       });
     }

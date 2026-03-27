@@ -1,13 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ForumPost from '@/models/ForumPost';
 
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
 
+    const { id } = await params;
     const updated = await ForumPost.findByIdAndUpdate(
-      params.id,
+      id,
       { $inc: { views: 1 } },
       { returnDocument: 'after' }
     ).select('views');

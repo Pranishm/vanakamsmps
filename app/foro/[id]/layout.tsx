@@ -23,8 +23,9 @@ function excerpt(text: string, max = 160) {
   return clean.slice(0, max - 1).trimEnd() + '…';
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const post = await getPost(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const post = await getPost(id);
   if (!post) {
     return {
       title: 'Publicación no encontrada',
@@ -34,13 +35,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
   const title = String(post.title || '').trim() || 'Foro';
   const description = excerpt(post.content || '', 160) || 'Publicación del foro de 999Wrld Network.';
-  const url = absoluteUrl(`/foro/${encodeURIComponent(params.id)}`);
+  const url = absoluteUrl(`/foro/${encodeURIComponent(id)}`);
 
   return {
     ...buildPageMetadata({
       title,
       description,
-      path: `/foro/${encodeURIComponent(params.id)}`,
+      path: `/foro/${encodeURIComponent(id)}`,
       type: 'article',
       keywords: ['foro minecraft', 'discusion minecraft', String(post.authorUsername || '')],
     }),
@@ -52,15 +53,16 @@ export default async function ForoIdLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const post = await getPost(params.id);
+  const { id } = await params;
+  const post = await getPost(id);
   if (!post) notFound();
 
-  const url = absoluteUrl(`/foro/${encodeURIComponent(params.id)}`);
+  const url = absoluteUrl(`/foro/${encodeURIComponent(id)}`);
   const createdAt = post.createdAt ? new Date(post.createdAt) : null;
   const modifiedAt = post.updatedAt ? new Date(post.updatedAt) : createdAt;
-  const nonce = headers().get('x-csp-nonce') || undefined;
+  const nonce = (await headers()).get('x-csp-nonce') || undefined;
 
   const jsonLd = {
     '@context': 'https://schema.org',

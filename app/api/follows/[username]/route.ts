@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Follow from '@/models/Follow';
@@ -18,10 +18,11 @@ async function findUserIdByUsername(usernameParam: string) {
   return user ? { id: user._id.toString(), username: (user as any).username as string } : null;
 }
 
-export async function POST(_request: Request, { params }: { params: { username: string } }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
     const currentUser = await requireAuth();
-    const usernameParam = typeof params.username === 'string' ? params.username.trim() : '';
+    const { username } = await params;
+    const usernameParam = typeof username === 'string' ? username.trim() : '';
     if (!usernameParam) {
       return NextResponse.json({ error: 'Username inválido' }, { status: 400 });
     }
@@ -74,10 +75,11 @@ export async function POST(_request: Request, { params }: { params: { username: 
   }
 }
 
-export async function DELETE(_request: Request, { params }: { params: { username: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
     const currentUser = await requireAuth();
-    const usernameParam = typeof params.username === 'string' ? params.username.trim() : '';
+    const { username } = await params;
+    const usernameParam = typeof username === 'string' ? username.trim() : '';
     if (!usernameParam) {
       return NextResponse.json({ error: 'Username inválido' }, { status: 400 });
     }

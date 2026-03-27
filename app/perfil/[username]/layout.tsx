@@ -16,13 +16,14 @@ const getPublicProfile = cache(async (username: string) => {
     .lean();
 });
 
-export async function generateMetadata({ params }: { params: { username: string } }): Promise<Metadata> {
-  const profile = await getPublicProfile(params.username);
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+  const { username: usernameParam } = await params;
+  const profile = await getPublicProfile(usernameParam);
   if (!profile) {
     return { title: 'Perfil no encontrado', robots: { index: false, follow: false } };
   }
 
-  const username = String((profile as any).username || params.username).trim();
+  const username = String((profile as any).username || usernameParam).trim();
   const displayName = String((profile as any).displayName || '').trim();
   const heading = displayName || username;
   const description = `${heading} en ${getSiteName()}. Perfil público de la comunidad con actividad y presencia dentro del servidor.`;
@@ -38,21 +39,22 @@ export async function generateMetadata({ params }: { params: { username: string 
   });
 }
 
-export default function PublicPerfilLayout({
+export default async function PublicPerfilLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
-  const nonce = headers().get('x-csp-nonce') || undefined;
-  const profileUrl = absoluteUrl(`/perfil/${encodeURIComponent(params.username)}`);
+  const { username } = await params;
+  const nonce = (await headers()).get('x-csp-nonce') || undefined;
+  const profileUrl = absoluteUrl(`/perfil/${encodeURIComponent(username)}`);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     mainEntity: {
       '@type': 'Person',
-      name: params.username,
+      name: username,
       url: profileUrl,
     },
     url: profileUrl,
@@ -61,7 +63,7 @@ export default function PublicPerfilLayout({
   return (
     <>
       <SeoJsonLd data={jsonLd} nonce={nonce} />
-      <PublicProfileShell username={params.username}>{children}</PublicProfileShell>
+      <PublicProfileShell username={username}>{children}</PublicProfileShell>
     </>
   );
 }

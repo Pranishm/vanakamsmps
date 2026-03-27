@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/session';
 import dbConnect from '@/lib/mongodb';
 import Ticket from '@/models/Ticket';
@@ -42,11 +42,12 @@ function isStaffRole(role?: string) {
 }
 
 export async function POST(
-  _request: Request,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
+    const { id } = await params;
 
     const enabled = parseBool(process.env.TICKETS_AI_ENABLED, true);
     if (!enabled) {
@@ -80,7 +81,7 @@ export async function POST(
 
     await dbConnect();
 
-    const ticket = await Ticket.findById(params.id);
+    const ticket = await Ticket.findById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket no encontrado' }, { status: 404 });
     }
@@ -96,13 +97,13 @@ export async function POST(
     }
 
     // Avoid loops / spam: only reply if the latest message is from the user.
-    const latest = await TicketReply.findOne({ ticketId: params.id }).sort({ createdAt: -1 }).lean();
+    const latest = await TicketReply.findOne({ ticketId: id }).sort({ createdAt: -1 }).lean();
     if (latest && (latest as any).isStaff) {
       return NextResponse.json({ ok: false, skipped: 'latest_is_staff' }, { status: 200 });
     }
 
     // Cooldown between AI replies.
-    const lastAi = await TicketReply.findOne({ ticketId: params.id, isAi: true }).sort({ createdAt: -1 }).lean();
+    const lastAi = await TicketReply.findOne({ ticketId: id, isAi: true }).sort({ createdAt: -1 }).lean();
     if (lastAi?.createdAt) {
       const elapsedMs = Date.now() - new Date(lastAi.createdAt as any).getTime();
       if (elapsedMs < 20_000) {
@@ -110,7 +111,7 @@ export async function POST(
       }
     }
 
-    const replies = await TicketReply.find({ ticketId: params.id }).sort({ createdAt: 1 }).lean();
+    const replies = await TicketReply.find({ ticketId: id }).sort({ createdAt: 1 }).lean();
 
     const convo = [
       {
@@ -193,7 +194,7 @@ export async function POST(
     }
 
     const reply = await TicketReply.create({
-      ticketId: params.id,
+      ticketId: id,
       userId: 'ai',
       username: 'IA',
       message: replyText,

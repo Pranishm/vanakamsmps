@@ -5,9 +5,10 @@ import { cookies } from 'next/headers';
 import { getLangFromCookieStore } from '@/lib/i18n';
 import { Badge, Card } from '@/components/ui';
 
-export default function TermsPage() {
+export default async function TermsPage() {
   const updatedAt = '2026-02-27';
-  const lang = getLangFromCookieStore(cookies());
+  const cookieStore = await cookies();
+  const lang = getLangFromCookieStore(cookieStore);
 
   const copy =
     lang === 'en'

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ForumReply from '@/models/ForumReply';
 import ForumPost from '@/models/ForumPost';
@@ -11,31 +11,32 @@ function escapeRegex(text: string) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
 
+    const { id } = await params;
     const [threadReplies, legacyReplies] = await Promise.all([
       ForumPost.find({
         $or: [
-          { rootId: params.id, parentId: { $ne: null } },
+          { rootId: id, parentId: { $ne: null } },
           // compat: replies viejos que no guardaban rootId
-          { rootId: null, parentId: params.id },
+          { rootId: null, parentId: id },
         ],
       })
         .select('-likedBy')
         .sort({ createdAt: 1 })
         .limit(500)
         .lean(),
-      ForumReply.find({ postId: params.id }).sort({ createdAt: 1 }).limit(500).lean(),
+      ForumReply.find({ postId: id }).sort({ createdAt: 1 }).limit(500).lean(),
     ]);
 
     const normalized = [
       ...threadReplies.map((r: any) => ({
         _id: String(r._id),
-        postId: params.id,
+        postId: id,
         rootId: typeof r.rootId === 'string' ? r.rootId : null,
-        parentId: typeof r.parentId === 'string' ? r.parentId : params.id,
+        parentId: typeof r.parentId === 'string' ? r.parentId : id,
         userId: String(r.authorId || ''),
         username: String(r.authorUsername || ''),
         content: String(r.content || ''),
@@ -47,9 +48,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       })),
       ...legacyReplies.map((r: any) => ({
         _id: String(r._id),
-        postId: params.id,
+        postId: id,
         rootId: null,
-        parentId: params.id,
+        parentId: id,
         userId: String(r.userId || ''),
         username: String(r.username || ''),
         content: String(r.content || ''),
@@ -112,14 +113,15 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     const body = await request.json().catch(() => ({}));
 
+    const { id } = await params;
     const content = typeof body.content === 'string' ? body.content.trim() : '';
     const parentIdRaw = typeof (body as any).parentId === 'string' ? ((body as any).parentId as string).trim() : '';
-    const parentId = parentIdRaw || params.id;
+    const parentId = parentIdRaw || id;
     const mediaRaw = Array.isArray((body as any).media) ? (body as any).media : [];
     const media = mediaRaw
       .filter((u: any) => typeof u === 'string')
@@ -133,20 +135,20 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     await dbConnect();
 
-    const post = await ForumPost.findById(params.id).select('_id authorId title').lean();
+    const post = await ForumPost.findById(id).select('_id authorId title').lean();
     if (!post) {
       return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
     }
 
-    if (parentId !== params.id) {
+    if (parentId !== id) {
       const parent = await ForumPost.findById(parentId).select('_id rootId parentId').lean();
       if (!parent) {
         return NextResponse.json({ error: 'Comentario no encontrado' }, { status: 404 });
       }
 
       const belongsToThread =
-        String((parent as any).rootId || '') === params.id ||
-        (String((parent as any).rootId || '') === '' && String((parent as any).parentId || '') === params.id);
+        String((parent as any).rootId || '') === id ||
+        (String((parent as any).rootId || '') === '' && String((parent as any).parentId || '') === id);
 
       if (!belongsToThread) {
         return NextResponse.json({ error: 'Comentario inválido' }, { status: 400 });
@@ -161,14 +163,14 @@ export async function POST(request: Request, { params }: { params: { id: string 
       category: 'GENERAL',
       authorId: user.id,
       authorUsername: user.name,
-      rootId: params.id,
+      rootId: id,
       parentId,
       repostOf: null,
       media,
       repliesCount: 0,
     });
 
-    await ForumPost.updateOne({ _id: params.id }, { $inc: { repliesCount: 1 } });
+    await ForumPost.updateOne({ _id: id }, { $inc: { repliesCount: 1 } });
 
     // Notify post author (if different user)
     try {
@@ -178,7 +180,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
           userId: authorId,
           title: 'Nueva respuesta en tu publicación',
           message: `${user.name} respondió: ${content.slice(0, 120)}${content.length > 120 ? '…' : ''}`,
-          href: `/foro/${params.id}`,
+          href: `/foro/${id}`,
           type: 'INFO',
         });
       }
@@ -197,7 +199,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
     const body = await request.json().catch(() => ({}));
@@ -208,30 +210,31 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
 
     await dbConnect();
+    const { id } = await params;
 
     // Intentar borrar reply tipo hilo (ForumPost)
     const reply = await ForumPost.findById(replyId).select('_id rootId parentId').lean();
     if (reply) {
       const isThreadReply =
-        String((reply as any).rootId || '') === params.id ||
-        (String((reply as any).rootId || '') === '' && String((reply as any).parentId || '') === params.id);
+        String((reply as any).rootId || '') === id ||
+        (String((reply as any).rootId || '') === '' && String((reply as any).parentId || '') === id);
 
       if (isThreadReply) {
         // Reenganchar hijos al root (evita orfandad)
-        await ForumPost.updateMany({ rootId: params.id, parentId: replyId }, { $set: { parentId: params.id } });
+        await ForumPost.updateMany({ rootId: id, parentId: replyId }, { $set: { parentId: id } });
         await ForumPost.deleteOne({ _id: replyId });
-        await ForumPost.updateOne({ _id: params.id }, { $inc: { repliesCount: -1 } });
+        await ForumPost.updateOne({ _id: id }, { $inc: { repliesCount: -1 } });
         return NextResponse.json({ ok: true });
       }
     }
 
     // Fallback: reply legacy
-    const deletedLegacy = await ForumReply.findOneAndDelete({ _id: replyId, postId: params.id }).select('_id');
+    const deletedLegacy = await ForumReply.findOneAndDelete({ _id: replyId, postId: id }).select('_id');
     if (!deletedLegacy) {
       return NextResponse.json({ error: 'Respuesta no encontrada' }, { status: 404 });
     }
 
-    await ForumPost.updateOne({ _id: params.id }, { $inc: { repliesCount: -1 } });
+    await ForumPost.updateOne({ _id: id }, { $inc: { repliesCount: -1 } });
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {

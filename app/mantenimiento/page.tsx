@@ -4,7 +4,8 @@ import { cookies } from 'next/headers';
 import { getLangFromCookieStore, t } from '@/lib/i18n';
 
 export default async function MantenimientoPage() {
-  const lang = getLangFromCookieStore(cookies());
+  const cookieStore = await cookies();
+  const lang = getLangFromCookieStore(cookieStore);
   await dbConnect();
 
   const messageSetting = await Settings.findOne({ key: 'maintenance_message' });

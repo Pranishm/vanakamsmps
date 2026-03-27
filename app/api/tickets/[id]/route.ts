@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/session';
 import dbConnect from '@/lib/mongodb';
 import Ticket from '@/models/Ticket';
@@ -7,14 +7,15 @@ import Notification from '@/models/Notification';
 import { buildTicketSlaDates } from '@/lib/ticketSla';
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
     await dbConnect();
+    const { id } = await params;
 
-    const ticket = await Ticket.findById(params.id);
+    const ticket = await Ticket.findById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket no encontrado' }, { status: 404 });
     }
@@ -24,7 +25,7 @@ export async function GET(
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
-    const replies = await TicketReply.find({ ticketId: params.id }).sort({ createdAt: 1 });
+    const replies = await TicketReply.find({ ticketId: id }).sort({ createdAt: 1 });
 
     return NextResponse.json({ ticket, replies });
   } catch (error: any) {
@@ -38,16 +39,17 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
     const body = await request.json();
+    const { id } = await params;
 
     await dbConnect();
 
-    const ticket = await Ticket.findById(params.id);
+    const ticket = await Ticket.findById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket no encontrado' }, { status: 404 });
     }

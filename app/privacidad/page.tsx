@@ -6,9 +6,10 @@ import { getLangFromCookieStore } from '@/lib/i18n';
 import { Badge, Card } from '@/components/ui';
 import CookiePreferencesButton from '@/components/CookiePreferencesButton';
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
   const updatedAt = '2026-02-27';
-  const lang = getLangFromCookieStore(cookies());
+  const cookieStore = await cookies();
+  const lang = getLangFromCookieStore(cookieStore);
 
   const copy =
     lang === 'en'

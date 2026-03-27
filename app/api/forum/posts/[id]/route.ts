@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ForumPost from '@/models/ForumPost';
 import ForumReply from '@/models/ForumReply';
@@ -10,11 +10,12 @@ function escapeRegex(text: string) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await dbConnect();
 
-    const post = await ForumPost.findById(params.id).select('-likedBy').lean();
+    const { id } = await params;
+    const post = await ForumPost.findById(id).select('-likedBy').lean();
     if (!post) {
       return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
     }
@@ -48,17 +49,18 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
     await dbConnect();
 
-    const post = await ForumPost.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const post = await ForumPost.findByIdAndDelete(id);
     if (!post) {
       return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
     }
 
-    await ForumReply.deleteMany({ postId: params.id });
+    await ForumReply.deleteMany({ postId: id });
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {

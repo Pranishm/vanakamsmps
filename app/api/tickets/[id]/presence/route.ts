@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/session';
 import dbConnect from '@/lib/mongodb';
 import Ticket from '@/models/Ticket';
@@ -42,17 +42,18 @@ async function listActive(ticketId: string) {
   }));
 }
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const access = await assertTicketAccess(params.id, user);
+    const { id } = await params;
+    const access = await assertTicketAccess(id, user);
     if (!access.ok) {
       return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
-    const participants = await listActive(params.id);
+    const participants = await listActive(id);
     return NextResponse.json({ participants });
   } catch (error: any) {
     if (error.message === 'Unauthorized') {
@@ -64,12 +65,13 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const access = await assertTicketAccess(params.id, user);
+    const { id } = await params;
+    const access = await assertTicketAccess(id, user);
     if (!access.ok) {
       return NextResponse.json({ error: access.error }, { status: access.status });
     }
@@ -78,7 +80,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
     const staff = access.staff;
 
     await TicketPresence.updateOne(
-      { ticketId: params.id, userId: String(user.id) },
+      { ticketId: id, userId: String(user.id) },
       {
         $set: {
           username: user?.name || 'User',
@@ -100,17 +102,18 @@ export async function POST(_request: Request, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const access = await assertTicketAccess(params.id, user);
+    const { id } = await params;
+    const access = await assertTicketAccess(id, user);
     if (!access.ok) {
       return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
-    await TicketPresence.deleteOne({ ticketId: params.id, userId: String(user.id) });
+    await TicketPresence.deleteOne({ ticketId: id, userId: String(user.id) });
     return NextResponse.json({ ok: true });
   } catch (error: any) {
     if (error.message === 'Unauthorized') {

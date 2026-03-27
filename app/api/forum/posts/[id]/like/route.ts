@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ForumPost from '@/models/ForumPost';
 import { requireAuth } from '@/lib/session';
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const post = await ForumPost.findById(params.id).select('likesCount likedBy');
+    const { id } = await params;
+    const post = await ForumPost.findById(id).select('likesCount likedBy');
     if (!post) {
       return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
     }
@@ -24,12 +25,13 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   }
 }
 
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const existing = await ForumPost.findById(params.id).select('likedBy');
+    const { id } = await params;
+    const existing = await ForumPost.findById(id).select('likedBy');
     if (!existing) {
       return NextResponse.json({ error: 'Publicación no encontrada' }, { status: 404 });
     }
@@ -40,7 +42,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
       ? { $pull: { likedBy: user.id }, $inc: { likesCount: -1 } }
       : { $addToSet: { likedBy: user.id }, $inc: { likesCount: 1 } };
 
-    const updated = await ForumPost.findByIdAndUpdate(params.id, update, { returnDocument: 'after' }).select(
+    const updated = await ForumPost.findByIdAndUpdate(id, update, { returnDocument: 'after' }).select(
       'likesCount likedBy'
     );
 

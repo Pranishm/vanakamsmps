@@ -15,6 +15,11 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    turbopack: {
+      root: '.',
+    },
+  },
 }
 
 module.exports = nextConfig

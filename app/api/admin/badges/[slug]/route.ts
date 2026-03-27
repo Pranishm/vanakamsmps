@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import { requireOwner } from '@/lib/session';
 import dbConnect from '@/lib/mongodb';
 import AdminLog from '@/models/AdminLog';
 import Badge from '@/models/Badge';
 
-function getRequestIp(request: Request) {
+
+
+function getRequestIp(request: NextRequest) {
   const xff = request.headers.get('x-forwarded-for');
   if (xff) return xff.split(',')[0].trim();
   return request.headers.get('x-real-ip') || '';
@@ -29,10 +31,16 @@ function normalizeIcon(input: string) {
   return `/${raw}`.slice(0, 300);
 }
 
-export async function PATCH(request: Request, { params }: { params: { slug: string } }) {
+// ✅ PATCH
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
+    const { slug: rawSlug } = await context.params;
+    const slug = normalizeSlug(rawSlug);
+
     const owner = await requireOwner();
-    const slug = normalizeSlug(params?.slug);
     const body = await request.json().catch(() => ({}));
 
     await dbConnect();
@@ -69,17 +77,23 @@ export async function PATCH(request: Request, { params }: { params: { slug: stri
 
     return NextResponse.json(updated);
   } catch (error: any) {
-    if (error.message === 'Unauthorized' || error.message === 'Forbidden: Owner access required') {
+    if (error.message === 'Unauthorized' || error.message.includes('Owner')) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
     return NextResponse.json({ error: 'Error al actualizar badge' }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { slug: string } }) {
+// ✅ DELETE
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
+    const { slug: rawSlug } = await context.params;
+    const slug = normalizeSlug(rawSlug);
+
     const owner = await requireOwner();
-    const slug = normalizeSlug(params?.slug);
 
     await dbConnect();
 
@@ -105,7 +119,7 @@ export async function DELETE(request: Request, { params }: { params: { slug: str
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {
-    if (error.message === 'Unauthorized' || error.message === 'Forbidden: Owner access required') {
+    if (error.message === 'Unauthorized' || error.message.includes('Owner')) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
     return NextResponse.json({ error: 'Error al eliminar badge' }, { status: 500 });

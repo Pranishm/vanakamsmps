@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Follow from '@/models/Follow';
@@ -41,9 +41,10 @@ function computePublicPresence(params: {
   return { status: 'online' as const, lastSeenAt: new Date(lastSeenMs).toISOString() };
 }
 
-export async function GET(_request: Request, { params }: { params: { username: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
-    const usernameParam = typeof params.username === 'string' ? params.username.trim() : '';
+    const { username } = await params;
+    const usernameParam = typeof username === 'string' ? username.trim() : '';
     if (!usernameParam || usernameParam.length < 3 || usernameParam.length > 20) {
       return NextResponse.json({ error: 'Username inválido' }, { status: 400 });
     }

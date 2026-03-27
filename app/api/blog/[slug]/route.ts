@@ -1,18 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import BlogPost from '@/models/BlogPost';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect();
+    const { slug } = await params;
 
     const post = await BlogPost.findOneAndUpdate(
-      { slug: params.slug, isPublished: true },
+      { slug, isPublished: true },
       { $inc: { views: 1 } },
       { returnDocument: 'after' }
     ).select('-likedBy');

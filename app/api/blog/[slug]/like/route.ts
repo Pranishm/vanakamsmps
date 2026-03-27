@@ -1,16 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import BlogPost from '@/models/BlogPost';
 import { requireAuth } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_request: Request, { params }: { params: { slug: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const post = await BlogPost.findOne({ slug: params.slug, isPublished: true })
+    const { slug } = await params;
+
+    const post = await BlogPost.findOne({ slug, isPublished: true })
       .select('likesCount likedBy')
       .lean();
 
@@ -30,12 +32,14 @@ export async function GET(_request: Request, { params }: { params: { slug: strin
   }
 }
 
-export async function POST(_request: Request, { params }: { params: { slug: string } }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const user = await requireAuth();
     await dbConnect();
 
-    const exists = await BlogPost.findOne({ slug: params.slug, isPublished: true })
+    const { slug } = await params;
+
+    const exists = await BlogPost.findOne({ slug, isPublished: true })
       .select('_id')
       .lean();
     if (!exists) {
@@ -43,22 +47,22 @@ export async function POST(_request: Request, { params }: { params: { slug: stri
     }
 
     // Toggle like atomically.
-    const likedBefore = await BlogPost.exists({ slug: params.slug, isPublished: true, likedBy: user.id });
+    const likedBefore = await BlogPost.exists({ slug, isPublished: true, likedBy: user.id });
 
     if (likedBefore) {
       await BlogPost.updateOne(
-        { slug: params.slug, isPublished: true, likedBy: user.id },
+        { slug, isPublished: true, likedBy: user.id },
         { $pull: { likedBy: user.id }, $inc: { likesCount: -1 } }
       );
     } else {
       await BlogPost.updateOne(
-        { slug: params.slug, isPublished: true, likedBy: { $ne: user.id } },
+        { slug, isPublished: true, likedBy: { $ne: user.id } },
         { $addToSet: { likedBy: user.id }, $inc: { likesCount: 1 } }
       );
     }
 
     // Return fresh counts.
-    const post = await BlogPost.findOne({ slug: params.slug, isPublished: true })
+    const post = await BlogPost.findOne({ slug, isPublished: true })
       .select('likesCount likedBy')
       .lean();
 
@@ -67,7 +71,7 @@ export async function POST(_request: Request, { params }: { params: { slug: stri
 
     // Best-effort fix if count ever goes negative.
     if (Number((post as any)?.likesCount || 0) < 0) {
-      await BlogPost.updateOne({ slug: params.slug, isPublished: true }, { $set: { likesCount } });
+      await BlogPost.updateOne({ slug, isPublished: true }, { $set: { likesCount } });
     }
 
     return NextResponse.json({ likesCount, liked });
