@@ -728,7 +728,7 @@ const init = async () => {
   console.log('\n✅ ¡Inicialización completada con éxito!');
   console.log('\n📝 Próximos pasos:');
   console.log('   1. Ejecuta: npm run dev');
-  console.log('   2. Abre: http://localhost:3000');
+  console.log('   2. Abre: https://vanakam.me');
   console.log('   3. Inicia sesión con las credenciales del admin');
   console.log('   4. ¡Personaliza tu servidor!\n');
   
