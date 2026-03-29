@@ -84,7 +84,7 @@ At minimum, configure:
 
 ```env
 MONGODB_URI=
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=https://vanakam.me
 NEXTAUTH_SECRET=
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=change-me
@@ -104,7 +104,7 @@ This seeds the initial admin using `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 npm run dev
 ```
 
-Open: `http://localhost:3000`
+Open: `https://vanakam.me`
 
 ## 🔧 Core environment variables
 

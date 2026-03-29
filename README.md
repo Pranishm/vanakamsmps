@@ -142,7 +142,7 @@ npm run init-db
 npm run dev
 ```
 
-Open: http://localhost:3000
+Open: https://vanakam.me
 
 For a complete setup guide (local + production), see **[SETUP.md](SETUP.md)**.
 
@@ -294,7 +294,7 @@ Full reference available in `.env.example`.
 | Variable | Required | Purpose |
 |-----------|:--------:|----------|
 | `MONGODB_URI` | ✅ | MongoDB connection |
-| `NEXTAUTH_URL` | ✅ | Base URL (local: `http://localhost:3000`) |
+| `NEXTAUTH_URL` | ✅ | Base URL (`https://vanakam.me`) |
 | `NEXTAUTH_SECRET` | ✅ | NextAuth secret |
 
 ### Optional
