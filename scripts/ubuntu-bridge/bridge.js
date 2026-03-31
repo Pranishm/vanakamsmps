@@ -2,7 +2,7 @@ const express = require('express');
 const { spawn } = require('child_process');
 
 const app = express();
-const PORT = 3030;
+const PORT = 4000;
 
 // Extremely basic security token (optional but recommended!)
 // Set it on your Ubuntu server like: export BRIDGE_TOKEN=my-secret-token
@@ -22,6 +22,7 @@ app.post('/api/bridge-start', (req, res) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
 
+    console.log("Incoming boot request from Vercel...");
     res.write('Connection to Ubuntu Laptop established...\n');
     res.write('Initializing boot script: /home/pranish/VanakamSMP/web_start.sh\n');
 
@@ -48,6 +49,6 @@ app.post('/api/bridge-start', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ VanakamSMP Bridge listening natively on http://localhost:${PORT}`);
+    console.log(`🛡️ Ubuntu Bridge listening on http://localhost:${PORT}`);
     console.log(`Waiting for signals from vanakam.me Vercel backend...`);
 });

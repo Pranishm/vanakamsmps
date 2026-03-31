@@ -2,9 +2,9 @@
   "name": "vanakamsmp-bridge",
   "version": "1.0.0",
   "description": "Bridge server to execute local scripts securely from Vercel.",
-  "main": "server.js",
+  "main": "bridge.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node bridge.js"
   },
   "dependencies": {
     "express": "^4.19.0"
