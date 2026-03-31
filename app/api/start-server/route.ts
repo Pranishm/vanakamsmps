@@ -9,7 +9,7 @@ export async function POST(req: Request) {
             controller.enqueue(encoder.encode('Initializing boot script natively on Ubuntu host...\n'));
 
             // Use spawn to execute and stream data 
-            const child = spawn('/home/pranish/VanakamSMP/web_start.sh');
+            const child = spawn('bash', ['/home/pranish/VanakamSMP/web_start.sh']);
 
             child.stdout.on('data', (data) => {
                 controller.enqueue(encoder.encode(data.toString()));
