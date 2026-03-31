@@ -4,10 +4,12 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { FaPlay, FaShoppingCart, FaUsers, FaShieldAlt, FaFire, FaGem } from 'react-icons/fa';
+import { FaPlay, FaShoppingCart, FaUsers, FaShieldAlt, FaFire, FaGem, FaTree, FaCrosshairs, FaCloudSun, FaCopy } from 'react-icons/fa';
 import ServerStatusWidget from '@/components/ServerStatusWidget';
 import StaffOnlineWidget from '@/components/StaffOnlineWidget';
 import DiscordSupportWidget from '@/components/DiscordSupportWidget';
+import CommunityDashboard from '@/components/CommunityDashboard';
+import HeroPlayerBadge from '@/components/HeroPlayerBadge';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, Button, Input, Textarea } from '@/components/ui';
 import { t } from '@/lib/i18n';
@@ -20,7 +22,7 @@ export default function HomePage() {
   const [sendingStaff, setSendingStaff] = useState(false);
   const [heroScrollOffset, setHeroScrollOffset] = useState(0);
 
-  const serverHost = process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || 'play.999wrldnetwork.es';
+  const serverHost = process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || 'marketing-great.gl.joinmc.link';
   const serverPort = Number(process.env.NEXT_PUBLIC_MINECRAFT_SERVER_PORT || 25565);
   const serverAddress = `${serverHost}:${Number.isFinite(serverPort) ? serverPort : 25565}`;
   const serverDisplayAddress = serverHost;
@@ -152,17 +154,17 @@ export default function HomePage() {
     {
       name: 'Survival',
       description: t(lang, 'home.modes.survivalDesc'),
-      image: '🏕️',
+      icon: <FaTree className="mx-auto text-minecraft-grass" />,
     },
     {
       name: 'PvP',
       description: t(lang, 'home.modes.pvpDesc'),
-      image: '⚔️',
+      icon: <FaCrosshairs className="mx-auto text-minecraft-redstone" />,
     },
     {
       name: 'SkyBlock',
       description: t(lang, 'home.modes.skyblockDesc'),
-      image: '🏝️',
+      icon: <FaCloudSun className="mx-auto text-minecraft-diamond" />,
     },
   ];
 
@@ -195,15 +197,16 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+            <HeroPlayerBadge host={serverHost} port={Number.isFinite(serverPort) ? serverPort : 25565} />
             <h1
-              className="mb-5 bg-[linear-gradient(90deg,#fde7ee_0%,#f2b9cf_34%,#d58eaf_66%,#fff2f6_100%)] bg-[length:200%_200%] bg-clip-text text-4xl font-bold text-transparent [text-shadow:0_0_24px_rgba(242,185,207,0.18)] sm:text-5xl md:text-7xl"
+              className="mb-5 bg-[linear-gradient(90deg,#fde7ee_0%,#f2b9cf_34%,#d58eaf_66%,#fff2f6_100%)] bg-[length:200%_200%] bg-clip-text text-3xl md:text-5xl lg:text-6xl font-bold text-transparent [text-shadow:0_0_24px_rgba(242,185,207,0.18)] font-[family-name:var(--font-press-start)]"
               style={{
                 animation: 'home-title-gradient 8s ease-in-out infinite',
               }}
             >
-              999Wrld Network
+              VANAKAMSMPs
             </h1>
-            <p className="mx-auto mb-8 max-w-3xl text-base leading-7 text-gray-700 dark:text-gray-300 sm:text-xl md:text-2xl">
+            <p className="mx-auto mb-8 max-w-3xl text-base leading-7 text-gray-700 dark:text-gray-300 sm:text-lg md:text-xl">
               {t(lang, 'home.hero.subtitle')}
             </p>
           </motion.div>
@@ -214,9 +217,9 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mb-12 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
           >
-            <Button size="lg" className="w-full sm:min-w-[200px] sm:w-auto" type="button" onClick={handlePlayNow}>
-              <FaPlay />
-              <span>{t(lang, 'home.hero.playNow')}</span>
+            <Button size="lg" className="w-full sm:w-auto overflow-hidden whitespace-nowrap" type="button" onClick={handlePlayNow}>
+              <FaCopy className="shrink-0" />
+              <span className="truncate">{t(lang, 'home.hero.playNow')} (IP: vanakam.me)</span>
             </Button>
             <Link href="/tienda" className="w-full sm:w-auto">
               <Button variant="secondary" size="lg" className="w-full sm:min-w-[200px] sm:w-auto">
@@ -248,6 +251,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Community Dashboard (Leaderboards, Patch Notes, Ranks) */}
+      <AnimatedSection>
+        <CommunityDashboard />
+      </AnimatedSection>
+
       {/* Features Section */}
       <AnimatedSection>
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -265,7 +273,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full rounded-[28px] text-center">
+                <Card hover className="h-full flex flex-col items-center rounded-[28px] text-center transform transition-all duration-300 hover:-translate-y-2 hover:border-minecraft-grass/50 hover:shadow-[0_8px_30px_rgba(81,200,98,0.15)]">
                   <div className="mb-4 flex justify-center">{feature.icon}</div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
                   <p className="text-sm leading-6 text-gray-600 dark:text-gray-400 sm:text-base">{feature.description}</p>
@@ -293,13 +301,54 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
               >
-                <Card hover className="h-full rounded-[28px] text-center">
-                  <div className="text-6xl mb-4">{mode.image}</div>
+                <Card hover className="h-full flex flex-col items-center rounded-[28px] text-center transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                  <div className="text-6xl mb-4">{mode.icon}</div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{mode.name}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{mode.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">{mode.description}</p>
+                  <Button variant="secondary" className="w-full mt-auto" onClick={handlePlayNow}>
+                    {lang === 'es' ? `Jugar ${mode.name}` : `Play ${mode.name}`}
+                  </Button>
                 </Card>
               </motion.div>
             ))}
+          </div>
+        </section>
+      </AnimatedSection>
+
+      {/* Screenshot Gallery Section */}
+      <AnimatedSection>
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+          <div className="mb-10 text-center sm:mb-12">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">{lang === 'es' ? 'Galería del Servidor' : 'In-Game Server Gallery'}</h2>
+            <p className="text-base text-gray-600 dark:text-gray-400 sm:text-lg">
+              {lang === 'es' ? 'Echa un vistazo a lo que te espera dentro del servidor.' : 'Take a look at what awaits you inside the server.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
+              <Image src="/fondo.png" alt="Gallery 1" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'El Spawn' : 'The Spawn'}</span>
+              </div>
+            </div>
+            
+            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
+              <Image src="/fondo.png" alt="Gallery 2" fill className="object-cover object-bottom transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'Zonas de Economía' : 'Economy Zones'}</span>
+              </div>
+            </div>
+            
+            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group md:col-span-2 lg:col-span-1">
+              <Image src="/fondo.png" alt="Gallery 3" fill className="object-cover object-left transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'Eventos PvP' : 'PvP Events'}</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 text-center text-sm text-gray-500">
+            {lang === 'es' ? '(Reemplaza estas imágenes en la carpeta public)' : '(Replace these placeholder images in the public folder)'}
           </div>
         </section>
       </AnimatedSection>
@@ -317,10 +366,10 @@ export default function HomePage() {
           <Card hover={false} className="rounded-[30px] border-gray-200 dark:border-gray-800">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                {staffOpen ? t(lang, 'home.staffForm.openTitle') : t(lang, 'home.staffForm.closedTitle')}
+                {staffOpen ? t(lang, 'home.staffForm.openTitle') : (lang === 'es' ? 'Aplicaciones cerradas' : 'Applications currently closed')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {staffOpen ? t(lang, 'home.staffForm.openDesc') : t(lang, 'home.staffForm.closedDesc')}
+                {staffOpen ? t(lang, 'home.staffForm.openDesc') : (lang === 'es' ? 'Nuestras peticiones de moderador volverán a abrir en Mayo. ¡Mantente atento a nuestro canal de Discord para futuras aperturas!' : 'Our staff applications will open again in May. Stay tuned to our Discord for future openings!')}
               </p>
             </div>
 

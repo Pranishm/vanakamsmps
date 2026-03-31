@@ -33,7 +33,7 @@ async function getNewsletterIconAttachment() {
     return {
       filename: 'icon.png',
       content,
-      cid: 'site-icon@999wrld',
+      cid: 'site-icon@vanakamsmps',
       contentType: 'image/png',
     };
   } catch {
@@ -47,11 +47,11 @@ function baseUrlFromEnv() {
 }
 
 function getServerAddress() {
-  const serverHost = String(process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || process.env.MINECRAFT_SERVER_IP || 'play.999wrldnetwork.es').trim();
+  const serverHost = String(process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || process.env.MINECRAFT_SERVER_IP || 'play.vanakamsmpsnetwork.es').trim();
   const serverPortRaw = String(process.env.NEXT_PUBLIC_MINECRAFT_SERVER_PORT || process.env.MINECRAFT_SERVER_PORT || '').trim();
   const serverPort = serverPortRaw ? Number(serverPortRaw) : NaN;
 
-  if (!serverHost) return 'play.999wrldnetwork.es';
+  if (!serverHost) return 'play.vanakamsmpsnetwork.es';
   if (Number.isFinite(serverPort) && serverPort !== 25565) return `${serverHost}:${serverPort}`;
   return serverHost;
 }
@@ -353,7 +353,7 @@ function buildNewsletterHtml(params: {
 export async function sendWeeklyNewsletter() {
   await dbConnect();
 
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
   const baseUrl = baseUrlFromEnv();
   const serverAddress = getServerAddress();
 
@@ -437,7 +437,7 @@ export async function sendWeeklyNewsletterTest(toRaw: string) {
   const to = String(toRaw || '').trim().toLowerCase();
   if (!to) throw new Error('Missing recipient');
 
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
   const baseUrl = baseUrlFromEnv();
   const serverAddress = getServerAddress();
 

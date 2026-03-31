@@ -4,9 +4,9 @@ import { buildPageMetadata } from '@/lib/seo';
 export const metadata: Metadata = buildPageMetadata({
   title: 'Staff',
   description:
-    'Conoce al equipo de 999Wrld Network: administración, moderación y soporte del servidor de Minecraft.',
+    'Meet the VANAKAMSMPs team: administration, moderation and support for the Minecraft server.',
   path: '/staff',
-  keywords: ['minecraft staff', 'server moderators', '999wrld staff'],
+  keywords: ['minecraft staff', 'server moderators', 'vanakamsmps staff'],
 });
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {

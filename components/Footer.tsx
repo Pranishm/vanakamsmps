@@ -2,23 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaDiscord, FaTiktok, FaYoutube, FaHeart, FaStripe } from 'react-icons/fa';
-import { SiPaypal, SiVisa, SiAmericanexpress } from 'react-icons/si';
+import { FaDiscord, FaTiktok, FaYoutube, FaHeart, FaInstagram, FaCcVisa, FaCcMastercard, FaCcAmex, FaPaypal, FaStripe } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import { t } from '@/lib/i18n';
 import { useClientLang } from '@/lib/useClientLang';
 import { Input, Button } from '@/components/ui';
-
-function MastercardIcon({ size = 28 }: { size?: number }) {
-  const s = size;
-  return (
-    <svg width={s} height={s} viewBox="0 0 64 40" role="img" aria-label="Mastercard">
-      <circle cx="24" cy="20" r="18" fill="#EB001B" />
-      <circle cx="40" cy="20" r="18" fill="#F79E1B" />
-      <circle cx="32" cy="20" r="18" fill="#FF5F00" opacity="0.95" />
-    </svg>
-  );
-}
 
 const Footer = () => {
   const lang = useClientLang();
@@ -98,7 +86,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4 xl:gap-12">
           {/* About */}
           <div className="xl:col-span-1">
-            <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">999Wrld Network</h3>
+            <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">VANAKAMSMPs</h3>
             <p className="text-sm leading-6 text-gray-600 dark:text-gray-400">
               {t(lang, 'footer.about')}
             </p>
@@ -166,43 +154,55 @@ const Footer = () => {
                 href={process.env.NEXT_PUBLIC_DISCORD_URL || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 dark:text-gray-400 hover:text-[#5865F2] transition-colors"
+                className="text-gray-600 dark:text-gray-400 hover:text-[#5865F2] hover:-translate-y-1 transition-all"
               >
-                <FaDiscord size={24} />
+                <FaDiscord size={28} />
               </a>
               <a
                 href={process.env.NEXT_PUBLIC_TIKTOK_URL || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:-translate-y-1 transition-all"
               >
-                <FaTiktok size={24} />
+                <FaTiktok size={28} />
               </a>
               <a
                 href={process.env.NEXT_PUBLIC_YOUTUBE_URL || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 dark:text-gray-400 hover:text-[#FF0000] transition-colors"
+                className="text-gray-600 dark:text-gray-400 hover:text-[#FF0000] hover:-translate-y-1 transition-all"
               >
-                <FaYoutube size={24} />
+                <FaYoutube size={28} />
+              </a>
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 dark:text-gray-400 hover:text-[#E1306C] hover:-translate-y-1 transition-all"
+              >
+                <FaInstagram size={28} />
               </a>
             </div>
 
             <div className="mt-6">
               <div className="text-gray-900 dark:text-white font-semibold text-sm mb-2">{t(lang, 'footer.newsletter.title')}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">{t(lang, 'footer.newsletter.subtitle')}</div>
-              <form onSubmit={subscribeNewsletter} className="space-y-2">
-                <Input
+              <form onSubmit={subscribeNewsletter} className="relative mt-2">
+                <input
                   type="email"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder={t(lang, 'footer.newsletter.placeholder')}
                   disabled={newsletterLoading}
-                  className="border-white/10 bg-white/[0.04]"
+                  className="w-full rounded-full border border-gray-300 dark:border-white/20 bg-white/80 dark:bg-black/30 px-5 py-3.5 pr-32 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 transition-colors focus:border-minecraft-grass focus:outline-none focus:ring-1 focus:ring-minecraft-grass"
                 />
-                <Button type="submit" variant="secondary" className="w-full" disabled={newsletterLoading || !newsletterEmail.trim()}>
+                <button 
+                  type="submit" 
+                  disabled={newsletterLoading || !newsletterEmail.trim()}
+                  className="absolute right-1 top-1 bottom-1 rounded-full bg-minecraft-grass px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-500 disabled:opacity-50"
+                >
                   {newsletterLoading ? t(lang, 'footer.newsletter.loading') : t(lang, 'footer.newsletter.submit')}
-                </Button>
+                </button>
               </form>
               {newsletterDone ? (
                 <div className="mt-2 text-xs text-green-600 dark:text-green-400">{t(lang, 'footer.newsletter.success')}</div>
@@ -220,38 +220,26 @@ const Footer = () => {
               {t(lang, 'footer.payments')}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <span className="inline-flex items-center" style={{ color: '#635BFF' }} aria-label="Stripe" title="Stripe">
-                <FaStripe size={28} />
+              <span className="inline-flex items-center text-gray-400 hover:text-[#003087] transition-colors" aria-label="PayPal" title="PayPal">
+                <FaPaypal size={32} />
               </span>
-              <span className="inline-flex items-center" style={{ color: '#003087' }} aria-label="PayPal" title="PayPal">
-                <SiPaypal size={28} />
+              <span className="inline-flex items-center text-gray-400 hover:text-[#1A1F71] transition-colors" aria-label="Visa" title="Visa">
+                <FaCcVisa size={32} />
               </span>
-              <span className="inline-flex items-center" style={{ color: '#1A1F71' }} aria-label="Visa" title="Visa">
-                <SiVisa size={28} />
+              <span className="inline-flex items-center text-gray-400 hover:text-[#EB001B] transition-colors" aria-label="Mastercard" title="Mastercard">
+                <FaCcMastercard size={32} />
               </span>
-              <span className="inline-flex items-center" aria-label="Mastercard" title="Mastercard">
-                <MastercardIcon size={28} />
+              <span className="inline-flex items-center text-gray-400 hover:text-[#2E77BB] transition-colors" aria-label="American Express" title="American Express">
+                <FaCcAmex size={32} />
               </span>
-              <span className="inline-flex items-center" aria-label="American Express" title="American Express">
-                {!amexLogoError ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={amexLogoSrc}
-                    alt="American Express"
-                    className="h-[28px] w-[46px] rounded-[4px] object-contain"
-                    onError={() => setAmexLogoError(true)}
-                  />
-                ) : (
-                  <span style={{ color: '#2E77BB' }}>
-                    <SiAmericanexpress size={22} />
-                  </span>
-                )}
+              <span className="inline-flex items-center text-gray-400 hover:text-[#635BFF] transition-colors" aria-label="Stripe" title="Stripe">
+                <FaStripe size={32} />
               </span>
             </div>
           </div>
 
           <p className="flex items-center justify-center text-center text-sm text-gray-600 dark:text-gray-400">
-            © {currentYear} 999Wrld Network. {t(lang, 'footer.madeWith')}{' '}
+            © {currentYear} VANAKAMSMPs. {t(lang, 'footer.madeWith')}{' '}
             <FaHeart className="mx-1 text-red-500" /> {t(lang, 'footer.forCommunity')}
           </p>
           <p className="text-center text-gray-500 dark:text-gray-500 text-xs mt-2">

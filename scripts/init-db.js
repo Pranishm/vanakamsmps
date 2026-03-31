@@ -304,9 +304,9 @@ const createSamplePosts = async (adminId, adminUsername) => {
 
     const posts = [
       {
-        title: '¡Bienvenidos a 999Wrld Network!',
-        slug: 'bienvenidos-a-999wrld-network',
-        content: `# ¡Bienvenidos a 999Wrld Network! 🎮
+        title: '¡Bienvenidos a VANAKAMSMPs!',
+        slug: 'bienvenidos-a-vanakamsmps-network',
+        content: `# ¡Bienvenidos a VANAKAMSMPs! 🎮
 
 Estamos emocionados de darles la bienvenida a nuestro increíble servidor de Minecraft. Después de meses de desarrollo y pruebas exhaustivas, finalmente abrimos nuestras puertas a toda la comunidad.
 
@@ -342,10 +342,10 @@ Sistema anti-griefing de última generación que protege todas tus construccione
 
 ## Únete Ahora
 
-Connect to: **play.999wrldnetwork.es**
+Connect to: **play.vanakamsmpsnetwork.es**
 
 ¡Te esperamos en el servidor! 🎉`,
-        excerpt: 'Te damos la bienvenida oficial a 999Wrld Network. Conoce todo lo que tenemos preparado para ti en esta nueva aventura.',
+        excerpt: 'Te damos la bienvenida oficial a VANAKAMSMPs. Conoce todo lo que tenemos preparado para ti en esta nueva aventura.',
         author: adminUsername,
         authorId: adminId,
         coverImage: '/images/welcome-banner.png',
@@ -666,7 +666,7 @@ const createSettings = async () => {
     const settings = [
       {
         key: 'server_name',
-        value: process.env.SITE_NAME || '999Wrld Network',
+        value: process.env.SITE_NAME || 'VANAKAMSMPs',
         description: 'Nombre del servidor',
       },
       {

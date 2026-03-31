@@ -70,7 +70,7 @@ async function fetchWithTimeout(url: string, timeoutMs: number) {
       cache: 'no-store',
       signal: controller.signal,
       headers: {
-        'user-agent': '999wrld-services-status/1.0',
+        'user-agent': 'vanakamsmps-services-status/1.0',
       },
     });
   } finally {
@@ -88,7 +88,7 @@ function formatCheckValue(c: ServicesStatusCheck) {
 export async function buildServicesStatusReport(trigger: ServicesStatusTrigger) {
   await dbConnect();
 
-  const siteName = process.env.SITE_NAME || '999Wrld Network';
+  const siteName = process.env.SITE_NAME || 'VANAKAMSMPs';
   const siteUrl = String(process.env.SITE_URL || '').trim();
 
   const host = process.env.MINECRAFT_SERVER_IP || process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || 'localhost';

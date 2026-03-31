@@ -68,7 +68,7 @@ function prettyUrl(url) {
 }
 
 function banner({ readyLabel } = {}) {
-  const title = `${color('999WRLD Network', ansi.bold)} ${color('— Dev Server', ansi.gray)}`;
+  const title = `${color('VANAKAMSMPs', ansi.bold)} ${color('— Dev Server', ansi.gray)}`;
   const localUrl = `http://${host}:${port}`;
   const netIp = getNetworkIPv4();
   const networkUrl = netIp ? `http://${netIp}:${port}` : null;

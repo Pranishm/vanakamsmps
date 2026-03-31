@@ -141,7 +141,7 @@ function buildDiscordPayload(log: IAdminLog) {
   }
 
   return {
-    username: '999Wrld Logs',
+    username: 'VANAKAMSMPs Logs',
     allowed_mentions: { parse: [] },
     embeds: [
       {
@@ -153,7 +153,7 @@ function buildDiscordPayload(log: IAdminLog) {
         ),
         timestamp: (log.createdAt ? new Date(log.createdAt) : new Date()).toISOString(),
         footer: {
-          text: '999Wrld Network • Admin Logs',
+          text: 'VANAKAMSMPs • Admin Logs',
         },
         fields: fields.slice(0, 25),
       },

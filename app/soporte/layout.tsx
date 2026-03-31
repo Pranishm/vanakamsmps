@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Soporte',
+  title: 'Support',
   description:
-    'Soporte técnico y de cuenta para 999Wrld Network: tickets, pagos, tienda, incidencias y ayuda del equipo.',
+    'Technical and account support for VANAKAMSMPs: tickets, payments, store, incidents and team help.',
   path: '/soporte',
-  keywords: ['minecraft support', 'soporte minecraft', 'help desk minecraft'],
+  keywords: ['minecraft support', 'minecraft help desk', 'help desk minecraft'],
 });
 
 export default function SoporteLayout({ children }: { children: React.ReactNode }) {

@@ -70,9 +70,9 @@ export async function POST(request: Request) {
       .join('\n\n')
       .slice(0, 2500);
 
-    const siteName = process.env.SITE_NAME || '999Wrld Network';
+    const siteName = process.env.SITE_NAME || 'VANAKAMSMPs';
     const serverIp =
-      process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || process.env.MINECRAFT_SERVER_IP || 'play.999wrldnetwork.es';
+      process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || process.env.MINECRAFT_SERVER_IP || 'play.vanakamsmpsnetwork.es';
     const serverPort = process.env.MINECRAFT_SERVER_PORT || '25565';
     const discordUrl = process.env.DISCORD_URL;
 

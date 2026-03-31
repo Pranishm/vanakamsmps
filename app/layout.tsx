@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Rajdhani } from 'next/font/google';
+import { Rajdhani, Press_Start_2P } from 'next/font/google';
 import { cookies } from 'next/headers';
 import './globals.css';
 import CookieConsent from '@/components/CookieConsent';
@@ -11,10 +11,17 @@ import { normalizeLang } from '@/lib/i18n';
 import ConsentAnalytics from '@/components/ConsentAnalytics';
 import { buildPageMetadata, getAlternateLanguages, getDefaultKeywords, getSiteName, getSiteUrl } from '@/lib/seo';
 import SeoJsonLd from '@/components/SeoJsonLd';
+import SiteFeatures from '@/components/SiteFeatures';
 
 const rajdhani = Rajdhani({ 
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+});
+
+const pressStart2P = Press_Start_2P({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-press-start',
 });
 
 const siteUrl = getSiteUrl();
@@ -31,14 +38,14 @@ export const metadata: Metadata = {
   ...buildPageMetadata({
     title: '- Minecraft Server',
     description:
-      'Servidor y comunidad de Minecraft con tienda oficial, foro, noticias, soporte y eventos. Preparado para usuarios, buscadores y asistentes IA.',
+      'Minecraft server and community with official store, forum, news, support and events. Built for players, search engines and AI assistants.',
     path: '/',
     keywords: getDefaultKeywords(),
   }),
   metadataBase: new URL(siteUrl),
   title: {
-    default: '999Wrld Network - Minecraft Server',
-    template: '%s | 999Wrld Network',
+    default: 'VANAKAMSMPs - Minecraft Server',
+    template: '%s | VANAKAMSMPs',
   },
   applicationName: getSiteName(),
   authors: [{ name: getSiteName() }],
@@ -80,7 +87,7 @@ export default async function RootLayout({
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: process.env.SITE_NAME || '999Wrld Network',
+    name: process.env.SITE_NAME || 'VANAKAMSMPs',
     url: siteUrl,
     logo: `${siteUrl}/icon.png`,
     sameAs: [
@@ -95,7 +102,7 @@ export default async function RootLayout({
     '@type': 'WebSite',
     name: getSiteName(),
     url: siteUrl,
-    inLanguage: ['es', 'en'],
+    inLanguage: ['en', 'es'],
   };
 
   return (
@@ -120,9 +127,10 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={rajdhani.className}>
+      <body className={`${rajdhani.className} ${pressStart2P.variable}`}>
         <Providers initialLang={lang}>
           <RootShell>{children}</RootShell>
+          <SiteFeatures />
           <CookieConsent />
           <ChatbotWidget />
         </Providers>

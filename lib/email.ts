@@ -56,7 +56,7 @@ export async function sendMail(input: SendMailInput) {
 }
 
 export async function sendPasswordResetEmail(params: { to: string; resetUrl: string }) {
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
 
   const subject = `${siteName} • Password reset`;
   const text = `We received a request to reset your password.\n\nReset link: ${params.resetUrl}\n\nIf you did not request this, you can ignore this email.`;
@@ -79,7 +79,7 @@ export async function sendPasswordResetEmail(params: { to: string; resetUrl: str
 }
 
 export async function sendEmailVerificationCodeEmail(params: { to: string; code: string }) {
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
   const mins = 10;
 
   const subject = `${siteName} • Código de verificación`;
@@ -105,7 +105,7 @@ export async function sendGiftReceivedEmail(params: {
   itemsLabel: string;
   giftMessage?: string;
 }) {
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
   const subject = `${siteName} • Has recibido un regalo`;
   const text = [
     `Hola ${params.recipientUsername},`,

@@ -283,6 +283,23 @@ export async function GET(request: Request) {
       if (mc) byMc.set(mc.toLowerCase(), u);
     }
 
+    const envStaffList = (process.env.MINECRAFT_STAFF_PLAYERS || '')
+      .split(',')
+      .map(p => p.trim())
+      .filter(Boolean);
+
+    for (const name of envStaffList) {
+      const mc = name.toLowerCase();
+      if (playerLower.has(mc) && !byMc.has(mc)) {
+        byMc.set(mc, {
+          username: name,
+          role: 'ADMIN',
+          minecraftUsername: name,
+          minecraftUuid: '',
+        });
+      }
+    }
+
     const ordered = playerList
       .map((p) => byMc.get(String(p || '').trim().toLowerCase()))
       .filter(Boolean);

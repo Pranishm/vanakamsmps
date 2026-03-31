@@ -406,7 +406,7 @@ This project ships with:
 
 Recommended for production:
 
-1) Set `SITE_URL=https://www.999wrldnetwork.es`
+1) Set `SITE_URL=https://www.vanakamsmpsnetwork.es`
 2) Verify ownership in Google Search Console and submit your sitemap.
 
 ---

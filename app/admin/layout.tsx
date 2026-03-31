@@ -23,12 +23,14 @@ import {
   FaTimes,
   FaUserFriends,
   FaUsers,
+  FaMap,
+  FaServer,
 } from 'react-icons/fa';
 import { t } from '@/lib/i18n';
 import { Badge } from '@/components/ui';
 import AdminSectionBanner from '@/components/admin/AdminSectionBanner';
 import { useClientLang } from '@/lib/useClientLang';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+ 
 import ThemeToggle from '@/components/ThemeToggle';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -70,6 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { key: 'coupons', name: lang === 'es' ? 'Cupones' : 'Coupons', href: '/admin/coupons', icon: FaPercent, group: 'main' },
     { key: 'referrals', name: lang === 'es' ? 'Referidos' : 'Referrals', href: '/admin/referrals', icon: FaUserFriends, group: 'main' },
     { key: 'loyalty', name: t(lang, 'admin.menu.loyalty'), href: '/admin/loyalty', icon: FaAward, group: 'main' },
+    { key: 'votemap', name: 'Map Voting', href: '/admin/votemap', icon: FaMap, group: 'main' },
     { key: 'tickets', name: t(lang, 'admin.menu.tickets'), href: '/admin/tickets', icon: FaTicketAlt, group: 'main' },
     { key: 'applications', name: t(lang, 'admin.menu.applications'), href: '/admin/postulaciones', icon: FaClipboardList, group: 'main' },
     { key: 'forum', name: t(lang, 'admin.menu.forum'), href: '/admin/foro', icon: FaComments, group: 'content' },
@@ -77,6 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { key: 'partner', name: t(lang, 'admin.menu.partner'), href: '/admin/partner', icon: FaShieldAlt, group: 'content' },
     { key: 'newsletter', name: t(lang, 'admin.menu.newsletter'), href: '/admin/newsletter', icon: FaEnvelope, group: 'system' },
     { key: 'servicesStatus', name: t(lang, 'admin.menu.servicesStatus'), href: '/admin/services-status', icon: FaHeartbeat, group: 'system' },
+    { key: 'server', name: lang === 'es' ? 'Servidor' : 'Server', href: '/admin/server', icon: FaServer, group: 'system' },
     { key: 'logs', name: t(lang, 'admin.menu.logs'), href: '/admin/logs', icon: FaHistory, group: 'system' },
     { key: 'settings', name: t(lang, 'admin.menu.settings'), href: '/admin/settings', icon: FaCog, group: 'system' },
   ];
@@ -104,6 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.startsWith('/admin/coupons')) return 'coupons';
     if (pathname.startsWith('/admin/referrals')) return 'referrals';
     if (pathname.startsWith('/admin/loyalty')) return 'loyalty';
+    if (pathname.startsWith('/admin/votemap')) return 'votemap';
     if (pathname.startsWith('/admin/tickets')) return 'tickets';
     if (pathname.startsWith('/admin/postulaciones/chat/')) return 'applicationChat';
     if (pathname.startsWith('/admin/postulaciones')) return 'applications';
@@ -112,6 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.startsWith('/admin/partner')) return 'partner';
     if (pathname.startsWith('/admin/newsletter')) return 'newsletter';
     if (pathname.startsWith('/admin/services-status')) return 'servicesStatus';
+    if (pathname.startsWith('/admin/server')) return 'server';
     if (pathname.startsWith('/admin/logs')) return 'logs';
     if (pathname.startsWith('/admin/settings')) return 'settings';
     if (pathname.startsWith('/admin/permisos')) return 'permissions';
@@ -193,6 +199,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           icon: <FaAward />,
           badgeLabel: isSpanish ? 'Loyalty' : 'Loyalty',
         };
+      case 'votemap':
+        return {
+          eyebrow: isSpanish ? 'Votación de Mapas' : 'Map Voting',
+          title: 'Map Voting',
+          description: isSpanish
+            ? 'Gestiona mapas de juego y visualiza los votos de usuarios.'
+            : 'Manage game maps and view user map votes.',
+          icon: <FaMap />,
+          badgeLabel: isSpanish ? 'Mapas' : 'Maps',
+        };
       case 'tickets':
         return {
           eyebrow: isSpanish ? 'Soporte y conversaciones' : 'Support and conversations',
@@ -268,6 +284,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             : 'Configure automatic service status reporting and its webhook.',
           icon: <FaHeartbeat />,
           badgeLabel: isSpanish ? 'Estado' : 'Status',
+        };
+      case 'server':
+        return {
+          eyebrow: isSpanish ? 'Control de servidor' : 'Server control',
+          title: isSpanish ? 'Servidor Minecraft' : 'Minecraft Server',
+          description: isSpanish 
+            ? 'Monitorea y arranca el servidor de juego.' 
+            : 'Monitor and start the game server.',
+          icon: <FaServer />,
+          badgeLabel: isSpanish ? 'Servidor' : 'Server',
         };
       case 'logs':
         return {
@@ -503,7 +529,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <div className="flex items-center gap-2">
               <div className="admin-header-card flex items-center gap-1 px-1 py-1">
-                <LanguageSwitcher />
                 <ThemeToggle />
               </div>
 

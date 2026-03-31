@@ -81,6 +81,25 @@ export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [starting, setStarting] = useState(false);
+
+  const startServer = async () => {
+    setStarting(true);
+    toast.info("Sending boot signal...");
+    try {
+      const response = await fetch('/api/start-server', { method: 'POST' });
+      const data = await response.json();
+      if (data.success) {
+        toast.success("✅ " + data.message);
+      } else {
+        toast.error("❌ Error starting server.");
+      }
+    } catch (error) {
+      toast.error("❌ Error starting server.");
+    } finally {
+      setStarting(false);
+    }
+  };
   const [ticketFeedFilter, setTicketFeedFilter] = useState<'ALL' | 'BREACHED' | 'WAITING_RESPONSE'>('ALL');
   const filteredRecentTickets = useMemo(() => {
     const tickets = Array.isArray(data?.recentTickets) ? data.recentTickets : [];
@@ -274,6 +293,14 @@ export default function AdminDashboard() {
         </div>
 
         <div className="flex gap-2">
+          <Button
+            variant="primary"
+            onClick={startServer}
+            disabled={starting}
+            className="h-10 font-bold cursor-pointer mr-2.5 bg-blue-500 text-white"
+          >
+            <span>{starting ? "🚀 Booting..." : "🚀 Start Server"}</span>
+          </Button>
           <Button
             variant="secondary"
             onClick={fetchDashboardData}

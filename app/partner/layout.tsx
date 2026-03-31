@@ -4,9 +4,9 @@ import { buildPageMetadata } from '@/lib/seo';
 export const metadata: Metadata = buildPageMetadata({
   title: 'Partners',
   description:
-    'Programa partner de 999Wrld Network para colaboraciones, promociones y visibilidad entre comunidades y servidores de Minecraft.',
+    'VANAKAMSMPs partner program for collaborations, promotions and visibility among Minecraft communities and servers.',
   path: '/partner',
-  keywords: ['minecraft partner program', 'partner minecraft server', '999wrld partners'],
+  keywords: ['minecraft partner program', 'partner minecraft server', 'vanakamsmps partners'],
 });
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {

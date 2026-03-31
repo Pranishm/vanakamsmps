@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="public/icon.png" alt="999Wrld Network" width="88" height="88" />
+	<img src="public/icon.png" alt="VANAKAMSMPs" width="88" height="88" />
 </p>
 
 <h1 align="center">Setup Guide</h1>
@@ -251,7 +251,7 @@ SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASS=
-SMTP_FROM=999Wrld Network <no-reply@yourdomain.com>
+SMTP_FROM=VANAKAMSMPs <no-reply@yourdomain.com>
 ```
 
 Without SMTP:

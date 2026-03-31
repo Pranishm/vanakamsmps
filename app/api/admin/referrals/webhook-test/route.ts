@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const referralCode = String((body as any)?.referralCode || 'PLAYER-AB12C').trim().toUpperCase();
 
-    const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+    const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
     const siteUrl = String(process.env.SITE_URL || process.env.NEXTAUTH_URL || '').trim();
 
     await sendReferralRewardWebhook({

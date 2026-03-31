@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="public/icon.png" alt="999Wrld Network" width="88" height="88" />
+	<img src="public/icon.png" alt="VANAKAMSMPs" width="88" height="88" />
 </p>
 
 <h1 align="center">Troubleshooting</h1>

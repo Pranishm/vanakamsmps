@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Noticias',
+  title: 'News',
   description:
-    'Noticias, eventos, guías y actualizaciones de 999Wrld Network para seguir el pulso del servidor de Minecraft.',
+    'News, events, guides and updates from VANAKAMSMPs to stay up to date with the Minecraft server.',
   path: '/noticias',
-  keywords: ['minecraft news', 'minecraft updates', 'noticias minecraft', '999wrld noticias'],
+  keywords: ['minecraft news', 'minecraft updates', 'server news', 'vanakamsmps news'],
 });
 
 export default function NoticiasLayout({ children }: { children: React.ReactNode }) {

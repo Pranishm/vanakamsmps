@@ -42,7 +42,11 @@ export default function StaffOnlineWidget({ host, port = 25565 }: StaffOnlineWid
     const fetchStaff = async () => {
       setLoading(true);
       try {
-        const res = await fetch(endpoint, { cache: 'no-store' });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch(endpoint, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         const json = (await res.json().catch(() => null)) as StaffOnlineResponse | null;
         if (!alive) return;
         if (res.ok && json) setData(json);
@@ -81,27 +85,30 @@ export default function StaffOnlineWidget({ host, port = 25565 }: StaffOnlineWid
 
       {!loading && (data?.staff?.length || 0) > 0 ? (
         <div className="flex flex-wrap gap-2">
-          {data!.staff.slice(0, 12).map((u) => (
-            <div
-              key={`${u.minecraftUsername}-${u.username}`}
-              className="relative h-7 w-7 rounded overflow-hidden bg-black border border-gray-800"
-              title={u.minecraftUsername || u.username}
-              aria-label={u.minecraftUsername || u.username}
-            >
-              <Image
-                src={(() => {
-                  const mc = String(u.minecraftUsername || '').trim();
-
-                  // Use Minotar (supports usernames). More reliable than Crafatar in some regions.
-                  return `https://minotar.net/helm/${encodeURIComponent(mc || 'Steve')}/28.png`;
-                })()}
-                alt=""
-                fill
-                sizes="28px"
-                className="object-cover"
-              />
-            </div>
-          ))}
+          {data!.staff.slice(0, 12).map((u) => {
+            const mc = String(u.minecraftUsername || '').trim();
+            const displayName = mc || u.username;
+            return (
+              <div
+                key={`${u.minecraftUsername}-${u.username}`}
+                className="flex items-center gap-2 rounded-full border border-gray-800 bg-gray-950/50 pr-3 p-1 transition-colors hover:bg-gray-800/50"
+                title={displayName}
+              >
+                <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-black">
+                  <Image
+                    src={`https://minotar.net/helm/${encodeURIComponent(mc || 'Steve')}/24.png`}
+                    alt={displayName}
+                    fill
+                    sizes="24px"
+                    className="object-cover"
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-200">
+                  {displayName}
+                </span>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-sm text-gray-400">

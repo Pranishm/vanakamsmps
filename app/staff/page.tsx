@@ -9,45 +9,45 @@ import { Card, Badge } from '@/components/ui';
 export default function StaffPage() {
   const staff = [
     {
-      name: 'Founder',
-      role: 'Fundador',
+      name: 'Notch',
+      role: 'Founder',
       description: 'Creador y dueño del servidor',
-      icon: <FaCrown className="text-6xl text-minecraft-gold" />,
+      status: 'Online',
       color: 'minecraft-gold',
     },
     {
-      name: 'Admin1',
+      name: 'Jeb_',
       role: 'Administrador',
       description: 'Gestión general y soporte técnico',
-      icon: <FaShieldAlt className="text-6xl text-minecraft-redstone" />,
+      status: 'Offline',
       color: 'minecraft-redstone',
     },
     {
-      name: 'Admin2',
+      name: 'Dinnerbone',
       role: 'Administrador',
       description: 'Gestión de eventos y comunidad',
-      icon: <FaShieldAlt className="text-6xl text-minecraft-redstone" />,
+      status: 'In Game',
       color: 'minecraft-redstone',
     },
     {
-      name: 'Mod1',
+      name: 'C418',
       role: 'Moderador',
       description: 'Moderación del servidor y Discord',
-      icon: <FaUserShield className="text-6xl text-minecraft-diamond" />,
+      status: 'Online',
       color: 'minecraft-diamond',
     },
     {
-      name: 'Mod2',
+      name: 'Steve',
       role: 'Moderador',
       description: 'Moderación del servidor y Discord',
-      icon: <FaUserShield className="text-6xl text-minecraft-diamond" />,
+      status: 'Do Not Disturb',
       color: 'minecraft-diamond',
     },
     {
-      name: 'Helper1',
+      name: 'Alex',
       role: 'Ayudante',
       description: 'Soporte a jugadores',
-      icon: <FaUsers className="text-6xl text-minecraft-grass" />,
+      status: 'Online',
       color: 'minecraft-grass',
     },
   ];
@@ -95,12 +95,21 @@ export default function StaffPage() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="h-full rounded-[30px] text-center">
-                <div className="mb-4 flex justify-center">{member.icon}</div>
+              <Card className="h-full rounded-[30px] text-center overflow-hidden border border-white/5 relative">
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-white/10 to-transparent"></div>
+                <div className="mb-6 flex justify-center mt-6 relative">
+                  <div className="relative">
+                    <img src={`https://minotar.net/armor/bust/${member.name}/120.png`} alt={member.name} className="w-24 h-24 rounded-lg drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] bg-black/50" />
+                    <div title={member.status} className={`absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-4 border-gray-900 shadow-md ${member.status === 'Online' ? 'bg-minecraft-grass' : member.status === 'In Game' ? 'bg-minecraft-diamond' : member.status === 'Do Not Disturb' ? 'bg-minecraft-redstone' : 'bg-gray-500'}`}></div>
+                  </div>
+                </div>
                 <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{member.name}</h3>
-                <Badge variant="info" className="mb-3">
-                  {member.role}
-                </Badge>
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Badge variant="info">
+                    {member.role}
+                  </Badge>
+                  <span className="text-xs bg-black/30 rounded-full px-2 py-1 text-gray-300 font-medium border border-white/10">{member.status}</span>
+                </div>
                 <p className="text-sm leading-6 text-gray-600 dark:text-gray-400 sm:text-base">{member.description}</p>
               </Card>
             </motion.div>

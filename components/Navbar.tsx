@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+ 
 import { t } from '@/lib/i18n';
 import { useClientLang } from '@/lib/useClientLang';
 import { formatPrice } from '@/lib/utils';
@@ -865,7 +865,7 @@ const Navbar = () => {
                     {brandIconStatus !== 'error' && (
                       <Image
                         src="/icon.png"
-                        alt=""
+                        alt="VANAKAMSMPs Logo"
                         fill
                         sizes="44px"
                         className="object-cover"
@@ -875,7 +875,7 @@ const Navbar = () => {
                     {brandIconStatus === 'ok' ? null : <span className="text-white font-bold text-lg">MC</span>}
                   </div>
                   <div className="min-w-0">
-                    <div className="truncate text-base font-bold text-white">999Wrld Network</div>
+                    <div className="truncate text-base font-bold text-white">VANAKAMSMPs</div>
                     <div className="text-[11px] uppercase tracking-[0.22em] text-slate-400">Minecraft community</div>
                   </div>
                 </Link>
@@ -1108,7 +1108,7 @@ const Navbar = () => {
                         setIsOpen(false);
                         setNotifOpenMobile(false);
                       }}
-                      className="block rounded-[20px] px-4 py-3 text-base font-medium text-white bg-gradient-to-r from-minecraft-grass to-minecraft-diamond hover:from-minecraft-grass/90 hover:to-minecraft-diamond/90 ring-1 ring-white/10 text-center"
+                      className="block rounded-[20px] px-4 py-3 text-base font-bold text-gray-900 bg-minecraft-gold shadow-[0_0_20px_rgba(255,170,0,0.3)] hover:bg-yellow-400 text-center transition-all duration-200"
                     >
                       {t(lang, 'user.login')}
                     </Link>
@@ -1141,7 +1141,7 @@ const Navbar = () => {
               {brandIconStatus !== 'error' && (
                 <Image
                   src="/icon.png"
-                  alt=""
+                  alt="VANAKAMSMPs Logo"
                   fill
                   sizes="40px"
                   className="object-cover"
@@ -1151,7 +1151,7 @@ const Navbar = () => {
               {brandIconStatus === 'ok' ? null : <span className="text-white font-bold text-xl">MC</span>}
             </div>
             <span className="hidden truncate text-lg font-black tracking-tight text-white sm:block lg:text-xl">
-              999Wrld Network
+              VANAKAMSMPs
             </span>
           </Link>
 
@@ -1202,10 +1202,10 @@ const Navbar = () => {
                     ref={(node) => {
                       desktopNavItemRefs.current[item.href] = node;
                     }}
-                    className={`group relative inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                    className={`group relative inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
                       active
-                        ? 'text-white'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'text-minecraft-grass font-bold'
+                        : 'text-gray-300 hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
                     {active ? null : (
@@ -1366,7 +1366,7 @@ const Navbar = () => {
               ) : (
                 <Link
                   href="/auth/login"
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-minecraft-grass to-minecraft-diamond px-4 text-sm font-semibold text-white shadow-lg shadow-minecraft-diamond/20 ring-1 ring-white/10 transition-all duration-200 hover:from-minecraft-grass/90 hover:to-minecraft-diamond/90"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-minecraft-gold px-4 text-sm font-bold text-gray-900 shadow-[0_0_20px_rgba(255,170,0,0.3)] transition-all duration-200 hover:bg-yellow-400 hover:shadow-[0_0_25px_rgba(255,170,0,0.5)] hover:-translate-y-0.5"
                 >
                   <FaSignInAlt />
                   <span>{t(lang, 'user.login')}</span>
@@ -1587,9 +1587,6 @@ const Navbar = () => {
                   </AnimatePresence>
                 </div>
               )}
-              <div className="rounded-full transition-colors">
-                <LanguageSwitcher />
-              </div>
             </div>
           </div>
 
@@ -1722,7 +1719,6 @@ const Navbar = () => {
                 )}
               </Link>
             ) : null}
-            <LanguageSwitcher />
             <button
               onClick={() => {
                 const next = !isOpen;

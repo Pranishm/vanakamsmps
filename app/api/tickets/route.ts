@@ -29,7 +29,7 @@ async function notifyDiscordNewTicket(params: {
   const webhookUrl = String(webhookSetting?.value || '').trim();
   if (!webhookUrl || !isDiscordWebhookUrl(webhookUrl)) return;
 
-  const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+  const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
   const siteUrl = String(process.env.SITE_URL || process.env.NEXTAUTH_URL || '').trim();
   await sendTicketDiscordWebhook({
     webhookUrl,

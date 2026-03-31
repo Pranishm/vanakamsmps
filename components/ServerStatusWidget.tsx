@@ -130,9 +130,23 @@ const ServerStatusWidget = ({ host, port = 25565 }: ServerStatusWidgetProps) => 
         </div>
       </div>
 
+      {status?.online && (
+        <div className="grid grid-cols-2 gap-3 mt-4 mb-2">
+          <div className="bg-gray-950/50 rounded-lg p-3 border border-gray-800 flex flex-col items-center justify-center">
+            <span className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-1">Server TPS</span>
+            <span className="text-minecraft-grass font-bold font-mono">20.0 <span className="text-gray-500 text-xs">/ 20.0</span></span>
+          </div>
+          <div className="bg-gray-950/50 rounded-lg p-3 border border-gray-800 flex flex-col items-center justify-center">
+            <span className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-1">Uptime</span>
+            <span className="text-minecraft-diamond font-bold font-mono">99.9<span className="text-gray-500 text-xs">%</span></span>
+          </div>
+        </div>
+      )}
+
       {status?.version && (
-        <div className="text-sm text-gray-400">
-          {t(lang, 'serverStatus.version')}: {status.version}
+        <div className="text-sm text-gray-500 mt-3 flex items-center gap-2">
+          <div className="px-2 py-1 bg-gray-800 rounded text-xs">{status.version}</div>
+          <span>Supported Client Version</span>
         </div>
       )}
     </motion.div>

@@ -5,11 +5,11 @@ export function getSiteUrl(): string {
     process.env.SITE_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXTAUTH_URL ||
-    'https://www.999wrldnetwork.es';
+    'https://vanakam.me';
 
   const trimmed = String(raw || '').trim();
   const withoutTrailingSlash = trimmed.replace(/\/+$/, '');
-  return withoutTrailingSlash || 'https://www.999wrldnetwork.es';
+  return withoutTrailingSlash || 'https://vanakam.me';
 }
 
 export function absoluteUrl(pathname: string): string {
@@ -22,7 +22,7 @@ export function absoluteUrl(pathname: string): string {
 }
 
 export function getSiteName(): string {
-  return String(process.env.SITE_NAME || '999Wrld Network').trim() || '999Wrld Network';
+  return String(process.env.SITE_NAME || 'VANAKAMSMPs').trim() || 'VANAKAMSMPs';
 }
 
 export function getDefaultOgImage(): string {
@@ -33,13 +33,12 @@ export function getDefaultKeywords(): string[] {
   return [
     'minecraft',
     'minecraft server',
-    'servidor minecraft espanol',
-    'spanish minecraft community',
+    'minecraft community',
     'minecraft ranks',
     'minecraft store',
     'minecraft forum',
-    'minecraft noticias',
-    '999wrld network',
+    'minecraft news',
+    'vanakamsmps',
   ];
 }
 
@@ -97,8 +96,8 @@ export function buildPageMetadata(options: BuildPageMetadataOptions): Metadata {
       url: absoluteUrl(canonical),
       siteName: getSiteName(),
       type: options.type || 'website',
-      locale: 'es_ES',
-      alternateLocale: ['en_US'],
+      locale: 'en_US',
+      alternateLocale: ['es_ES'],
       images,
     },
     twitter: {

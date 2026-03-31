@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const post = await getPost(id);
   if (!post) {
     return {
-      title: 'Publicación no encontrada',
+      title: 'Post not found',
       robots: { index: false, follow: false },
     };
   }
 
-  const title = String(post.title || '').trim() || 'Foro';
-  const description = excerpt(post.content || '', 160) || 'Publicación del foro de 999Wrld Network.';
+  const title = String(post.title || '').trim() || 'Forum';
+  const description = excerpt(post.content || '', 160) || 'VANAKAMSMPs forum post.';
   const url = absoluteUrl(`/foro/${encodeURIComponent(id)}`);
 
   return {
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description,
       path: `/foro/${encodeURIComponent(id)}`,
       type: 'article',
-      keywords: ['foro minecraft', 'discusion minecraft', String(post.authorUsername || '')],
+      keywords: ['minecraft forum', 'minecraft discussion', String(post.authorUsername || '')],
     }),
   };
 }

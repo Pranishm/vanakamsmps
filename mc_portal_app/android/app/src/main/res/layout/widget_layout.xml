@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#28004D">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vanakam MC"
+        android:textColor="#47D1E8"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/widget_server_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: Loading"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/widget_players"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Players: 0 / 100"
+        android:textColor="#7BC043"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp" />
+</LinearLayout>

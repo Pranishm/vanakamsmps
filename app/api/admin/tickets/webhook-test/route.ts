@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const requestedPriority = String((body as any)?.priority || 'MEDIUM').toUpperCase();
     const priority = requestedPriority === 'HIGH' || requestedPriority === 'LOW' ? requestedPriority : 'MEDIUM';
 
-    const siteName = String(process.env.SITE_NAME || '999Wrld Network').trim();
+    const siteName = String(process.env.SITE_NAME || 'VANAKAMSMPs').trim();
     const siteUrl = String(process.env.SITE_URL || process.env.NEXTAUTH_URL || '').trim();
 
     await sendTicketDiscordWebhook({

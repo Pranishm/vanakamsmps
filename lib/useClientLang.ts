@@ -12,7 +12,7 @@ import { useLangContext } from '@/lib/lang-context';
 export function useClientLang(): Lang {
   const ctx = useLangContext();
   const hasProvider = !!ctx;
-  const [lang, setLang] = useState<Lang>('es');
+  const [lang, setLang] = useState<Lang>('en');
 
   useEffect(() => {
     if (hasProvider) return;

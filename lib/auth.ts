@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email y contraseña son requeridos');
+          throw new Error('Email and password are required');
         }
 
         await dbConnect();
@@ -23,24 +23,24 @@ export const authOptions: NextAuthOptions = {
         const user = await User.findOne({ email: credentials.email.toLowerCase() });
 
         if (!user) {
-          throw new Error('Usuario no encontrado');
+          throw new Error('User not found');
         }
 
         if (user.isBanned) {
-          throw new Error(`Usuario baneado: ${user.bannedReason || 'Sin razón especificada'}`);
+          throw new Error(`User banned: ${user.bannedReason || 'No reason specified'}`);
         }
 
         const requireEmailVerification =
           isEmailConfigured() && String(process.env.REQUIRE_EMAIL_VERIFICATION || '').toLowerCase() !== 'false';
 
         if (requireEmailVerification && !(user as any).emailVerifiedAt) {
-          throw new Error('Debes verificar tu email antes de iniciar sesión');
+          throw new Error('You must verify your email before logging in');
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error('Contraseña incorrecta');
+          throw new Error('Incorrect password');
         }
 
         // Update last login (sin validar todo el documento)

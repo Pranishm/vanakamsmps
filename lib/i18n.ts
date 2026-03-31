@@ -54,7 +54,7 @@ const DICT = {
     home: {
       hero: {
         subtitle:
-          'La mejor experiencia de Minecraft en español. Únete a nuestra comunidad y vive aventuras épicas.',
+          'The best Minecraft experience awaits. Join our community and live epic adventures.',
         playNow: 'Jugar ahora',
         viewShop: 'Ver tienda',
       },
@@ -122,7 +122,7 @@ const DICT = {
       },
       cta: {
         title: '¿Listo para la aventura?',
-        subtitle: 'Únete ahora y comienza tu viaje en 999Wrld Network',
+        subtitle: 'Únete ahora y comienza tu viaje en VANAKAMSMPs',
         startPlaying: 'Comenzar a jugar',
         createAccount: 'Crear cuenta',
       },
@@ -140,7 +140,7 @@ const DICT = {
       },
       login: {
         title: 'Iniciar sesión',
-        subtitle: 'Bienvenido de vuelta a 999Wrld Network',
+        subtitle: 'Bienvenido de vuelta a VANAKAMSMPs',
         success: '¡Bienvenido de vuelta!',
         error: 'Error al iniciar sesión',
         loading: 'Cargando...',
@@ -154,7 +154,7 @@ const DICT = {
       },
       register: {
         title: 'Crear cuenta',
-        subtitle: 'Únete a la comunidad de 999Wrld Network',
+        subtitle: 'Únete a la comunidad de VANAKAMSMPs',
         passwordMismatch: 'Las contraseñas no coinciden',
         success: '¡Cuenta creada exitosamente! Ya puedes iniciar sesión.',
         verifySent: 'Te enviamos un código por email. Escribe el código para crear tu cuenta.',
@@ -480,7 +480,7 @@ const DICT = {
       defaultMessage: 'Estamos en mantenimiento. Vuelve más tarde.',
     },
     footer: {
-      about: 'El mejor servidor de Minecraft en español. Únete a nuestra comunidad y vive aventuras épicas.',
+      about: 'The best Minecraft server. Join our community and live epic adventures.',
       quickLinks: 'Enlaces rápidos',
       legal: 'Legal',
       cookies: 'Política de Cookies',
@@ -913,7 +913,7 @@ const DICT = {
       subtitleAgent: 'Agente humano',
       typing: 'Escribiendo…',
       greet:
-        'Hola. Soy el asistente de 999Wrld Network. Puedo ayudarte con acceso/cuenta, votar, tienda/pagos, reportes y problemas de conexión. ¿Qué necesitas?',
+        'Hola. Soy el asistente de VANAKAMSMPs. Puedo ayudarte con acceso/cuenta, votar, tienda/pagos, reportes y problemas de conexión. ¿Qué necesitas?',
       openAria: 'Abrir chat',
       closeAria: 'Cerrar',
       inputPlaceholderAi: 'Escribe tu mensaje…',
@@ -946,7 +946,7 @@ const DICT = {
         loading: 'Cargando…',
         loadingRanking: 'Cargando ranking…',
       },
-      title: 'Partners destacados',
+      title: 'Partnership',
       subtitle: 'Publica tu servidor y aparece en el top con banner y enlaces.',
       actions: {
         viewRanking: 'Ver ranking',
@@ -1058,7 +1058,7 @@ const DICT = {
     home: {
       hero: {
         subtitle:
-          'The best Minecraft experience in Spanish. Join our community and live epic adventures.',
+          'The best Minecraft experience awaits. Join our community and live epic adventures.',
         playNow: 'Play now',
         viewShop: 'View shop',
       },
@@ -1126,7 +1126,7 @@ const DICT = {
       },
       cta: {
         title: 'Ready for the adventure?',
-        subtitle: 'Join now and start your journey on 999Wrld Network',
+        subtitle: 'Join now and start your journey on VANAKAMSMPs',
         startPlaying: 'Start playing',
         createAccount: 'Create account',
       },
@@ -1144,7 +1144,7 @@ const DICT = {
       },
       login: {
         title: 'Sign in',
-        subtitle: 'Welcome back to 999Wrld Network',
+        subtitle: 'Welcome back to VANAKAMSMPs',
         success: 'Welcome back!',
         error: 'Error signing in',
         loading: 'Loading...',
@@ -1158,7 +1158,7 @@ const DICT = {
       },
       register: {
         title: 'Create account',
-        subtitle: 'Join the 999Wrld Network community',
+        subtitle: 'Join the VANAKAMSMPs community',
         passwordMismatch: "Passwords don't match",
         success: 'Account created successfully! You can now sign in.',
         verifySent: 'We emailed you a code. Enter it to create your account.',
@@ -1484,7 +1484,7 @@ const DICT = {
       defaultMessage: 'We are under maintenance. Please come back later.',
     },
     footer: {
-      about: 'The best Minecraft server in Spanish. Join our community and live epic adventures.',
+      about: 'The best Minecraft server. Join our community and live epic adventures.',
       quickLinks: 'Quick links',
       legal: 'Legal',
       cookies: 'Cookie Policy',
@@ -1916,7 +1916,7 @@ const DICT = {
       subtitleAgent: 'Human agent',
       typing: 'Typing…',
       greet:
-        "Hi! I'm the 999Wrld Network assistant. I can help with login/account, voting, store/payments, reports, and connection issues. What do you need?",
+        "Hi! I'm the VANAKAMSMPs assistant. I can help with login/account, voting, store/payments, reports, and connection issues. What do you need?",
       openAria: 'Open chat',
       closeAria: 'Close',
       inputPlaceholderAi: 'Type your message…',
@@ -1948,7 +1948,7 @@ const DICT = {
         loading: 'Loading…',
         loadingRanking: 'Loading ranking…',
       },
-      title: 'Featured partners',
+      title: 'Partnership',
       subtitle: 'Publish your server and show up on top with banner and links.',
       actions: {
         viewRanking: 'View ranking',
@@ -2010,8 +2010,7 @@ const DICT = {
 } satisfies Record<Lang, any>;
 
 export function normalizeLang(value: string | undefined | null): Lang {
-  if (value === 'en') return 'en';
-  return 'es';
+  return 'en';
 }
 
 export function t(lang: Lang, key: string): string {
@@ -2024,7 +2023,7 @@ export function t(lang: Lang, key: string): string {
 }
 
 export function getClientLangFromCookie(): Lang {
-  if (typeof document === 'undefined') return 'es';
+  if (typeof document === 'undefined') return 'en';
   const match = document.cookie.match(/(?:^|; )lang=([^;]*)/);
   const raw = match ? decodeURIComponent(match[1]) : '';
   return normalizeLang(raw);

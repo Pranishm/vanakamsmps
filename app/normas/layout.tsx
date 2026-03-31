@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Normas',
+  title: 'Rules',
   description:
-    'Normas del servidor y de Discord de 999Wrld Network para mantener una comunidad sana, segura y competitiva.',
+    'Server and Discord rules for VANAKAMSMPs to maintain a healthy, safe and competitive community.',
   path: '/normas',
-  keywords: ['minecraft server rules', 'normas minecraft', 'discord server rules'],
+  keywords: ['minecraft server rules', 'server rules', 'discord server rules'],
 });
 
 export default function NormasLayout({ children }: { children: React.ReactNode }) {

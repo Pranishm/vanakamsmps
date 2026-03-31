@@ -1,4 +1,4 @@
-# Chatbot Knowledge Base (999Wrld Network)
+# Chatbot Knowledge Base (VANAKAMSMPs)
 
 This document is used by the in-site support assistant to answer common questions.
 Keep it up to date with the current server info and support policies.
@@ -8,7 +8,7 @@ Keep it up to date with the current server info and support policies.
 ## ES — Preguntas frecuentes
 
 ### Cómo unirme al servidor
-- **IP (Java):** `play.999wrldnetwork.es`
+- **IP (Java):** `play.vanakamsmpsnetwork.es`
 - **Puerto:** `25565`
 - Si estás en **Bedrock**, dilo explícitamente para poder indicarte si hay soporte.
 - Si no te deja entrar, comparte el **mensaje exacto del error** (sin capturas de tokens/contraseñas).
@@ -40,7 +40,7 @@ Keep it up to date with the current server info and support policies.
 ## EN — Frequently asked questions
 
 ### How to join the server
-- **Java IP:** `play.999wrldnetwork.es`
+- **Java IP:** `play.vanakamsmpsnetwork.es`
 - **Port:** `25565`
 - If you are on **Bedrock**, say it explicitly so we can confirm support.
 - If you can’t join, share the **exact error message** (never share passwords/tokens).

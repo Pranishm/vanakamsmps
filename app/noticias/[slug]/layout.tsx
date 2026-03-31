@@ -30,13 +30,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await getPost(slug);
   if (!post) {
     return {
-      title: 'Noticia no encontrada',
+      title: 'Post not found',
       robots: { index: false, follow: false },
     };
   }
 
-  const title = String(post.title || '').trim() || 'Noticia';
-  const description = stripMarkdown(post.excerpt || '') || 'Noticias de 999Wrld Network.';
+  const title = String(post.title || '').trim() || 'News';
+  const description = stripMarkdown(post.excerpt || '') || 'VANAKAMSMPs News.';
   const url = absoluteUrl(`/noticias/${encodeURIComponent(String(post.slug))}`);
 
   const image = String(post.image || '').trim();
@@ -78,11 +78,11 @@ export default async function NoticiaSlugLayout({
     image: post.image ? [String(post.image)] : [absoluteUrl('/icon.png')],
     author: {
       '@type': 'Person',
-      name: String(post.author || '999Wrld Network'),
+      name: String(post.author || 'VANAKAMSMPs'),
     },
     publisher: {
       '@type': 'Organization',
-      name: process.env.SITE_NAME || '999Wrld Network',
+      name: process.env.SITE_NAME || 'VANAKAMSMPs',
       logo: {
         '@type': 'ImageObject',
         url: absoluteUrl('/icon.png'),

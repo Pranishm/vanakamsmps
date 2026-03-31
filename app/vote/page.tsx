@@ -1,210 +1,172 @@
 'use client';
 
-import { useClientLang } from '@/lib/useClientLang';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { FaGift, FaExternalLinkAlt, FaVoteYea } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
+import { FaMap, FaCheckCircle, FaVoteYea } from 'react-icons/fa';
 import PageHeader from '@/components/PageHeader';
 import AnimatedSection from '@/components/AnimatedSection';
-import { Badge, Card } from '@/components/ui';
-import { t } from '@/lib/i18n';
-import { VOTE_SITES } from '@/lib/voteSites';
-import { useSession } from 'next-auth/react';
+import { Badge, Card, Button } from '@/components/ui';
+import { toast } from 'react-toastify';
 
-type LeaderboardItem = {
-  userId: string;
-  username: string;
-  votes: number;
-};
+interface VoteMap {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  isActive: boolean;
+  votesCount: number;
+}
 
-function recordVoteClick(site: string) {
-  try {
-    const payload = JSON.stringify({ site });
+export default function MapVotePage() {
+  const { status } = useSession();
+  const [maps, setMaps] = useState<VoteMap[]>([]);
+  const [userVote, setUserVote] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [voting, setVoting] = useState<string | null>(null);
 
-    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-      const blob = new Blob([payload], { type: 'application/json' });
-      navigator.sendBeacon('/api/votes/click', blob);
+  const fetchMaps = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/votemap', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed to load maps');
+      const data = await res.json();
+      setMaps(Array.isArray(data.maps) ? data.maps : []);
+      if (data.userVote) {
+        setUserVote(data.userVote);
+      }
+    } catch (e) {
+      toast.error('Could not load voting options');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMaps();
+  }, [status]);
+
+  const handleVote = async (mapId: string) => {
+    if (status !== 'authenticated') {
+      toast.error('You must be logged in to vote');
       return;
     }
 
-    fetch('/api/votes/click', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload,
-      keepalive: true,
-    }).catch(() => undefined);
-  } catch {
-    // best-effort
-  }
-}
-
-export default function VotePage() {
-  const lang = useClientLang();
-  const { status } = useSession();
-  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
-  const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoadingLeaderboard(true);
-        const res = await fetch('/api/votes/leaderboard?days=30&limit=10', { cache: 'no-store' });
-        const data = await res.json();
-        const items = Array.isArray(data?.items) ? (data.items as LeaderboardItem[]) : [];
-        if (!cancelled) setLeaderboard(items);
-      } catch {
-        if (!cancelled) setLeaderboard([]);
-      } finally {
-        if (!cancelled) setLoadingLeaderboard(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setVoting(mapId);
+    try {
+      const res = await fetch('/api/votemap/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mapId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to vote');
+      
+      toast.success(data.message || 'Vote successfully cast!');
+      fetchMaps();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setVoting(null);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
       <PageHeader
-        title={t(lang, 'vote.title')}
-        description={t(lang, 'vote.headerDesc')}
-        icon={<FaVoteYea className="text-6xl text-minecraft-gold" />}
+        title="Map Voting"
+        description="Vote for your favorite map to play next! You can cast one vote."
+        icon={<FaMap className="text-6xl text-minecraft-gold" />}
       />
 
       <AnimatedSection>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5 lg:gap-8">
-          <Card
-            className="rounded-[30px] border-minecraft-grass/30 bg-gradient-to-br from-minecraft-grass/10 to-minecraft-diamond/10 lg:col-span-2"
-            hover={false}
-          >
-            <div className="flex items-start justify-between gap-3 mb-5">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t(lang, 'vote.howTitle')}</h2>
-              <div className="shrink-0 h-10 w-10 rounded-xl bg-white border border-gray-200 dark:bg-white/5 dark:border-white/10 grid place-items-center text-minecraft-gold">
-                <FaVoteYea />
-              </div>
-            </div>
-
-            <ol className="space-y-3">
-              {[
-                t(lang, 'vote.howStep1'),
-                t(lang, 'vote.howStep2'),
-                t(lang, 'vote.howStep3'),
-              ].map((step, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-700 dark:border-white/10 dark:bg-black/20 dark:text-gray-300"
-                >
-                  <Badge variant="info" className="mt-0.5">
-                    {idx + 1}
-                  </Badge>
-                  <span className="leading-relaxed">{step}</span>
-                </li>
-              ))}
-            </ol>
-
-            <div className="mt-6 rounded-xl border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-black/20 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-9 w-9 rounded-xl bg-white border border-gray-200 dark:bg-white/5 dark:border-white/10 grid place-items-center text-minecraft-gold shrink-0">
-                  <FaGift />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-semibold text-gray-900 dark:text-white">{t(lang, 'vote.rewardsTitle')}</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {t(lang, 'vote.rewardsSubtitle')}
-                  </div>
-                </div>
-              </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                {t(lang, 'vote.rewardsText')}
-              </div>
-            </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="text-gray-500">Loading maps...</div>
+          </div>
+        ) : maps.length === 0 ? (
+          <Card className="rounded-[30px] border-gray-200 dark:border-white/10 text-center py-20" hover={false}>
+            <div className="text-6xl mb-4 text-gray-400 flex justify-center"><FaMap /></div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No active maps</h2>
+            <p className="text-gray-500">There is currently no ongoing map voting.</p>
           </Card>
-
-          <div className="lg:col-span-3 space-y-8">
-            <Card hover={false} className="rounded-[30px] border-gray-200 dark:border-white/10">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-6">
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{t(lang, 'vote.linksTitle')}</h2>
-                  <p className="text-gray-600 dark:text-gray-400">{t(lang, 'vote.linksSubtitle')}</p>
-                </div>
-                <Badge variant="info">{VOTE_SITES.length}</Badge>
-              </div>
-
-              {VOTE_SITES.length === 0 ? (
-                <div className="text-center py-10">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t(lang, 'vote.comingTitle')}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{t(lang, 'vote.comingDesc')}</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {VOTE_SITES.map((site) => (
-                    <div
-                      key={site.name}
-                      className="rounded-2xl border border-gray-200/80 bg-white/80 hover:bg-white transition-colors p-5 shadow-sm shadow-black/5 ring-1 ring-black/5 backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:ring-white/10"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">{site.name}</div>
-                          {site.description ? (
-                            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{site.description}</div>
-                          ) : null}
-                        </div>
-
-                        <div className="shrink-0 h-11 w-11 rounded-xl bg-white border border-gray-200 dark:bg-white/5 dark:border-white/10 grid place-items-center text-minecraft-gold">
-                          <FaVoteYea />
-                        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {maps.map((map) => (
+              <Card key={map._id} className={`rounded-[30px] overflow-hidden p-0 transition-all ${userVote === map._id ? 'border-2 border-minecraft-grass ring-4 ring-minecraft-grass/20' : 'border border-gray-200 dark:border-white/10'}`} hover>
+                {map.image && (
+                  <div className="w-full h-48 bg-gray-200 dark:bg-gray-800 relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={map.image} alt={map.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    {userVote === map._id && (
+                      <div className="absolute top-3 right-3 bg-minecraft-grass text-white rounded-full p-1.5 shadow-lg">
+                        <FaCheckCircle className="text-xl" />
                       </div>
-
-                      <div className="mt-4">
-                        <Link
-                          href={site.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => recordVoteClick(site.name)}
-                          className="w-full font-semibold rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 text-white bg-gradient-to-r from-minecraft-grass to-minecraft-diamond bg-[length:200%_200%] bg-[position:0%_50%] hover:bg-[position:100%_50%] transition-[background-position] duration-700 hover:from-minecraft-grass/90 hover:to-minecraft-diamond/90 shadow-lg shadow-minecraft-diamond/20 ring-1 ring-white/10 px-5 py-3 text-base"
-                        >
-                          <FaExternalLinkAlt />
-                          <span>{t(lang, 'vote.cta')}</span>
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                )}
+                
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white truncate pr-2">{map.title}</h3>
+                    <Badge variant="info" className="shrink-0">{map.votesCount} {map.votesCount === 1 ? 'Vote' : 'Votes'}</Badge>
+                  </div>
+                  
+                  {map.description && (
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 line-clamp-3">{map.description}</p>
+                  )}
+                  
+                  <Button 
+                    variant={userVote === map._id ? 'secondary' : 'primary'}
+                    className="w-full justify-center"
+                    onClick={() => handleVote(map._id)}
+                    disabled={voting === map._id || userVote === map._id}
+                  >
+                    {voting === map._id ? 'Voting...' : userVote === map._id ? 'Voted' : (
+                      <>
+                        <FaVoteYea className="mr-2" />
+                        Vote
+                      </>
+                    )}
+                  </Button>
                 </div>
-              )}
+              </Card>
+            ))}
+          </div>
+        )}
+      </AnimatedSection>
+
+      <AnimatedSection>
+        <div className="mt-20">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Vote Rewards</h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Participating in server votes helps our community grow! As a token of our appreciation, you will receive these rewards instantly in-game every time you participate.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <Card hover className="rounded-[24px] text-center p-6 border border-gray-200 dark:border-white/10 dark:bg-white/[0.02]">
+              <div className="text-4xl mb-4 flex justify-center drop-shadow-md">💎</div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Diamonds</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Receive 5x Diamonds instantly dropped into your inventory.</p>
             </Card>
 
-            <Card hover={false} className="rounded-[30px] border-gray-200 dark:border-white/10">
-              <div className="flex items-start justify-between gap-3 mb-5">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t(lang, 'vote.topTitle')}</h2>
-                  <p className="text-gray-600 dark:text-gray-400">{t(lang, 'vote.topSubtitle')}</p>
-                </div>
-                {status !== 'authenticated' ? <Badge variant="warning">{t(lang, 'vote.topLoginHint')}</Badge> : null}
-              </div>
+            <Card hover className="rounded-[24px] text-center p-6 border border-gray-200 dark:border-white/10 dark:bg-white/[0.02]">
+              <div className="text-4xl mb-4 flex justify-center drop-shadow-md">🔑</div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Vote Keys</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Get 1x Vote Crate Key to unlock rare cosmetics and gear.</p>
+            </Card>
 
-              {loadingLeaderboard ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400">{t(lang, 'common.loading')}</div>
-              ) : leaderboard.length === 0 ? (
-                <div className="text-sm text-gray-600 dark:text-gray-400">{t(lang, 'vote.topEmpty')}</div>
-              ) : (
-                <ol className="space-y-2">
-                  {leaderboard.map((item, idx) => (
-                    <li
-                      key={item.userId}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white/70 px-4 py-3 dark:border-white/10 dark:bg-black/20"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Badge variant="info">#{idx + 1}</Badge>
-                        <span className="font-semibold text-gray-900 dark:text-white truncate">{item.username}</span>
-                      </div>
-                      <Badge variant="success">{item.votes}</Badge>
-                    </li>
-                  ))}
-                </ol>
-              )}
+            <Card hover className="rounded-[24px] text-center p-6 border border-gray-200 dark:border-white/10 dark:bg-white/[0.02]">
+              <div className="text-4xl mb-4 flex justify-center drop-shadow-md">💰</div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Economy Cash</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Earn $500 in-game currency to spend at the server shop.</p>
+            </Card>
+
+            <Card hover className="rounded-[24px] text-center p-6 border border-gray-200 dark:border-white/10 dark:bg-white/[0.02]">
+              <div className="text-4xl mb-4 flex justify-center drop-shadow-md">✨</div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Loyalty XP</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Gain +50 Experience points to level up your Mcmmo skills.</p>
             </Card>
           </div>
         </div>

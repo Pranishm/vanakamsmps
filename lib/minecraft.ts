@@ -21,7 +21,7 @@ async function fetchJsonWithTimeout(url: string, timeoutMs: number) {
       cache: 'no-store',
       signal: controller.signal,
       headers: {
-        'user-agent': '999wrld-minecraft-status/1.0',
+        'user-agent': 'vanakamsmps-minecraft-status/1.0',
         accept: 'application/json',
       },
     });
@@ -38,8 +38,8 @@ async function fetchJsonWithTimeout(url: string, timeoutMs: number) {
 
 export async function getServerStatus(host: string, port: number = 25565): Promise<ServerStatus> {
   try {
-    // Using mcsrvstat API as a reliable fallback
-    const data = await fetchJsonWithTimeout(`https://api.mcsrvstat.us/3/${host}:${port}`, 5000);
+    // Using mcstatus.io API which resolves SRV records and proxies much better
+    const data = await fetchJsonWithTimeout(`https://api.mcstatus.io/v2/status/java/${host}:${port}`, 5000);
 
     if (!data.online) {
       return {
@@ -56,12 +56,14 @@ export async function getServerStatus(host: string, port: number = 25565): Promi
       players: {
         online: data.players?.online || 0,
         max: data.players?.max || 0,
-        list: data.players?.list || [],
+        list: Array.isArray(data.players?.list) 
+          ? data.players.list.map((p: any) => p.name_clean || p.name_raw) 
+          : [],
       },
-      version: data.version || 'Unknown',
-      motd: data.motd?.clean?.join('\n') || data.motd?.raw?.join('\n') || '',
+      version: data.version?.name_clean || data.version?.name_raw || 'Unknown',
+      motd: data.motd?.clean || data.motd?.raw || '',
       favicon: data.icon || '',
-      ping: data.debug?.ping || 0,
+      ping: 0,
     };
   } catch (error) {
     return {
