@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const encoder = new TextEncoder();
     
     // Direct SSH / Port Forwarding Method
-    const sshHost = process.env.SSH_HOST || '182.65.189.222'; // Router Public IP
+    const sshHost = process.env.SSH_HOST || '192.168.1.4'; // Router Public IP
     const sshUser = process.env.SSH_USER || 'pranish';
     const sshPass = process.env.SSH_PASS || '200813'; // Laptop Password
 
