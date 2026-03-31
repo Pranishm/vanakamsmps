@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, Button } from '@/components/ui';
 import { toast } from 'react-toastify';
 import { FaServer, FaTerminal, FaPlay, FaHeartbeat } from 'react-icons/fa';
@@ -9,20 +9,37 @@ import { useClientLang } from '@/lib/useClientLang';
 export default function ServerControlPage() {
   const lang = useClientLang();
   const [starting, setStarting] = useState(false);
+  const [logs, setLogs] = useState<string>('');
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [logs]);
 
   const startServer = async () => {
     setStarting(true);
+    setLogs('');
     toast.info("Sending boot signal...");
     try {
       const response = await fetch('/api/start-server', { method: 'POST' });
-      const data = await response.json();
-      if (data.success) {
-        toast.success("✅ " + data.message);
-      } else {
-        toast.error("❌ " + (data.message || "Error starting server."));
+      
+      if (!response.body) throw new Error("No response body");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let done = false;
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setLogs((prev) => prev + chunk);
+        }
       }
+      toast.success("✅ Server process finished.");
     } catch (error) {
       toast.error("❌ Error starting server.");
+      setLogs((prev) => prev + "\n[System] Failed to retrieve logs.");
     } finally {
       setStarting(false);
     }
@@ -63,6 +80,26 @@ export default function ServerControlPage() {
           </div>
         </div>
       </Card>
+
+      {logs && (
+        <Card className="p-0 overflow-hidden bg-[#0d1117] border-[#30363d] dark:bg-[#0d1117] dark:border-[#30363d] animate-fade-in">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-[#30363d] bg-[#161b22]">
+            <div className="flex items-center gap-2">
+              <FaTerminal className="text-gray-400 text-sm" />
+              <span className="text-xs font-mono text-gray-400">vanakam-smp-boot</span>
+            </div>
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+            </div>
+          </div>
+          <div className="p-4 h-64 overflow-y-auto font-mono text-[13px] leading-relaxed text-gray-300 whitespace-pre-wrap">
+            {logs}
+            <div ref={logsEndRef} />
+          </div>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 relative overflow-hidden">

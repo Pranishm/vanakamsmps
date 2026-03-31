@@ -88,12 +88,15 @@ export default function AdminDashboard() {
     toast.info("Sending boot signal...");
     try {
       const response = await fetch('/api/start-server', { method: 'POST' });
-      const data = await response.json();
-      if (data.success) {
-        toast.success("✅ " + data.message);
-      } else {
-        toast.error("❌ Error starting server.");
+      // The response is now a stream, we can just read it or ignore its contents for the simplified dashboard view.
+      if (!response.body) throw new Error("No response body");
+      const reader = response.body.getReader();
+      let done = false;
+      while (!done) {
+        const { done: readerDone } = await reader.read();
+        done = readerDone;
       }
+      toast.success("✅ Server process finished.");
     } catch (error) {
       toast.error("❌ Error starting server.");
     } finally {
