@@ -29,7 +29,9 @@ export async function POST(req: Request) {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${bridgeToken}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Bypass-Tunnel-Reminder': 'true',
+                'User-Agent': 'VanakamSMP-Vercel-Bot'
             }
         });
 
