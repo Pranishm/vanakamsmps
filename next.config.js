@@ -15,9 +15,8 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverExternalPackages: ['ssh2'],
-  },
+  serverExternalPackages: ['ssh2'],
+  experimental: {},
 }
 
 module.exports = nextConfig
