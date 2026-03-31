@@ -16,9 +16,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    turbopack: {
-      root: '.',
-    },
+    serverExternalPackages: ['ssh2'],
   },
 }
 
