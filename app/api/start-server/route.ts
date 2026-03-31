@@ -6,10 +6,11 @@ export async function POST(req: Request) {
 
     const customReadable = new ReadableStream({
         start(controller) {
-            controller.enqueue(encoder.encode('Initializing boot script natively on Ubuntu host...\n'));
+            controller.enqueue(encoder.encode('--- DIMENSION TEST (SPY MODE) ---\n'));
+            controller.enqueue(encoder.encode('Who are you, what folder are you in, and can you see the pranish folder?\n'));
 
             // Use spawn to execute and stream data with a forced shell
-            const child = spawn('bash', ['-c', '/home/pranish/VanakamSMP/web_start.sh']);
+            const child = spawn('bash', ['-c', 'whoami && pwd && ls -la /home/pranish/VanakamSMP/']);
 
             child.stdout.on('data', (data) => {
                 controller.enqueue(encoder.encode(data.toString()));
