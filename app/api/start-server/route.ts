@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
     const encoder = new TextEncoder();
-    
+
     // The tunnel URL pointing to the Ubuntu laptop (e.g. https://my-laptop-tunnel.ngrok.io/api/bridge-start)
-    const bridgeUrl = process.env.UBUNTU_BRIDGE_URL;
+    const bridgeUrl = process.env.UBUNTU_BRIDGE_URL || 'https://honest-planets-teach.loca.lt/api/bridge-start';
     const bridgeToken = process.env.UBUNTU_BRIDGE_TOKEN || 'vanakam-smp-secret';
 
     if (!bridgeUrl) {
