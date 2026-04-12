@@ -57,7 +57,7 @@ export async function GET(request: Request) {
           slot: Number(b.slot || 0),
           kind: String(b.kind || ''),
           days: Number(b.days || 0),
-          currency: String(b.currency || 'EUR'),
+          currency: String(b.currency || 'INR'),
           totalPrice: Number(b.totalPrice || 0),
           provider: String(b.provider || ''),
           status: String(b.status || ''),

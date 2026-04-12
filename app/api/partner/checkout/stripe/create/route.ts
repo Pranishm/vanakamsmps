@@ -4,7 +4,7 @@ import dbConnect from '@/lib/mongodb';
 import { requireAuth } from '@/lib/session';
 import PartnerAd from '@/models/PartnerAd';
 import PartnerBooking from '@/models/PartnerBooking';
-import { PARTNER_MAX_DAYS, PARTNER_PAID_MAX_SLOT, PARTNER_VIP_SLOT, computeTotalEurWithConfig, normalizeDays } from '@/lib/partnerPricing';
+import { PARTNER_MAX_DAYS, PARTNER_PAID_MAX_SLOT, PARTNER_VIP_SLOT, computeTotalAmountWithConfig, normalizeDays } from '@/lib/partnerPricing';
 import { getStripe, toStripeAmount } from '@/lib/stripe';
 import { getPartnerPricingConfig } from '@/lib/partnerPricingStore';
 import { getPartnerSlotOverrides } from '@/lib/partnerSlotOverridesStore';
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Slot no disponible' }, { status: 409 });
     }
 
-    const existingAd = await PartnerAd.findOne({ userId: user.id }).lean();
+    const existingAd = await PartnerAd.findOne({ userId: user.id || "" }).lean();
 
     const nextData = {
       serverName: parsed.data.serverName,
@@ -63,12 +63,12 @@ export async function POST(request: Request) {
       banner: parsed.data.banner || '',
     };
 
-    const ownerUsername = String((user as any).name || user.email || '');
+    const ownerUsername = String((user as any).name || user.email || "" || '');
 
     let adId = '';
     if (!existingAd) {
       const createdAd = await PartnerAd.create({
-        userId: user.id,
+        userId: user.id || "",
         ownerUsername,
         ...nextData,
         status: 'PENDING_REVIEW',
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
 
       const nextStatus = String(current.status) === 'APPROVED' && !changed ? 'APPROVED' : 'PENDING_REVIEW';
       await PartnerAd.updateOne(
-        { _id: current._id, userId: user.id },
+        { _id: current._id, userId: user.id || "" },
         {
           $set: {
             ownerUsername,
@@ -139,12 +139,12 @@ export async function POST(request: Request) {
     }
 
     const pricingConfig = await getPartnerPricingConfig();
-    const pricing = computeTotalEurWithConfig({ slot: parsed.data.slot, kind, days, config: pricingConfig });
-    const currency = 'EUR';
+    const pricing = computeTotalAmountWithConfig({ slot: parsed.data.slot, kind, days, config: pricingConfig });
+    const currency = 'INR';
 
-    if (!Number.isFinite(pricing.totalEur) || pricing.totalEur <= 0) {
+    if (!Number.isFinite(pricing.totalAmount) || pricing.totalAmount <= 0) {
       return NextResponse.json(
-        { error: 'El precio configurado es 0€. Stripe no permite pagos de 0€. Sube el precio para poder probar el pago.' },
+        { error: 'El precio configurado es 0₹. Stripe no permite pagos de 0₹. Sube el precio para poder probar el pago.' },
         { status: 400 }
       );
     }
@@ -157,14 +157,14 @@ export async function POST(request: Request) {
     try {
       const created = await PartnerBooking.create({
         adId,
-        userId: user.id,
+        userId: user.id || "",
         slot: parsed.data.slot,
         kind,
         days: pricing.days,
         currency,
-        dailyPriceEur: pricing.dailyPriceEur,
+        dailyPriceEur: pricing.dailyPrice,
         discountPct: pricing.discountPct,
-        totalPrice: pricing.totalEur,
+        totalPrice: pricing.totalAmount,
         status: 'PENDING',
         provider: 'STRIPE',
         slotActiveKey: `SLOT#${parsed.data.slot}`,
@@ -195,14 +195,14 @@ export async function POST(request: Request) {
           quantity: 1,
           price_data: {
             currency: String(currency).toLowerCase(),
-            unit_amount: toStripeAmount(pricing.totalEur),
+            unit_amount: toStripeAmount(pricing.totalAmount),
             product_data: { name: label },
           },
         },
       ],
       client_reference_id: bookingId,
       metadata: { bookingId },
-      customer_email: user.email ? String(user.email) : undefined,
+      customer_email: user.email || "" ? String(user.email || "") : undefined,
       success_url: `${siteUrl}/partner/stripe/success?bookingId=${encodeURIComponent(bookingId)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/partner/stripe/cancel?bookingId=${encodeURIComponent(bookingId)}`,
     });

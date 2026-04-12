@@ -18,9 +18,9 @@ export default function ErrorPage({
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <div className="rounded-lg border border-minecraft-grass/20 bg-black/30 backdrop-blur-sm p-6">
-        <h2 className="text-2xl font-bold text-white">Algo se ha roto en esta página</h2>
+        <h2 className="text-2xl font-bold text-white">Something went wrong on this page</h2>
         <p className="mt-2 text-gray-300">
-          Esto suele pasar por un error de JavaScript o una petición que falla. Pulsa reintentar.
+          This is usually caused by a JavaScript error or a failed request. Please try again.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
@@ -29,14 +29,14 @@ export default function ErrorPage({
             onClick={reset}
             className="px-4 py-2 rounded-md text-sm font-medium bg-minecraft-grass text-white hover:bg-minecraft-grass/80 transition-colors"
           >
-            Reintentar
+            Try again
           </button>
           <button
             type="button"
             onClick={() => window.location.reload()}
             className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
           >
-            Recargar
+            Reload
           </button>
         </div>
 

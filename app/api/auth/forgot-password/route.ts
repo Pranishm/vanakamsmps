@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     const resetUrl = `${getBaseUrl(request)}/auth/reset-password?token=${encodeURIComponent(token)}`;
 
     if (isEmailConfigured()) {
-      await sendPasswordResetEmail({ to: user.email, resetUrl });
+      await sendPasswordResetEmail({ to: user.email || "", resetUrl });
     } else {
       // Dev fallback: do not leak to client, but help local debugging
       console.warn('[forgot-password] SMTP not configured. Reset URL:', resetUrl);

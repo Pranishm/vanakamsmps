@@ -65,11 +65,11 @@ export default function AdminNewsletterPage() {
       setSettings(settingsData || {});
 
       const subsData = (await subsRes.json().catch(() => ({}))) as SubscribersResponse;
-      if (!subsRes.ok) throw new Error(String((subsData as any)?.error || (lang === 'es' ? 'Error al cargar suscriptores' : 'Error loading subscribers')));
+      if (!subsRes.ok) throw new Error(String((subsData as any)?.error || ('Error loading subscribers')));
       setSubscribers(Array.isArray(subsData.items) ? subsData.items : []);
       if (subsData.totals) setTotals(subsData.totals);
     } catch (e: any) {
-      toast.error(e?.message || (lang === 'es' ? 'Error cargando newsletter' : 'Error loading newsletter'));
+      toast.error(e?.message || ('Error loading newsletter'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -108,16 +108,16 @@ export default function AdminNewsletterPage() {
         body: JSON.stringify({ newsletter_auto_enabled: nextValue }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error actualizando automático' : 'Error updating auto mode')));
+      if (!res.ok) throw new Error(String((data as any)?.error || ('Error updating auto mode')));
 
       setSettings((prev) => ({ ...prev, newsletter_auto_enabled: nextValue }));
       toast.success(
         nextValue === 'true'
-          ? (lang === 'es' ? 'Newsletter automática encendida' : 'Auto newsletter enabled')
-          : (lang === 'es' ? 'Newsletter automática apagada' : 'Auto newsletter disabled')
+          ? ('Auto newsletter enabled')
+          : ('Auto newsletter disabled')
       );
     } catch (e: any) {
-      toast.error(e?.message || (lang === 'es' ? 'Error actualizando automático' : 'Error updating auto mode'));
+      toast.error(e?.message || ('Error updating auto mode'));
     } finally {
       setTogglingAuto(false);
     }
@@ -128,16 +128,14 @@ export default function AdminNewsletterPage() {
     try {
       const res = await fetch('/api/admin/newsletter/send', { method: 'POST' });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error enviando newsletter' : 'Error sending newsletter')));
+      if (!res.ok) throw new Error(String((data as any)?.error || ('Error sending newsletter')));
 
       toast.success(
-        lang === 'es'
-          ? `Newsletter enviada (${String((data as any)?.sent ?? 0)} emails)`
-          : `Newsletter sent (${String((data as any)?.sent ?? 0)} emails)`
+        `Newsletter sent (${String((data as any)?.sent ?? 0)} emails)`
       );
       await fetchAll({ silent: true });
     } catch (e: any) {
-      toast.error(e?.message || (lang === 'es' ? 'Error enviando newsletter' : 'Error sending newsletter'));
+      toast.error(e?.message || ('Error sending newsletter'));
     } finally {
       setSending(false);
     }
@@ -154,16 +152,16 @@ export default function AdminNewsletterPage() {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(String((data as any)?.error || (lang === 'es' ? 'Error guardando horario' : 'Error saving schedule')));
+      if (!res.ok) throw new Error(String((data as any)?.error || ('Error saving schedule')));
 
       setSettings((prev) => ({
         ...prev,
         newsletter_schedule_dow: String(scheduleDow),
       }));
 
-      toast.success(lang === 'es' ? 'Horario guardado' : 'Schedule saved');
+      toast.success('Schedule saved');
     } catch (e: any) {
-      toast.error(e?.message || (lang === 'es' ? 'Error guardando horario' : 'Error saving schedule'));
+      toast.error(e?.message || ('Error saving schedule'));
     } finally {
       setSavingSchedule(false);
     }
@@ -183,7 +181,7 @@ export default function AdminNewsletterPage() {
 
       await fetchAll({ silent: true });
     } catch (e: any) {
-      toast.error(e?.message || (lang === 'es' ? 'Error actualizando suscriptor' : 'Error updating subscriber'));
+      toast.error(e?.message || ('Error updating subscriber'));
     } finally {
       setUpdatingRowId(null);
     }
@@ -199,7 +197,7 @@ export default function AdminNewsletterPage() {
       <div className="space-y-6">
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25 overflow-hidden p-0" hover={false}>
           <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-black/20">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Newsletter' : 'Newsletter'}</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Newsletter'}</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">{t(lang, 'admin.settings.loading')}</div>
           </div>
           <div className="divide-y divide-gray-200 dark:divide-white/10">
@@ -221,12 +219,10 @@ export default function AdminNewsletterPage() {
           </div>
           <div className="min-w-0">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-white dark:via-gray-200 dark:to-white dark:bg-clip-text truncate">
-              {lang === 'es' ? 'Newsletter' : 'Newsletter'}
+              {'Newsletter'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-              {lang === 'es'
-                ? 'Gestiona suscriptores, activa/desactiva el envío semanal y envía manualmente.'
-                : 'Manage subscribers, toggle weekly auto-send, and send manually.'}
+              {'Manage subscribers, toggle weekly auto-send, and send manually.'}
             </p>
           </div>
         </div>
@@ -235,28 +231,26 @@ export default function AdminNewsletterPage() {
       <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="flex-1">
-            <div className="text-gray-900 dark:text-white font-semibold mb-2">{lang === 'es' ? 'Horario semanal' : 'Weekly schedule'}</div>
+            <div className="text-gray-900 dark:text-white font-semibold mb-2">{'Weekly schedule'}</div>
             <div className="text-xs text-gray-500">
-              {lang === 'es'
-                ? 'Solo eliges el día. En Vercel Hobby el cron corre 1 vez al día y solo enviará en el día seleccionado.'
-                : 'Pick only the day. On Vercel Hobby cron runs once per day and will only send on the selected day.'}
+              {'Pick only the day. On Vercel Hobby cron runs once per day and will only send on the selected day.'}
             </div>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div>
-                <div className="text-xs text-gray-500 mb-2">{lang === 'es' ? 'Día de la semana' : 'Weekday'}</div>
+                <div className="text-xs text-gray-500 mb-2">{'Weekday'}</div>
                 <select
                   value={scheduleDow}
                   onChange={(e) => setScheduleDow(Number(e.target.value))}
                   className="w-full px-4 py-2.5 bg-white/90 border border-gray-300/80 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-minecraft-diamond/60 focus:border-transparent transition-all duration-200 dark:bg-gray-950/30 dark:border-white/10 dark:text-gray-100"
                 >
-                  <option value={1}>{lang === 'es' ? 'Lunes' : 'Monday'}</option>
-                  <option value={2}>{lang === 'es' ? 'Martes' : 'Tuesday'}</option>
-                  <option value={3}>{lang === 'es' ? 'Miércoles' : 'Wednesday'}</option>
-                  <option value={4}>{lang === 'es' ? 'Jueves' : 'Thursday'}</option>
-                  <option value={5}>{lang === 'es' ? 'Viernes' : 'Friday'}</option>
-                  <option value={6}>{lang === 'es' ? 'Sábado' : 'Saturday'}</option>
-                  <option value={0}>{lang === 'es' ? 'Domingo' : 'Sunday'}</option>
+                  <option value={1}>{'Monday'}</option>
+                  <option value={2}>{'Tuesday'}</option>
+                  <option value={3}>{'Wednesday'}</option>
+                  <option value={4}>{'Thursday'}</option>
+                  <option value={5}>{'Friday'}</option>
+                  <option value={6}>{'Saturday'}</option>
+                  <option value={0}>{'Sunday'}</option>
                 </select>
               </div>
             </div>
@@ -264,7 +258,7 @@ export default function AdminNewsletterPage() {
 
           <div className="flex gap-2">
             <Button type="button" variant="secondary" onClick={saveSchedule} disabled={savingSchedule}>
-              {savingSchedule ? (lang === 'es' ? 'Guardando…' : 'Saving…') : (lang === 'es' ? 'Guardar horario' : 'Save schedule')}
+              {savingSchedule ? ('Saving…') : ('Save schedule')}
             </Button>
           </div>
         </div>
@@ -273,29 +267,29 @@ export default function AdminNewsletterPage() {
       <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <div className="text-gray-900 dark:text-white font-semibold mb-2">{lang === 'es' ? 'Estado' : 'Status'}</div>
+            <div className="text-gray-900 dark:text-white font-semibold mb-2">{'Status'}</div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant={autoEnabled ? 'success' : 'warning'}>
-                {autoEnabled ? (lang === 'es' ? 'AUTO: ON' : 'AUTO: ON') : (lang === 'es' ? 'AUTO: OFF' : 'AUTO: OFF')}
+                {autoEnabled ? ('AUTO: ON') : ('AUTO: OFF')}
               </Badge>
               <div className="text-xs text-gray-500">
-                {lang === 'es' ? 'Activa el automático para que Vercel Cron envíe semanalmente.' : 'Enable auto for Vercel Cron to send weekly.'}
+                {'Enable auto for Vercel Cron to send weekly.'}
               </div>
             </div>
             <div className="mt-2 text-xs text-gray-500">
-              {lastSent ? (lang === 'es' ? `Último envío: ${lastSent}` : `Last sent: ${lastSent}`) : (lang === 'es' ? 'Último envío: —' : 'Last sent: —')}
+              {lastSent ? (`Last sent: ${lastSent}`) : ('Last sent: —')}
             </div>
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                <div className="text-xs text-gray-500">{lang === 'es' ? 'Activos' : 'Active'}</div>
+                <div className="text-xs text-gray-500">{'Active'}</div>
                 <div className="text-lg font-bold text-gray-900 dark:text-white">{totals.active}</div>
               </div>
               <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                <div className="text-xs text-gray-500">{lang === 'es' ? 'Bajas' : 'Unsubscribed'}</div>
+                <div className="text-xs text-gray-500">{'Unsubscribed'}</div>
                 <div className="text-lg font-bold text-gray-900 dark:text-white">{totals.unsubscribed}</div>
               </div>
               <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                <div className="text-xs text-gray-500">{lang === 'es' ? 'Total' : 'Total'}</div>
+                <div className="text-xs text-gray-500">{'Total'}</div>
                 <div className="text-lg font-bold text-gray-900 dark:text-white">{totals.all}</div>
               </div>
             </div>
@@ -304,19 +298,19 @@ export default function AdminNewsletterPage() {
           <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
             <Button type="button" variant="secondary" onClick={() => fetchAll()} disabled={refreshing}>
               <FaSyncAlt />
-              <span>{refreshing ? (lang === 'es' ? 'Recargando…' : 'Refreshing…') : (lang === 'es' ? 'Recargar' : 'Refresh')}</span>
+              <span>{refreshing ? ('Refreshing…') : ('Refresh')}</span>
             </Button>
 
             <Button type="button" variant={autoEnabled ? 'danger' : 'success'} onClick={toggleAuto} disabled={togglingAuto}>
               {togglingAuto
-                ? (lang === 'es' ? 'Actualizando…' : 'Updating…')
+                ? ('Updating…')
                 : autoEnabled
-                  ? (lang === 'es' ? 'Apagar automático' : 'Turn off auto')
-                  : (lang === 'es' ? 'Encender automático' : 'Turn on auto')}
+                  ? ('Turn off auto')
+                  : ('Turn on auto')}
             </Button>
 
             <Button type="button" variant="primary" onClick={sendNow} disabled={sending}>
-              <span>{sending ? t(lang, 'common.sending') : (lang === 'es' ? 'Enviar ahora' : 'Send now')}</span>
+              <span>{sending ? t(lang, 'common.sending') : ('Send now')}</span>
             </Button>
           </div>
         </div>
@@ -326,7 +320,7 @@ export default function AdminNewsletterPage() {
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
             <div>
-              <div className="text-xs text-gray-500 mb-2">{lang === 'es' ? 'Estado' : 'Status'}</div>
+              <div className="text-xs text-gray-500 mb-2">{'Status'}</div>
               <select
                 value={status}
                 onChange={(e) => {
@@ -335,25 +329,25 @@ export default function AdminNewsletterPage() {
                 }}
                 className="w-full sm:w-[220px] px-4 py-2.5 bg-white/90 border border-gray-300/80 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-minecraft-diamond/60 focus:border-transparent transition-all duration-200 dark:bg-gray-950/30 dark:border-white/10 dark:text-gray-100"
               >
-                <option value="active">{lang === 'es' ? 'Activos' : 'Active'}</option>
-                <option value="unsubscribed">{lang === 'es' ? 'Bajas' : 'Unsubscribed'}</option>
-                <option value="all">{lang === 'es' ? 'Todos' : 'All'}</option>
+                <option value="active">{'Active'}</option>
+                <option value="unsubscribed">{'Unsubscribed'}</option>
+                <option value="all">{'All'}</option>
               </select>
             </div>
 
             <div className="flex-1">
-              <div className="text-xs text-gray-500 mb-2">{lang === 'es' ? 'Buscar por email' : 'Search by email'}</div>
+              <div className="text-xs text-gray-500 mb-2">{'Search by email'}</div>
               <div className="flex gap-2">
-                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={lang === 'es' ? 'email@...' : 'email@...'} />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={'email@...'} />
                 <Button type="button" variant="secondary" onClick={onSearch}>
-                  {lang === 'es' ? 'Buscar' : 'Search'}
+                  {'Search'}
                 </Button>
               </div>
             </div>
           </div>
 
           <div className="text-xs text-gray-500">
-            {lang === 'es' ? `Mostrando: ${filteredStats.totalShown}` : `Showing: ${filteredStats.totalShown}`}
+            {`Showing: ${filteredStats.totalShown}`}
           </div>
         </div>
 
@@ -362,16 +356,16 @@ export default function AdminNewsletterPage() {
             <thead>
               <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-white/10">
                 <th className="px-4 py-3 font-semibold">Email</th>
-                <th className="px-4 py-3 font-semibold">{lang === 'es' ? 'Estado' : 'Status'}</th>
-                <th className="px-4 py-3 font-semibold">{lang === 'es' ? 'Suscrito' : 'Subscribed'}</th>
-                <th className="px-4 py-3 font-semibold text-right">{lang === 'es' ? 'Acciones' : 'Actions'}</th>
+                <th className="px-4 py-3 font-semibold">{'Status'}</th>
+                <th className="px-4 py-3 font-semibold">{'Subscribed'}</th>
+                <th className="px-4 py-3 font-semibold text-right">{'Actions'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-white/10">
               {subscribers.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-gray-600 dark:text-gray-400">
-                    {lang === 'es' ? 'No hay suscriptores' : 'No subscribers'}
+                    {'No subscribers'}
                   </td>
                 </tr>
               ) : (
@@ -386,7 +380,7 @@ export default function AdminNewsletterPage() {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={isUnsub ? 'warning' : 'success'}>
-                          {isUnsub ? (lang === 'es' ? 'BAJA' : 'UNSUB') : (lang === 'es' ? 'ACTIVO' : 'ACTIVE')}
+                          {isUnsub ? ('UNSUB') : ('ACTIVE')}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
@@ -404,7 +398,7 @@ export default function AdminNewsletterPage() {
                               className="!px-3"
                             >
                               <FaBan />
-                              <span>{lang === 'es' ? 'Dar de baja' : 'Unsubscribe'}</span>
+                              <span>{'Unsubscribe'}</span>
                             </Button>
                           ) : (
                             <Button
@@ -416,7 +410,7 @@ export default function AdminNewsletterPage() {
                               className="!px-3"
                             >
                               <FaCheckCircle />
-                              <span>{lang === 'es' ? 'Reactivar' : 'Resubscribe'}</span>
+                              <span>{'Resubscribe'}</span>
                             </Button>
                           )}
 
@@ -429,7 +423,7 @@ export default function AdminNewsletterPage() {
                             className="!px-3"
                           >
                             <FaTrash />
-                            <span>{lang === 'es' ? 'Borrar' : 'Delete'}</span>
+                            <span>{'Delete'}</span>
                           </Button>
                         </div>
                       </td>
@@ -442,10 +436,10 @@ export default function AdminNewsletterPage() {
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-xs text-gray-500">{lang === 'es' ? `Página ${page}` : `Page ${page}`}</div>
+          <div className="text-xs text-gray-500">{`Page ${page}`}</div>
           <div className="flex gap-2">
             <Button type="button" variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
-              {lang === 'es' ? 'Anterior' : 'Prev'}
+              {'Prev'}
             </Button>
             <Button
               type="button"
@@ -453,7 +447,7 @@ export default function AdminNewsletterPage() {
               onClick={() => setPage((p) => p + 1)}
               disabled={subscribers.length < limit}
             >
-              {lang === 'es' ? 'Siguiente' : 'Next'}
+              {'Next'}
             </Button>
           </div>
         </div>

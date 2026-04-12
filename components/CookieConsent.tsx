@@ -87,7 +87,7 @@ export default function CookieConsent() {
         
         <p className="mb-5 text-sm leading-relaxed text-gray-300">
           {copy.text}{' '}
-          <Link href="/privacidad" className="font-semibold text-minecraft-diamond hover:underline hover:text-cyan-300 transition-colors">
+          <Link href="/privacy" className="font-semibold text-minecraft-diamond hover:underline hover:text-cyan-300 transition-colors">
             {copy.policy}
           </Link>
         </p>

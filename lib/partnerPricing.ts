@@ -11,8 +11,8 @@ export type PartnerPricingConfig = {
 export const PARTNER_SLOTS = 10;
 export const PARTNER_MAX_DAYS = 30;
 
-// Paid placement is limited to VIP + slots #1..#5.
-// Slots #6..#10 are free but require admin approval.
+// Paid placement is limited to VIP + slots #1–#5.
+// Slots #6–#10 are free but require admin approval.
 export const PARTNER_PAID_MAX_SLOT = 5;
 
 // VIP is a special pinned slot that always appears above #1
@@ -32,28 +32,28 @@ export function isFreePartnerSlot(slot: number): boolean {
   return s > PARTNER_PAID_MAX_SLOT && s <= PARTNER_SLOTS;
 }
 
-const DEFAULT_DAILY_PRICES_EUR = [
-  5.0,  // #1
-  4.0,  // #2
-  3.0,  // #3
-  2.5,  // #4
-  2.0,  // #5
-  1.5,  // #6
-  1.2,  // #7
-  1.0,  // #8
-  0.8,  // #9
-  0.6,  // #10
+const DEFAULT_DAILY_PRICES_INR = [
+  500.0, // #1
+  400.0, // #2
+  300.0, // #3
+  250.0, // #4
+  200.0, // #5
+  150.0, // #6
+  120.0, // #7
+  100.0, // #8
+  80.0,  // #9
+  60.0,  // #10
 ];
 
-function getVipDailyPriceEur(): number {
-  const raw = Number(process.env.PARTNER_VIP_DAILY_PRICE_EUR);
+function getVipDailyPrice(): number {
+  const raw = Number(process.env.PARTNER_VIP_DAILY_PRICE_INR);
   if (Number.isFinite(raw) && raw >= 0) return raw;
   // Default: notably more expensive than slot #1
-  return DEFAULT_DAILY_PRICES_EUR[0] * 2;
+  return DEFAULT_DAILY_PRICES_INR[0] * 2;
 }
 
 export function getDefaultPartnerPricingConfigFromEnv(): PartnerPricingConfig {
-  const daily = getSlotDailyPricesEur();
+  const daily = getSlotDailyPrices();
   const slotTotalsEur = daily.map((d) =>
     Array.from({ length: PARTNER_MAX_DAYS }, (_, idx) => {
       const days = idx + 1;
@@ -62,7 +62,7 @@ export function getDefaultPartnerPricingConfigFromEnv(): PartnerPricingConfig {
     })
   );
 
-  const vipDaily = getVipDailyPriceEur();
+  const vipDaily = getVipDailyPrice();
   const vipTotalsEur = Array.from({ length: PARTNER_MAX_DAYS }, (_, idx) => {
     const days = idx + 1;
     const total = Number(vipDaily) * days;
@@ -75,7 +75,7 @@ export function getDefaultPartnerPricingConfigFromEnv(): PartnerPricingConfig {
 }
 
 export function getPartnerCurrency(): string {
-  return String(process.env.PARTNER_CURRENCY || process.env.SHOP_CURRENCY || 'EUR').toUpperCase();
+  return String(process.env.PARTNER_CURRENCY || process.env.SHOP_CURRENCY || 'INR').toUpperCase();
 }
 
 export function getMonthlyDiscountPct(): number {
@@ -84,38 +84,38 @@ export function getMonthlyDiscountPct(): number {
   return Math.min(80, Math.max(0, raw));
 }
 
-export function getSlotDailyPricesEur(): number[] {
+export function getSlotDailyPrices(): number[] {
   const raw = String(process.env.PARTNER_SLOT_DAILY_PRICES_JSON || '').trim();
-  if (!raw) return DEFAULT_DAILY_PRICES_EUR;
+  if (!raw) return DEFAULT_DAILY_PRICES_INR;
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return DEFAULT_DAILY_PRICES_EUR;
+    if (!Array.isArray(parsed)) return DEFAULT_DAILY_PRICES_INR;
     const nums = parsed.map((n) => Number(n)).filter((n) => Number.isFinite(n) && n >= 0);
-    if (nums.length !== PARTNER_SLOTS) return DEFAULT_DAILY_PRICES_EUR;
+    if (nums.length !== PARTNER_SLOTS) return DEFAULT_DAILY_PRICES_INR;
     return nums;
   } catch {
-    return DEFAULT_DAILY_PRICES_EUR;
+    return DEFAULT_DAILY_PRICES_INR;
   }
 }
 
-export function getDailyPriceEur(slot: number): number {
+export function getDailyPrice(slot: number): number {
   const idx = Math.floor(slot) - 1;
-  const prices = getSlotDailyPricesEur();
+  const prices = getSlotDailyPrices();
   if (idx < 0 || idx >= prices.length) return prices[prices.length - 1];
   return prices[idx];
 }
 
-export function getDailyPriceEurWithConfig(slot: number, config: PartnerPricingConfig): number {
+export function getDailyPriceWithConfig(slot: number, config: PartnerPricingConfig): number {
   if (isVipSlot(slot)) {
     const day1 = Array.isArray(config?.vipTotalsEur) ? Number(config.vipTotalsEur[0]) : NaN;
     if (Number.isFinite(day1) && day1 >= 0) return Math.round(day1 * 100) / 100;
-    return getVipDailyPriceEur();
+    return getVipDailyPrice();
   }
   const idx = Math.floor(slot) - 1;
   const row = Array.isArray(config?.slotTotalsEur) ? config.slotTotalsEur[idx] : null;
   const day1 = Array.isArray(row) ? Number(row[0]) : NaN;
   if (Number.isFinite(day1) && day1 >= 0) return Math.round(day1 * 100) / 100;
-  return getDailyPriceEur(slot);
+  return getDailyPrice(slot);
 }
 
 export function normalizeDays(kind: PartnerDurationKind, daysRaw?: number): number {
@@ -125,12 +125,12 @@ export function normalizeDays(kind: PartnerDurationKind, daysRaw?: number): numb
   return Math.min(PARTNER_MAX_DAYS, Math.max(1, d));
 }
 
-export function computeTotalEur(params: {
+export function computeTotalAmount(params: {
   slot: number;
   kind: PartnerDurationKind;
   days?: number;
-}): { days: number; dailyPriceEur: number; discountPct: number; totalEur: number } {
-  return computeTotalEurWithConfig({
+}): { days: number; dailyPrice: number; discountPct: number; totalAmount: number; dailyPriceEur: number; totalEur: number } {
+  return computeTotalAmountWithConfig({
     slot: params.slot,
     kind: params.kind,
     days: params.days,
@@ -138,17 +138,19 @@ export function computeTotalEur(params: {
   });
 }
 
-export function computeTotalEurWithConfig(params: {
+export const computeTotalEur = computeTotalAmount;
+
+export function computeTotalAmountWithConfig(params: {
   slot: number;
   kind: PartnerDurationKind;
   days?: number;
   config: PartnerPricingConfig;
-}): { days: number; dailyPriceEur: number; discountPct: number; totalEur: number } {
+}): { days: number; dailyPrice: number; discountPct: number; totalAmount: number; dailyPriceEur: number; totalEur: number } {
   const days = normalizeDays(params.kind, params.days);
 
   if (isVipSlot(params.slot)) {
     const fromTable = Array.isArray(params.config?.vipTotalsEur) ? Number(params.config.vipTotalsEur[days - 1]) : NaN;
-    const fallbackDaily = getDailyPriceEurWithConfig(PARTNER_VIP_SLOT, params.config);
+    const fallbackDaily = getDailyPriceWithConfig(PARTNER_VIP_SLOT, params.config);
 
     const total = Number.isFinite(fromTable) && fromTable >= 0
       ? Math.round(fromTable * 100) / 100
@@ -158,8 +160,12 @@ export function computeTotalEurWithConfig(params: {
 
     return {
       days,
-      dailyPriceEur: Math.round(daily * 100) / 100,
+      dailyPrice: Math.round(daily * 100) / 100,
       discountPct: 0,
+      totalAmount: total,
+
+      // Backward compatibility aliases
+      dailyPriceEur: Math.round(daily * 100) / 100,
       totalEur: total,
     };
   }
@@ -167,7 +173,7 @@ export function computeTotalEurWithConfig(params: {
   const slotIdx = Math.floor(params.slot) - 1;
   const row = Array.isArray(params.config?.slotTotalsEur) ? params.config.slotTotalsEur[slotIdx] : null;
   const fromTable = Array.isArray(row) ? Number(row[days - 1]) : NaN;
-  const fallbackDaily = getDailyPriceEurWithConfig(params.slot, params.config);
+  const fallbackDaily = getDailyPriceWithConfig(params.slot, params.config);
 
   const total = Number.isFinite(fromTable) && fromTable >= 0
     ? Math.round(fromTable * 100) / 100
@@ -177,8 +183,14 @@ export function computeTotalEurWithConfig(params: {
 
   return {
     days,
-    dailyPriceEur: Math.round(daily * 100) / 100,
+    dailyPrice: Math.round(daily * 100) / 100,
     discountPct: 0,
+    totalAmount: total,
+
+    // Backward compatibility aliases
+    dailyPriceEur: Math.round(daily * 100) / 100,
     totalEur: total,
   };
 }
+
+export const computeTotalEurWithConfig = computeTotalAmountWithConfig;

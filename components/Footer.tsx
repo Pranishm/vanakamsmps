@@ -52,34 +52,29 @@ const Footer = () => {
 
   return (
     <footer
-      className={`relative mt-16 overflow-hidden sm:mt-20 ${
-        isHome
+      className={`relative mt-16 overflow-hidden sm:mt-20 ${isHome
           ? 'border-t border-minecraft-diamond/15 bg-[linear-gradient(180deg,rgba(2,7,20,0.72),rgba(2,10,26,0.94))]'
           : 'border-t border-transparent bg-[linear-gradient(180deg,rgba(14,17,26,0.94),rgba(16,18,28,0.98))]'
-      }`}
+        }`}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
-          className={`absolute inset-x-0 top-0 h-32 ${
-            isHome
+          className={`absolute inset-x-0 top-0 h-32 ${isHome
               ? 'bg-[linear-gradient(180deg,rgba(71,209,232,0.1),transparent)]'
               : 'bg-[linear-gradient(180deg,rgba(255,214,226,0.08),transparent)]'
-          }`}
+            }`}
         />
         <div
-          className={`absolute -left-16 top-12 h-44 w-44 rounded-full blur-3xl ${
-            isHome ? 'bg-minecraft-diamond/12' : 'bg-rose-300/8'
-          }`}
+          className={`absolute -left-16 top-12 h-44 w-44 rounded-full blur-3xl ${isHome ? 'bg-minecraft-diamond/12' : 'bg-rose-300/8'
+            }`}
         />
         <div
-          className={`absolute right-0 top-10 h-56 w-56 rounded-full blur-3xl ${
-            isHome ? 'bg-minecraft-grass/10' : 'bg-amber-200/6'
-          }`}
+          className={`absolute right-0 top-10 h-56 w-56 rounded-full blur-3xl ${isHome ? 'bg-minecraft-grass/10' : 'bg-amber-200/6'
+            }`}
         />
         <div
-          className={`absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px] ${
-            isHome ? 'opacity-[0.08]' : 'opacity-[0.05]'
-          }`}
+          className={`absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px] ${isHome ? 'opacity-[0.08]' : 'opacity-[0.05]'
+            }`}
         />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
@@ -102,17 +97,17 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/tienda" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
+                <Link href="/shop" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
                   {t(lang, 'nav.shop')}
                 </Link>
               </li>
               <li>
-                <Link href="/normas" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
+                <Link href="/rules" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
                   {t(lang, 'nav.rules')}
                 </Link>
               </li>
               <li>
-                <Link href="/soporte" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
+                <Link href="/support" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
                   {t(lang, 'nav.support')}
                 </Link>
               </li>
@@ -129,12 +124,12 @@ const Footer = () => {
             <h3 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">{t(lang, 'footer.legal')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/terminos" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
+                <Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
                   {t(lang, 'footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link href="/privacidad" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
+                <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-minecraft-grass transition-colors text-sm">
                   {t(lang, 'footer.privacy')}
                 </Link>
               </li>
@@ -196,8 +191,8 @@ const Footer = () => {
                   disabled={newsletterLoading}
                   className="w-full rounded-full border border-gray-300 dark:border-white/20 bg-white/80 dark:bg-black/30 px-5 py-3.5 pr-32 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 transition-colors focus:border-minecraft-grass focus:outline-none focus:ring-1 focus:ring-minecraft-grass"
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={newsletterLoading || !newsletterEmail.trim()}
                   className="absolute right-1 top-1 bottom-1 rounded-full bg-minecraft-grass px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-500 disabled:opacity-50"
                 >

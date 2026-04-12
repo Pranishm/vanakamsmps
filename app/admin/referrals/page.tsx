@@ -40,13 +40,13 @@ export default function AdminReferralsPage() {
     try {
       const res = await fetch('/api/admin/referrals', { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
       const list = Array.isArray((data as any)?.profiles) ? (data as any).profiles : [];
       setProfiles(list as ReferralProfile[]);
       setReferralDiscountPercent(String((data as any)?.referralDiscountPercent ?? 5));
       setReferralWebhook(String((data as any)?.referralWebhook || (data as any)?.shop_referral_discord_webhook || ''));
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error cargando referidos' : 'Error loading referrals'));
+      toast.error(err?.message || ('Error loading referrals'));
     } finally {
       setLoading(false);
     }
@@ -65,12 +65,12 @@ export default function AdminReferralsPage() {
         body: JSON.stringify({ userQuery: userQuery.trim() }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
-      toast.success(lang === 'es' ? 'Perfil de referido listo' : 'Referral profile ready');
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
+      toast.success('Referral profile ready');
       setUserQuery('');
       fetchProfiles();
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error creando referido' : 'Error creating referral'));
+      toast.error(err?.message || ('Error creating referral'));
     } finally {
       setCreating(false);
     }
@@ -84,10 +84,10 @@ export default function AdminReferralsPage() {
         body: JSON.stringify({ id: profile._id, active: !profile.active }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
       fetchProfiles();
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error actualizando referido' : 'Error updating referral'));
+      toast.error(err?.message || ('Error updating referral'));
     }
   };
 
@@ -101,11 +101,11 @@ export default function AdminReferralsPage() {
         body: JSON.stringify({ referralDiscountPercent: value }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
       setReferralDiscountPercent(String((data as any)?.referralDiscountPercent ?? value));
-      toast.success(lang === 'es' ? 'Descuento de referidos actualizado' : 'Referral discount updated');
+      toast.success('Referral discount updated');
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error actualizando descuento de referidos' : 'Error updating referral discount'));
+      toast.error(err?.message || ('Error updating referral discount'));
     } finally {
       setSavingDiscount(false);
     }
@@ -120,11 +120,11 @@ export default function AdminReferralsPage() {
         body: JSON.stringify({ shop_referral_discord_webhook: referralWebhook.trim() }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
       setReferralWebhook(String(referralWebhook || '').trim());
-      toast.success(lang === 'es' ? 'Webhook de referidos guardado' : 'Referral webhook saved');
+      toast.success('Referral webhook saved');
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error guardando webhook de referidos' : 'Error saving referral webhook'));
+      toast.error(err?.message || ('Error saving referral webhook'));
     } finally {
       setSavingWebhook(false);
     }
@@ -138,10 +138,10 @@ export default function AdminReferralsPage() {
         headers: { 'Content-Type': 'application/json' },
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error' : 'Error'));
-      toast.success(lang === 'es' ? 'Webhook de prueba enviado' : 'Referral test webhook sent');
+      if (!res.ok) throw new Error((data as any).error || ('Error'));
+      toast.success('Referral test webhook sent');
     } catch (err: any) {
-      toast.error(err?.message || (lang === 'es' ? 'Error enviando webhook de prueba' : 'Error sending referral test webhook'));
+      toast.error(err?.message || ('Error sending referral test webhook'));
     } finally {
       setTestingWebhook(false);
     }
@@ -155,28 +155,28 @@ export default function AdminReferralsPage() {
             <FaUserFriends />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Referidos' : 'Referrals'}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{'Referrals'}</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {lang === 'es' ? 'Gestiona códigos de invitación personales y recompensas.' : 'Manage personal invite codes and rewards.'}
+              {'Manage personal invite codes and rewards.'}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3">
           <Input
-            placeholder={lang === 'es' ? 'ID de usuario / email / username' : 'User ID / email / username'}
+            placeholder={'User ID / email / username'}
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
           />
           <Button type="button" onClick={createForUser} disabled={creating || !userQuery.trim()}>
             <FaPlus />
-            <span>{creating ? (lang === 'es' ? 'Creando...' : 'Creating...') : (lang === 'es' ? 'Crear/Asegurar perfil' : 'Create/Ensure profile')}</span>
+            <span>{creating ? ('Creating...') : ('Create/Ensure profile')}</span>
           </Button>
         </div>
 
         <div className="mt-4 rounded-xl border border-gray-200 dark:border-white/10 p-3">
           <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-            {lang === 'es' ? 'Porcentaje de descuento por referido' : 'Referral discount percentage'}
+            {'Referral discount percentage'}
           </div>
           <div className="flex flex-col md:flex-row gap-3">
             <Input
@@ -188,19 +188,17 @@ export default function AdminReferralsPage() {
               placeholder="5"
             />
             <Button type="button" onClick={saveReferralDiscount} disabled={savingDiscount}>
-              <span>{savingDiscount ? (lang === 'es' ? 'Guardando...' : 'Saving...') : (lang === 'es' ? 'Guardar %' : 'Save %')}</span>
+              <span>{savingDiscount ? ('Saving...') : ('Save %')}</span>
             </Button>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-            {lang === 'es'
-              ? 'Este descuento se aplica automáticamente a usuarios que se registraron con un código válido.'
-              : 'This discount is applied automatically to users who signed up with a valid referral code.'}
+            {'This discount is applied automatically to users who signed up with a valid referral code.'}
           </div>
         </div>
 
         <div className="mt-4 rounded-xl border border-gray-200 dark:border-white/10 p-3">
           <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-            {lang === 'es' ? 'Webhook de recompensas por referido (Discord)' : 'Referral reward webhook (Discord)'}
+            {'Referral reward webhook (Discord)'}
           </div>
           <div className="flex flex-col md:flex-row gap-3">
             <Input
@@ -210,10 +208,10 @@ export default function AdminReferralsPage() {
               placeholder="https://discord.com/api/webhooks/..."
             />
             <Button type="button" variant="secondary" onClick={testReferralWebhook} disabled={testingWebhook || !referralWebhook.trim()}>
-              <span>{testingWebhook ? (lang === 'es' ? 'Enviando prueba...' : 'Sending test...') : (lang === 'es' ? 'Enviar prueba' : 'Send test')}</span>
+              <span>{testingWebhook ? ('Sending test...') : ('Send test')}</span>
             </Button>
             <Button type="button" onClick={saveReferralWebhook} disabled={savingWebhook}>
-              <span>{savingWebhook ? (lang === 'es' ? 'Guardando...' : 'Saving...') : (lang === 'es' ? 'Guardar webhook' : 'Save webhook')}</span>
+              <span>{savingWebhook ? ('Saving...') : ('Save webhook')}</span>
             </Button>
           </div>
         </div>
@@ -221,9 +219,9 @@ export default function AdminReferralsPage() {
 
       <Card hover={false} className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25">
         {loading ? (
-          <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Cargando...' : 'Loading...'}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">{'Loading...'}</div>
         ) : profiles.length === 0 ? (
-          <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Aún no hay referidos.' : 'No referrals yet.'}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">{'No referrals yet.'}</div>
         ) : (
           <div className="space-y-2">
             {profiles.map((p) => (
@@ -231,15 +229,15 @@ export default function AdminReferralsPage() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <div className="font-semibold text-gray-900 dark:text-white">{p.code}</div>
-                    <Badge variant={p.active ? 'success' : 'default'}>{p.active ? (lang === 'es' ? 'ACTIVO' : 'ACTIVE') : 'OFF'}</Badge>
+                    <Badge variant={p.active ? 'success' : 'default'}>{p.active ? ('ACTIVE') : 'OFF'}</Badge>
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    {p.user?.username || p.user?.email || p.userId} | {lang === 'es' ? 'Invitaciones' : 'Invites'}: {p.successfulInvites} | {lang === 'es' ? 'Recompensas' : 'Rewards'}: {Number(p.totalRewardsGiven || 0).toFixed(2)}
+                    {p.user?.username || p.user?.email || p.userId} | {'Invites'}: {p.successfulInvites} | {'Rewards'}: {Number(p.totalRewardsGiven || 0).toFixed(2)}
                   </div>
                 </div>
 
                 <Button type="button" variant="secondary" onClick={() => toggleActive(p)}>
-                  <span>{p.active ? (lang === 'es' ? 'Desactivar' : 'Disable') : (lang === 'es' ? 'Activar' : 'Enable')}</span>
+                  <span>{p.active ? ('Disable') : ('Enable')}</span>
                 </Button>
               </div>
             ))}

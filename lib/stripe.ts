@@ -22,6 +22,6 @@ export function getStripe(): Stripe {
 export function toStripeAmount(amount: number): number {
   const n = Number(amount);
   if (!Number.isFinite(n) || n <= 0) throw new Error('Importe inválido');
-  // Prices in this project are stored as major currency units (e.g. EUR).
+  // Prices in this project are stored as major currency units (e.g. INR).
   return Math.max(1, Math.round(n * 100));
 }

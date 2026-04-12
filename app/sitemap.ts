@@ -12,17 +12,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/vote`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/tienda`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/foro`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-    { url: `${baseUrl}/noticias`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
-    { url: `${baseUrl}/normas`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/shop`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/forum`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
+    { url: `${baseUrl}/news`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
+    { url: `${baseUrl}/rules`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/staff`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/partner`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/soporte`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/support`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/llms.txt`, lastModified: now, changeFrequency: 'weekly', priority: 0.4 },
-    { url: `${baseUrl}/noticias/rss.xml`, lastModified: now, changeFrequency: 'daily', priority: 0.4 },
-    { url: `${baseUrl}/terminos`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/privacidad`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${baseUrl}/news/rss.xml`, lastModified: now, changeFrequency: 'daily', priority: 0.4 },
+    { url: `${baseUrl}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${baseUrl}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${baseUrl}/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!slug) continue;
       const last = (p as any).updatedAt || (p as any).publishedAt || now;
       entries.push({
-        url: `${baseUrl}/noticias/${encodeURIComponent(slug)}`,
+        url: `${baseUrl}/news/${encodeURIComponent(slug)}`,
         lastModified: new Date(last),
         changeFrequency: 'weekly',
         priority: 0.8,
@@ -59,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!id) continue;
       const last = (fp as any).updatedAt || (fp as any).createdAt || now;
       entries.push({
-        url: `${baseUrl}/foro/${encodeURIComponent(id)}`,
+        url: `${baseUrl}/forum/${encodeURIComponent(id)}`,
         lastModified: new Date(last),
         changeFrequency: 'weekly',
         priority: 0.6,
@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!username) continue;
       const last = (user as any).updatedAt || (user as any).createdAt || now;
       entries.push({
-        url: `${baseUrl}/perfil/${encodeURIComponent(username)}`,
+        url: `${baseUrl}/profile/${encodeURIComponent(username)}`,
         lastModified: new Date(last),
         changeFrequency: 'monthly',
         priority: 0.55,

@@ -174,13 +174,13 @@ export default function AdminUserDetailPage() {
         body: JSON.stringify({ userId, updates }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error al actualizar usuario' : 'Error updating user'));
+      if (!res.ok) throw new Error((data as any).error || ('Error updating user'));
       const next = data as AdminUser;
       setUser((prev) => (prev ? { ...prev, ...next } : next));
       if (next) syncDraftFromUser({ ...(user as any), ...(next as any) } as AdminUser);
-      toast.success(lang === 'es' ? 'Usuario actualizado' : 'User updated');
+      toast.success('User updated');
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : lang === 'es' ? 'Error al actualizar usuario' : 'Error updating user');
+      toast.error(e instanceof Error ? e.message : 'Error updating user');
     } finally {
       setSaving(false);
     }
@@ -188,7 +188,7 @@ export default function AdminUserDetailPage() {
 
   const deleteUser = async () => {
     if (!userId) return;
-    const ok = window.confirm(lang === 'es' ? '¿Eliminar este usuario?' : 'Delete this user?');
+    const ok = window.confirm('Delete this user?');
     if (!ok) return;
     try {
       const res = await fetch('/api/admin/users', {
@@ -197,11 +197,11 @@ export default function AdminUserDetailPage() {
         body: JSON.stringify({ userId }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error al eliminar usuario' : 'Error deleting user'));
-      toast.success(lang === 'es' ? 'Usuario eliminado' : 'User deleted');
+      if (!res.ok) throw new Error((data as any).error || ('Error deleting user'));
+      toast.success('User deleted');
       router.push('/admin/users');
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : lang === 'es' ? 'Error al eliminar usuario' : 'Error deleting user');
+      toast.error(e instanceof Error ? e.message : 'Error deleting user');
     }
   };
 
@@ -235,9 +235,9 @@ export default function AdminUserDetailPage() {
   const isProtectedOwner = user.role === 'OWNER' && !canEditOwnerAccount;
 
   const statusBadge = user.isBanned ? (
-    <Badge variant="danger">{lang === 'es' ? 'Baneado' : 'Banned'}</Badge>
+    <Badge variant="danger">{'Banned'}</Badge>
   ) : (
-    <Badge variant="success">{lang === 'es' ? 'Activo' : 'Active'}</Badge>
+    <Badge variant="success">{'Active'}</Badge>
   );
 
   return (
@@ -246,12 +246,12 @@ export default function AdminUserDetailPage() {
         <div className="flex items-center gap-2">
           <Button type="button" variant="secondary" onClick={() => router.push('/admin/users')} className="gap-2">
             <FaArrowLeft />
-            <span>{lang === 'es' ? 'Usuarios' : 'Users'}</span>
+            <span>{'Users'}</span>
           </Button>
           <Link href={`/perfil/${encodeURIComponent(user.username)}`} target="_blank" className="inline-flex">
             <Button type="button" variant="secondary" className="gap-2">
               <FaExternalLinkAlt />
-              <span>{lang === 'es' ? 'Ver perfil' : 'View profile'}</span>
+              <span>{'View profile'}</span>
             </Button>
           </Link>
         </div>
@@ -281,13 +281,13 @@ export default function AdminUserDetailPage() {
                 <div className="text-xl font-bold text-gray-900 dark:text-white truncate max-w-[520px]">@{user.username}</div>
                 {user.verified ? (
                   <span className="inline-flex items-center gap-2">
-                    <Badge variant="info">{lang === 'es' ? 'Verificado' : 'Verified'}</Badge>
+                    <Badge variant="info">{'Verified'}</Badge>
                     {Array.isArray(user.badges)
                       ? user.badges.slice(0, 6).map((b) => {
                           const id = normalizeBadgeId(b);
                           const meta = badgeBySlug.get(id);
                           if (!meta || !meta.icon) return null;
-                          const label = (lang === 'es' ? meta.labelEs : meta.labelEn) || meta.slug;
+                          const label = meta.labelEn || meta.slug;
                           return (
                             <span key={id} className="inline-flex items-center justify-center" title={label}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -310,7 +310,7 @@ export default function AdminUserDetailPage() {
               </div>
               <div className="text-xs text-gray-600 dark:text-gray-400 break-all">{user.email}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                {lang === 'es' ? 'Creado:' : 'Created:'} {formatDateTime(user.createdAt, lang === 'es' ? 'es-ES' : 'en-US')}
+                {'Created:'} {formatDateTime(user.createdAt, 'en-US')}
               </div>
             </div>
           </div>
@@ -320,8 +320,8 @@ export default function AdminUserDetailPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Identidad' : 'Identity'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Username y rol' : 'Username and role'}</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Identity'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Username and role'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div>
@@ -364,8 +364,8 @@ export default function AdminUserDetailPage() {
 
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Estado' : 'Status'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Verificado y ban' : 'Verified and ban'}</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Status'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Verified and ban'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -378,7 +378,7 @@ export default function AdminUserDetailPage() {
                   className="gap-2"
                 >
                   <FaCheckCircle />
-                  <span>{Boolean(user.verified) ? (lang === 'es' ? 'Quitar verificado' : 'Unverify') : (lang === 'es' ? 'Verificar' : 'Verify')}</span>
+                  <span>{Boolean(user.verified) ? ('Unverify') : ('Verify')}</span>
                 </Button>
               ) : null}
 
@@ -390,18 +390,18 @@ export default function AdminUserDetailPage() {
                 className={"gap-2 " + (user.isBanned ? 'text-minecraft-grass' : 'text-red-500')}
               >
                 <FaBan />
-                <span>{user.isBanned ? (lang === 'es' ? 'Desbanear' : 'Unban') : lang === 'es' ? 'Banear' : 'Ban'}</span>
+                <span>{user.isBanned ? ('Unban') : 'Ban'}</span>
               </Button>
             </div>
 
             <div>
-              <div className="text-xs text-gray-700 dark:text-gray-400 mb-2">{lang === 'es' ? 'Motivo de ban (opcional)' : 'Ban reason (optional)'}</div>
+              <div className="text-xs text-gray-700 dark:text-gray-400 mb-2">{'Ban reason (optional)'}</div>
               <div className="flex items-center gap-2">
                 <Input
                   value={bannedReasonDraft}
                   onChange={(e) => setBannedReasonDraft(e.target.value)}
                   disabled={saving || isProtectedOwner}
-                  placeholder={lang === 'es' ? 'Ej: spam' : 'e.g. spam'}
+                  placeholder={'e.g. spam'}
                 />
                 <Button type="button" onClick={() => patchUser({ bannedReason: bannedReasonDraft })} disabled={saving || isProtectedOwner} className="gap-2">
                   <FaSave />
@@ -414,12 +414,12 @@ export default function AdminUserDetailPage() {
 
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Saldo del usuario' : 'User balance'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Modifica el saldo disponible para compras en tienda' : 'Edit the balance available for shop purchases'}</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{'User balance'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Edit the balance available for shop purchases'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div>
-              <div className="text-xs text-gray-700 dark:text-gray-400 mb-2">{lang === 'es' ? 'Saldo actual' : 'Current balance'}</div>
+              <div className="text-xs text-gray-700 dark:text-gray-400 mb-2">{'Current balance'}</div>
               <div className="flex items-center gap-2">
                 <Input
                   type="number"
@@ -441,7 +441,7 @@ export default function AdminUserDetailPage() {
                 </Button>
               </div>
               <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Usa decimales si necesitas céntimos, por ejemplo 12.50.' : 'Use decimals if you need cents, for example 12.50.'}
+                {'Use decimals if you need cents, for example 12.50.'}
               </div>
             </div>
           </div>
@@ -449,8 +449,8 @@ export default function AdminUserDetailPage() {
 
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Social' : 'Social'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Overrides extra (+) de followers/following' : 'Extra overrides (+) for followers/following'}</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Social'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Extra overrides (+) for followers/following'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -499,7 +499,7 @@ export default function AdminUserDetailPage() {
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">{t(lang, 'admin.users.thTags')}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Etiquetas visibles en el perfil' : 'Profile tags'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Profile tags'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div className="flex flex-wrap gap-2">
@@ -524,7 +524,7 @@ export default function AdminUserDetailPage() {
                   </span>
                 ))
               ) : (
-                <div className="text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Sin tags' : 'No tags'}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{'No tags'}</div>
               )}
             </div>
 
@@ -533,10 +533,10 @@ export default function AdminUserDetailPage() {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 disabled={!isOwner || saving || isProtectedOwner}
-                placeholder={lang === 'es' ? 'Añadir tag…' : 'Add tag…'}
+                placeholder={'Add tag…'}
               />
               <Button type="button" variant="secondary" onClick={addTag} disabled={!isOwner || saving || isProtectedOwner}>
-                {lang === 'es' ? 'Añadir' : 'Add'}
+                {'Add'}
               </Button>
               <Button
                 type="button"
@@ -554,14 +554,14 @@ export default function AdminUserDetailPage() {
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="px-4 py-4 border-b border-gray-200 dark:border-white/10">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">Badges</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">{lang === 'es' ? 'Selecciona los badges del usuario' : 'Select user badges'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">{'Select user badges'}</div>
           </div>
           <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {selectableBadges.map((b) => {
                 const id = normalizeBadgeId(b.slug);
                 const selected = badgesDraft.includes(id);
-                const label = (lang === 'es' ? b.labelEs : b.labelEn) || b.slug;
+                const label = b.labelEn || b.slug;
                 return (
                   <button
                     key={id}

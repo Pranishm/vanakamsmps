@@ -161,8 +161,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       title: title.length >= 3 ? title : 'Respuesta',
       content,
       category: 'GENERAL',
-      authorId: user.id,
-      authorUsername: user.name,
+      authorId: user.id || "",
+      authorUsername: user.name || "User",
       rootId: id,
       parentId,
       repostOf: null,
@@ -175,11 +175,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Notify post author (if different user)
     try {
       const authorId = String((post as any).authorId || '');
-      if (authorId && authorId !== user.id) {
+      if (authorId && authorId !== user.id || "") {
         await Notification.create({
           userId: authorId,
           title: 'Nueva respuesta en tu publicación',
-          message: `${user.name} respondió: ${content.slice(0, 120)}${content.length > 120 ? '…' : ''}`,
+          message: `${user.name || "User"} respondió: ${content.slice(0, 120)}${content.length > 120 ? '…' : ''}`,
           href: `/foro/${id}`,
           type: 'INFO',
         });

@@ -227,7 +227,7 @@ export default function PartnerPublishPage() {
       return;
     }
     if (!Number.isFinite(Number(selectedQuote.totalEur)) || Number(selectedQuote.totalEur) <= 0) {
-      setError('El precio configurado es 0€. No se puede iniciar el pago.');
+      setError('El precio configurado es 0₹. No se puede iniciar el pago.');
       return;
     }
     if (!isFormValid) {
@@ -363,7 +363,7 @@ export default function PartnerPublishPage() {
       return;
     }
     if (!Number.isFinite(Number(selectedQuote.totalEur)) || Number(selectedQuote.totalEur) <= 0) {
-      setError('El precio configurado es 0€. No se puede iniciar el pago.');
+      setError('El precio configurado es 0₹. No se puede iniciar el pago.');
       return;
     }
     if (!isFormValid) {
@@ -578,7 +578,7 @@ export default function PartnerPublishPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="text-sm font-semibold text-gray-900 dark:text-white">Duración</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Precio total (no por día) • EUR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Precio total (no por día) • INR</div>
                     </div>
                     <div className="inline-flex rounded-full border border-gray-200 bg-white/70 p-1 dark:border-white/10 dark:bg-white/5">
                       {[1, 3, 7, 14, 30].map((d) => {
@@ -654,7 +654,7 @@ export default function PartnerPublishPage() {
                           </span>
                         </div>
                         <div className="text-[12px] text-gray-600 dark:text-gray-400 mt-2">
-                          Total: {formatPrice(Number(s.totalEur || 0), dateLocale, 'EUR')}
+                          Total: {formatPrice(Number(s.totalEur || 0), dateLocale, 'INR')}
                         </div>
                       </button>
                     );
@@ -867,7 +867,7 @@ export default function PartnerPublishPage() {
                       <td className="py-3 pr-4">
                         {String(b.provider) === 'FREE'
                           ? 'GRATIS'
-                          : `${b.provider} • ${formatPrice(Number(b.totalPrice || 0), dateLocale, String(b.currency || 'EUR'))}`}
+                          : `${b.provider} • ${formatPrice(Number(b.totalPrice || 0), dateLocale, String(b.currency || 'INR'))}`}
                       </td>
                       <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400">{formatDateTime(b.createdAt, dateLocale)}</td>
                       <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400">{b.endsAt ? formatDateTime(b.endsAt, dateLocale) : '—'}</td>

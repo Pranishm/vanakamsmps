@@ -15,7 +15,7 @@ export async function GET() {
     let userVote = null;
     
     if (session?.user?.id) {
-      const log = await VoteMapLog.findOne({ userId: session.user.id });
+      const log = await VoteMapLog.findOne({ userId: session.user.id || "" || "" });
       if (log) {
         userVote = log.mapId;
       }

@@ -142,7 +142,7 @@ export async function PATCH(request: Request) {
           await sendDiscordWebhook(webhookSetting, {
             embeds: [
               {
-                author: { name: `Panel Admin • ${admin.name}` },
+                author: { name: `Panel Admin • ${admin.name || "Admin"}` },
                 title,
                 url: siteUrl || undefined,
                 description: messageSetting,
@@ -151,7 +151,7 @@ export async function PATCH(request: Request) {
                 footer: { text: siteUrl ? `${siteName} • ${siteUrl}` : siteName },
                 fields: [
                   { name: 'Status', value: enabled ? 'MAINTENANCE' : 'LIVE', inline: true },
-                  { name: 'Changed By', value: admin.name, inline: true },
+                  { name: 'Changed By', value: admin.name || "Admin" || 'Admin', inline: true },
                   { name: 'Keys', value: changedKeys, inline: false },
                 ],
               },
@@ -165,8 +165,8 @@ export async function PATCH(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'UPDATE_SETTINGS',
       targetType: 'SETTINGS',
       targetId: 'global',

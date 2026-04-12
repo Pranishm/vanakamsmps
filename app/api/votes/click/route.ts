@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     await dbConnect();
 
     const since = new Date(Date.now() - COOLDOWN_HOURS * 60 * 60 * 1000);
-    const existing = await VoteEvent.findOne({ userId: user.id, site, createdAt: { $gte: since } })
+    const existing = await VoteEvent.findOne({ userId: user.id || "", site, createdAt: { $gte: since } })
       .select('_id')
       .lean();
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     await VoteEvent.create({
-      userId: user.id,
+      userId: user.id || "",
       username: String((user as any)?.name || (user as any)?.email || 'User').slice(0, 32),
       site,
     });

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const booking = await PartnerBooking.findById(parsed.data.bookingId).select('userId status').lean();
     if (!booking) return NextResponse.json({ ok: true });
 
-    if (String((booking as any).userId) !== String(user.id)) {
+    if (String((booking as any).userId) !== String(user.id || "")) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 

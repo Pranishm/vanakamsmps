@@ -41,7 +41,7 @@ export default function AdminBadgesPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [createForm, setCreateForm] = useState({ slug: '', labelEs: '', labelEn: '', icon: '', enabled: true });
+  const [createForm, setCreateForm] = useState({ slug: '', labelEn: '', icon: '', enabled: true });
   const [uploadingCreate, setUploadingCreate] = useState(false);
 
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function AdminBadgesPage() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error((data as any)?.error || 'Error');
     const url = String((data as any)?.url || '');
-    if (!url) throw new Error(lang === 'es' ? 'Upload sin URL' : 'Upload returned no URL');
+    if (!url) throw new Error('Upload returned no URL');
     return url;
   };
 
@@ -87,7 +87,7 @@ export default function AdminBadgesPage() {
     const q = search.trim().toLowerCase();
     if (!q) return items;
     return items.filter((b) => {
-      const blob = [b.slug, b.labelEs || '', b.labelEn || '', b.icon || ''].join(' ').toLowerCase();
+      const blob = [b.slug, b.labelEn || '', b.icon || ''].join(' ').toLowerCase();
       return blob.includes(q);
     });
   }, [items, search]);
@@ -95,13 +95,12 @@ export default function AdminBadgesPage() {
   const createBadge = async () => {
     if (!isOwner) return;
     const slug = normalizeSlug(createForm.slug);
-    const labelEs = createForm.labelEs.trim();
     const labelEn = createForm.labelEn.trim();
     const icon = createForm.icon.trim();
     const enabled = Boolean(createForm.enabled);
 
     if (!slug || !icon) {
-      toast.error(lang === 'es' ? 'Slug e icon son obligatorios' : 'Slug and icon are required');
+      toast.error('Slug and icon are required');
       return;
     }
 
@@ -110,13 +109,13 @@ export default function AdminBadgesPage() {
       const res = await fetch('/api/admin/badges', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, labelEs, labelEn, icon, enabled }),
+        body: JSON.stringify({ slug, labelEn, icon, enabled }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as any)?.error || 'Error');
-      toast.success(lang === 'es' ? 'Badge creado' : 'Badge created');
+      toast.success('Badge created');
       setShowCreate(false);
-      setCreateForm({ slug: '', labelEs: '', labelEn: '', icon: '', enabled: true });
+      setCreateForm({ slug: '', labelEn: '', icon: '', enabled: true });
       fetchBadges();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Error');
@@ -125,7 +124,7 @@ export default function AdminBadgesPage() {
     }
   };
 
-  const updateBadge = async (slug: string, updates: Partial<Pick<BadgeItem, 'labelEs' | 'labelEn' | 'icon' | 'enabled'>>) => {
+  const updateBadge = async (slug: string, updates: Partial<Pick<BadgeItem, 'labelEn' | 'icon' | 'enabled'>>) => {
     if (!isOwner) return;
     setSavingSlug(slug);
     try {
@@ -136,7 +135,7 @@ export default function AdminBadgesPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as any)?.error || 'Error');
-      toast.success(lang === 'es' ? 'Badge actualizado' : 'Badge updated');
+      toast.success('Badge updated');
       fetchBadges();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Error');
@@ -147,14 +146,14 @@ export default function AdminBadgesPage() {
 
   const deleteBadge = async (slug: string) => {
     if (!isOwner) return;
-    const ok = window.confirm(lang === 'es' ? '¿Eliminar badge?' : 'Delete badge?');
+    const ok = window.confirm('Delete badge?');
     if (!ok) return;
     setDeletingSlug(slug);
     try {
       const res = await fetch(`/api/admin/badges/${encodeURIComponent(slug)}`, { method: 'DELETE' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as any)?.error || 'Error');
-      toast.success(lang === 'es' ? 'Badge eliminado' : 'Badge deleted');
+      toast.success('Badge deleted');
       fetchBadges();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Error');
@@ -170,22 +169,22 @@ export default function AdminBadgesPage() {
           <div className="min-w-0">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate">Badges</h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-              {lang === 'es' ? 'Crea y administra badges del perfil' : 'Create and manage profile badges'}
+              {'Create and manage profile badges'}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end">
             <Button type="button" variant="secondary" onClick={fetchBadges} disabled={refreshing} className="h-9">
               <FaSyncAlt />
-              <span>{refreshing ? (lang === 'es' ? 'Cargando…' : 'Loading…') : lang === 'es' ? 'Recargar' : 'Refresh'}</span>
+              <span>{refreshing ? ('Loading…') : 'Refresh'}</span>
             </Button>
             {isOwner ? (
               <Button type="button" onClick={() => setShowCreate(true)} className="h-9">
                 <FaPlus />
-                <span>{lang === 'es' ? 'Nuevo badge' : 'New badge'}</span>
+                <span>{'New badge'}</span>
               </Button>
             ) : (
-              <Badge variant="info">{lang === 'es' ? 'Solo OWNER puede editar' : 'OWNER only to edit'}</Badge>
+              <Badge variant="info">{'OWNER only to edit'}</Badge>
             )}
           </div>
         </div>
@@ -195,10 +194,10 @@ export default function AdminBadgesPage() {
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               <FaSearch />
             </span>
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={lang === 'es' ? 'Buscar…' : 'Search…'} className="pl-9" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={'Search…'} className="pl-9" />
           </div>
           <span className="px-3 py-1.5 text-xs rounded-full bg-gray-50 border border-gray-200 text-gray-700 dark:bg-white/5 dark:border-white/10 dark:text-gray-200">
-            {loading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : `${filtered.length}`}
+            {loading ? ('Loading…') : `${filtered.length}`}
           </span>
         </div>
       </Card>
@@ -212,8 +211,8 @@ export default function AdminBadgesPage() {
           >
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <div className="text-white text-xl font-bold">{lang === 'es' ? 'Nuevo badge' : 'New badge'}</div>
-                <div className="text-xs text-gray-400">{lang === 'es' ? 'Slug + icon son obligatorios' : 'Slug + icon are required'}</div>
+                <div className="text-white text-xl font-bold">{'New badge'}</div>
+                <div className="text-xs text-gray-400">{'Slug + icon are required'}</div>
               </div>
               <Badge variant="info">OWNER</Badge>
             </div>
@@ -238,7 +237,7 @@ export default function AdminBadgesPage() {
                       try {
                         const url = await uploadBadgeIcon(file);
                         setCreateForm((p) => ({ ...p, icon: url }));
-                        toast.success(lang === 'es' ? 'Icono subido' : 'Icon uploaded');
+                        toast.success('Icon uploaded');
                       } catch (err) {
                         toast.error(err instanceof Error ? err.message : 'Error');
                       } finally {
@@ -249,17 +248,13 @@ export default function AdminBadgesPage() {
                     className="block w-full text-xs text-gray-300 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-white/15"
                   />
                   {uploadingCreate ? (
-                    <span className="text-xs text-gray-400">{lang === 'es' ? 'Subiendo…' : 'Uploading…'}</span>
+                    <span className="text-xs text-gray-400">{'Uploading…'}</span>
                   ) : null}
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-400 mb-2">Label (ES)</label>
-                <Input value={createForm.labelEs} onChange={(e) => setCreateForm((p) => ({ ...p, labelEs: e.target.value }))} placeholder="YouTuber" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-400 mb-2">Label (EN)</label>
-                <Input value={createForm.labelEn} onChange={(e) => setCreateForm((p) => ({ ...p, labelEn: e.target.value }))} placeholder="YouTuber" />
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-gray-400 mb-2">Label</label>
+                <Input value={createForm.labelEn} onChange={(e) => setCreateForm((p) => ({ ...p, labelEn: e.target.value }))} placeholder="Badge display name" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-2">Enabled</label>
@@ -273,10 +268,10 @@ export default function AdminBadgesPage() {
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Button onClick={createBadge} disabled={creating} className="flex-1 justify-center">
                 <FaSave />
-                <span>{creating ? (lang === 'es' ? 'Creando…' : 'Creating…') : lang === 'es' ? 'Crear' : 'Create'}</span>
+                <span>{creating ? ('Creating…') : 'Create'}</span>
               </Button>
               <Button type="button" variant="secondary" onClick={() => setShowCreate(false)} className="flex-1 justify-center">
-                <span>{lang === 'es' ? 'Cerrar' : 'Close'}</span>
+                <span>{'Close'}</span>
               </Button>
             </div>
           </motion.div>
@@ -300,13 +295,10 @@ export default function AdminBadgesPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="text-lg font-bold text-gray-900 dark:text-white">{b.slug}</div>
                     {b.enabled ? <Badge variant="success">enabled</Badge> : <Badge variant="warning">disabled</Badge>}
-                    {String(b.icon || '').startsWith('/uploads/') ? (
-                      <Badge variant="warning">uploads(dev)</Badge>
-                    ) : null}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400 truncate">{b.icon}</div>
                   <div className="mt-1 text-sm text-gray-800 dark:text-gray-200">
-                    <span className="opacity-80">ES:</span> {b.labelEs || '—'} <span className="opacity-80 ml-2">EN:</span> {b.labelEn || '—'}
+                    <span className="opacity-80">Label:</span> {b.labelEn || '—'}
                   </div>
                 </div>
               </div>
@@ -326,8 +318,17 @@ export default function AdminBadgesPage() {
 
             {isOwner ? (
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Badge Label</label>
+                  <Input
+                    defaultValue={b.labelEn || ''}
+                    onBlur={(e) => updateBadge(b.slug, { labelEn: e.target.value })}
+                    disabled={savingSlug === b.slug || uploadingSlug === b.slug}
+                    placeholder="Display name"
+                  />
+                </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Icon</label>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Icon URL</label>
                   <Input
                     defaultValue={b.icon}
                     onBlur={(e) => updateBadge(b.slug, { icon: e.target.value.trim() })}
@@ -356,7 +357,7 @@ export default function AdminBadgesPage() {
                       className="block w-full text-xs text-gray-600 dark:text-gray-300 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-gray-900 hover:file:bg-gray-200 dark:file:bg-white/10 dark:file:text-white dark:hover:file:bg-white/15"
                     />
                     {uploadingSlug === b.slug ? (
-                      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{lang === 'es' ? 'Subiendo…' : 'Uploading…'}</div>
+                      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{'Uploading…'}</div>
                     ) : null}
                   </div>
                 </div>
@@ -374,22 +375,6 @@ export default function AdminBadgesPage() {
                     <option value="true">true</option>
                     <option value="false">false</option>
                   </Select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Label (ES)</label>
-                  <Input
-                    defaultValue={b.labelEs || ''}
-                    onBlur={(e) => updateBadge(b.slug, { labelEs: e.target.value })}
-                    disabled={savingSlug === b.slug || uploadingSlug === b.slug}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Label (EN)</label>
-                  <Input
-                    defaultValue={b.labelEn || ''}
-                    onBlur={(e) => updateBadge(b.slug, { labelEn: e.target.value })}
-                    disabled={savingSlug === b.slug || uploadingSlug === b.slug}
-                  />
                 </div>
               </div>
             ) : null}

@@ -118,18 +118,14 @@ export default function AdminTicketsPage() {
       }
 
       toast.success(
-        lang === 'es'
-          ? 'Webhook de tickets guardado'
-          : 'Tickets webhook saved'
+        'Tickets webhook saved'
       );
       setCanManageWebhook(true);
       setTicketWebhook(String(ticketWebhook || '').trim());
     } catch (err: any) {
       toast.error(
         err?.message ||
-          (lang === 'es'
-            ? 'No se pudo guardar el webhook de tickets'
-            : 'Could not save tickets webhook')
+          ('Could not save tickets webhook')
       );
     } finally {
       setWebhookSaving(false);
@@ -151,16 +147,12 @@ export default function AdminTicketsPage() {
       }
 
       toast.success(
-        lang === 'es'
-          ? 'Webhook de prueba enviado a Discord'
-          : 'Test webhook sent to Discord'
+        'Test webhook sent to Discord'
       );
     } catch (err: any) {
       toast.error(
         err?.message ||
-          (lang === 'es'
-            ? 'No se pudo enviar el webhook de prueba'
-            : 'Could not send test webhook')
+          ('Could not send test webhook')
       );
     } finally {
       setWebhookTesting(false);
@@ -356,15 +348,15 @@ export default function AdminTicketsPage() {
   const getSlaBadge = (ticket: Ticket) => {
     const state = getTicketSlaState(ticket);
     if (state === 'BREACHED') {
-      return <Badge variant="danger">{lang === 'es' ? 'SLA vencido' : 'SLA breached'}</Badge>;
+      return <Badge variant="danger">{'SLA breached'}</Badge>;
     }
     if (state === 'RESOLVED_LATE') {
-      return <Badge variant="warning">{lang === 'es' ? 'Cerrado fuera de SLA' : 'Closed late'}</Badge>;
+      return <Badge variant="warning">{'Closed late'}</Badge>;
     }
     if (state === 'RESOLVED') {
-      return <Badge variant="success">{lang === 'es' ? 'SLA cumplido' : 'SLA met'}</Badge>;
+      return <Badge variant="success">{'SLA met'}</Badge>;
     }
-    return <Badge variant="info">{lang === 'es' ? 'En SLA' : 'On SLA'}</Badge>;
+    return <Badge variant="info">{'On SLA'}</Badge>;
   };
 
   const inProgressTickets = tickets.filter((t) => t.status === 'IN_PROGRESS');
@@ -524,20 +516,18 @@ export default function AdminTicketsPage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-gray-900 dark:text-white font-semibold">
               <FaDiscord className="text-[#5865F2]" />
-              <span>{lang === 'es' ? 'Webhook de tickets (Discord)' : 'Tickets webhook (Discord)'}</span>
+              <span>{'Tickets webhook (Discord)'}</span>
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-              {lang === 'es'
-                ? 'Cuando llegue un ticket nuevo, se enviará una notificación al canal configurado.'
-                : 'When a new ticket is created, a notification will be sent to the configured channel.'}
+              {'When a new ticket is created, a notification will be sent to the configured channel.'}
             </p>
           </div>
 
           {!webhookLoading ? (
             <Badge variant={String(ticketWebhook || '').trim() ? 'success' : 'default'}>
               {String(ticketWebhook || '').trim()
-                ? (lang === 'es' ? 'CONFIGURADO' : 'CONFIGURED')
-                : (lang === 'es' ? 'NO CONFIGURADO' : 'NOT CONFIGURED')}
+                ? ('CONFIGURED')
+                : ('NOT CONFIGURED')}
             </Badge>
           ) : null}
         </div>
@@ -574,8 +564,8 @@ export default function AdminTicketsPage() {
               >
                 <span>
                   {webhookTesting
-                    ? (lang === 'es' ? 'Enviando test...' : 'Sending test...')
-                    : (lang === 'es' ? 'Enviar test' : 'Send test')}
+                    ? ('Sending test...')
+                    : ('Send test')}
                 </span>
               </Button>
 
@@ -587,16 +577,14 @@ export default function AdminTicketsPage() {
                 <span>
                   {webhookSaving
                     ? t(lang, 'common.saving')
-                    : (lang === 'es' ? 'Guardar webhook' : 'Save webhook')}
+                    : ('Save webhook')}
                 </span>
               </Button>
             </div>
           </>
         ) : (
           <div className="mt-4 text-sm text-amber-700 dark:text-amber-300">
-            {lang === 'es'
-              ? 'Solo administradores pueden configurar este webhook.'
-              : 'Only administrators can configure this webhook.'}
+            {'Only administrators can configure this webhook.'}
           </div>
         )}
       </Card>
@@ -732,7 +720,7 @@ export default function AdminTicketsPage() {
                       {selectedTicket.assignedStaffName ? (
                         <>
                           <span>•</span>
-                          <span>{lang === 'es' ? 'Asignado a' : 'Assigned to'}: {selectedTicket.assignedStaffName}</span>
+                          <span>{'Assigned to'}: {selectedTicket.assignedStaffName}</span>
                         </>
                       ) : null}
                       <span>•</span>
@@ -798,13 +786,13 @@ export default function AdminTicketsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-black/20">
                     <div className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                      {lang === 'es' ? 'Asignación / workflow' : 'Assignment / workflow'}
+                      {'Assignment / workflow'}
                     </div>
                     <div className="space-y-3">
                       <Input
                         value={assignedStaffDraft}
                         onChange={(e) => setAssignedStaffDraft(e.target.value)}
-                        placeholder={lang === 'es' ? 'Nombre del responsable' : 'Assignee name'}
+                        placeholder={'Assignee name'}
                       />
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <Button
@@ -812,13 +800,13 @@ export default function AdminTicketsPage() {
                           variant="secondary"
                           onClick={() => updateTicket(selectedTicket._id, { assignToMe: true })}
                         >
-                          <span>{lang === 'es' ? 'Asignarme' : 'Assign to me'}</span>
+                          <span>{'Assign to me'}</span>
                         </Button>
                         <Button
                           type="button"
                           onClick={() => updateTicket(selectedTicket._id, { assignedStaffName: assignedStaffDraft })}
                         >
-                          <span>{lang === 'es' ? 'Guardar responsable' : 'Save assignee'}</span>
+                          <span>{'Save assignee'}</span>
                         </Button>
                         <Button
                           type="button"
@@ -828,7 +816,7 @@ export default function AdminTicketsPage() {
                             updateTicket(selectedTicket._id, { clearAssignment: true });
                           }}
                         >
-                          <span>{lang === 'es' ? 'Liberar' : 'Clear'}</span>
+                          <span>{'Clear'}</span>
                         </Button>
                       </div>
                     </div>
@@ -837,25 +825,25 @@ export default function AdminTicketsPage() {
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/10 dark:bg-black/20">
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {lang === 'es' ? 'SLA del ticket' : 'Ticket SLA'}
+                        {'Ticket SLA'}
                       </div>
                       {getSlaBadge(selectedTicket)}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                       <div>
-                        <div className="text-gray-500">{lang === 'es' ? 'Primer reply antes de' : 'First reply due'}</div>
+                        <div className="text-gray-500">{'First reply due'}</div>
                         <div className="text-gray-900 dark:text-white font-semibold">{selectedTicket.responseDueAt ? formatDateTime(selectedTicket.responseDueAt) : '-'}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">{lang === 'es' ? 'Resolver antes de' : 'Resolution due'}</div>
+                        <div className="text-gray-500">{'Resolution due'}</div>
                         <div className="text-gray-900 dark:text-white font-semibold">{selectedTicket.resolutionDueAt ? formatDateTime(selectedTicket.resolutionDueAt) : '-'}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">{lang === 'es' ? 'Primera respuesta staff' : 'First staff reply'}</div>
+                        <div className="text-gray-500">{'First staff reply'}</div>
                         <div className="text-gray-900 dark:text-white font-semibold">{selectedTicket.firstStaffReplyAt ? formatDateTime(selectedTicket.firstStaffReplyAt) : '-'}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">{lang === 'es' ? 'Cierre' : 'Resolved at'}</div>
+                        <div className="text-gray-500">{'Resolved at'}</div>
                         <div className="text-gray-900 dark:text-white font-semibold">{selectedTicket.resolvedAt ? formatDateTime(selectedTicket.resolvedAt) : '-'}</div>
                       </div>
                     </div>

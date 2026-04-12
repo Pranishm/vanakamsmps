@@ -211,7 +211,7 @@ export default function AdminDashboard() {
       accent: 'bg-minecraft-diamond/10 text-minecraft-diamond',
     },
     {
-      title: lang === 'es' ? 'SLA vencidos' : 'SLA breached',
+      title: 'SLA breached',
       value: data.stats.ticketsSlaBreached,
       icon: <FaExclamationTriangle className="text-3xl text-minecraft-redstone" />,
       href: '/admin/tickets',
@@ -410,8 +410,8 @@ export default function AdminDashboard() {
                     {t(lang, 'support.status.closed')}: {data.stats.ticketsClosed}
                   </span>
                   <span className="text-gray-600 dark:text-gray-400">
-                    <span className="inline-block h-2 w-2 rounded-full bg-minecraft-redstone mr-1" />
-                    {lang === 'es' ? 'SLA vencidos' : 'SLA breached'}: {data.stats.ticketsSlaBreached}
+                      <span className="inline-block h-2 w-2 rounded-full bg-minecraft-redstone mr-1" />
+                    SLA breached: {data.stats.ticketsSlaBreached}
                   </span>
                 </div>
               </div>
@@ -488,9 +488,9 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex gap-2">
                   {[
-                    { id: 'ALL', label: lang === 'es' ? 'Todos' : 'All' },
-                    { id: 'BREACHED', label: lang === 'es' ? 'SLA' : 'SLA' },
-                    { id: 'WAITING_RESPONSE', label: lang === 'es' ? 'Sin respuesta' : 'Waiting' },
+                    { id: 'ALL', label: 'All' },
+                    { id: 'BREACHED', label: 'SLA' },
+                    { id: 'WAITING_RESPONSE', label: 'Waiting' },
                   ].map((filter) => (
                     <button
                       key={filter.id}
@@ -520,10 +520,10 @@ export default function AdminDashboard() {
                         <p className="text-gray-900 dark:text-white font-medium truncate">{ticket.subject}</p>
                         <div className="flex items-center gap-2">
                           <Badge variant={ticketBadgeVariant(ticket.status)}>{ticket.status}</Badge>
-                          <Badge variant={getTicketSlaState(ticket) === 'BREACHED' ? 'danger' : 'info'}>
+                           <Badge variant={getTicketSlaState(ticket) === 'BREACHED' ? 'danger' : 'info'}>
                             {getTicketSlaState(ticket) === 'BREACHED'
-                              ? (lang === 'es' ? 'SLA vencido' : 'SLA breached')
-                              : (lang === 'es' ? 'En SLA' : 'On SLA')}
+                              ? 'SLA breached'
+                              : 'On SLA'}
                           </Badge>
                         </div>
                       </div>

@@ -22,7 +22,7 @@ export async function PATCH(request: Request) {
 
     await dbConnect();
 
-    const user = await User.findById(currentUser.id).select('_id password');
+    const user = await User.findById(currentUser.id || "").select('_id password');
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }

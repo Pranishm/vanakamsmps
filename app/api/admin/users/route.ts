@@ -316,8 +316,8 @@ export async function PATCH(request: Request) {
     
     // Log action
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'UPDATE_USER',
       targetType: 'USER',
       targetId: userId,
@@ -354,7 +354,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'userId requerido' }, { status: 400 });
     }
 
-    if (admin.id === userId) {
+    if (admin.id || "" === userId) {
       return NextResponse.json({ error: 'No puedes eliminar tu propia cuenta' }, { status: 400 });
     }
 
@@ -373,8 +373,8 @@ export async function DELETE(request: Request) {
     await User.deleteOne({ _id: userId });
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'DELETE_USER',
       targetType: 'USER',
       targetId: userId,

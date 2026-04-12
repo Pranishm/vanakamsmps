@@ -101,7 +101,7 @@ export async function applyOrderIncentives(orderId: string) {
           couponCode,
           discountAmount: Number((order as any).couponDiscountAmount || 0),
           totalPrice: Number((order as any).totalPrice || 0),
-          currency: String((order as any).currency || 'EUR'),
+          currency: String((order as any).currency || 'INR'),
           buyerLabel: buyer
             ? `**${String((buyer as any).username || '')}** (\`${String((buyer as any).email || '')}\`)`
             : `**${String((order as any).minecraftUsername || 'Unknown')}**`,
@@ -178,7 +178,7 @@ export async function applyOrderIncentives(orderId: string) {
           referralCode,
           buyerDiscountAmount: Number(discountAmount || 0),
           rewardAmount: Number(rewardAmount || 0),
-          currency: String((order as any).currency || 'EUR'),
+          currency: String((order as any).currency || 'INR'),
           referrerLabel: referrer
             ? `**${String((referrer as any).username || '')}** (\`${String((referrer as any).email || '')}\`)`
             : `\`${referrerUserId}\``,

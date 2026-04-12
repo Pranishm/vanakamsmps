@@ -4,9 +4,9 @@ import ShopOrder from '@/models/ShopOrder';
 import Settings from '@/models/Settings';
 import User from '@/models/User';
 
-const DEFAULT_EARNING_POINTS_PER_EURO = 10;
-const DEFAULT_REDEMPTION_POINTS_PER_EURO = 100;
-const DEFAULT_BALANCE_POINTS_PER_EURO = 100;
+const DEFAULT_EARNING_POINTS_PER_INRO = 10;
+const DEFAULT_REDEMPTION_POINTS_PER_INRO = 100;
+const DEFAULT_BALANCE_POINTS_PER_INRO = 100;
 
 export type LoyaltyConfig = {
   earningPointsPerEuro: number;
@@ -15,18 +15,18 @@ export type LoyaltyConfig = {
 };
 
 function readEarningPointsPerEuro() {
-  const raw = Number(process.env.LOYALTY_EARNING_POINTS_PER_EURO || process.env.LOYALTY_POINTS_PER_EURO || DEFAULT_EARNING_POINTS_PER_EURO);
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_EARNING_POINTS_PER_EURO;
+  const raw = Number(process.env.LOYALTY_EARNING_POINTS_PER_INRO || process.env.LOYALTY_POINTS_PER_INRO || DEFAULT_EARNING_POINTS_PER_INRO);
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_EARNING_POINTS_PER_INRO;
 }
 
 function readRedemptionPointsPerEuro() {
-  const raw = Number(process.env.LOYALTY_REDEMPTION_POINTS_PER_EURO || DEFAULT_REDEMPTION_POINTS_PER_EURO);
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_REDEMPTION_POINTS_PER_EURO;
+  const raw = Number(process.env.LOYALTY_REDEMPTION_POINTS_PER_INRO || DEFAULT_REDEMPTION_POINTS_PER_INRO);
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_REDEMPTION_POINTS_PER_INRO;
 }
 
 function readBalancePointsPerEuro() {
-  const raw = Number(process.env.LOYALTY_BALANCE_POINTS_PER_EURO || process.env.LOYALTY_REDEMPTION_POINTS_PER_EURO || DEFAULT_BALANCE_POINTS_PER_EURO);
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_BALANCE_POINTS_PER_EURO;
+  const raw = Number(process.env.LOYALTY_BALANCE_POINTS_PER_INRO || process.env.LOYALTY_REDEMPTION_POINTS_PER_INRO || DEFAULT_BALANCE_POINTS_PER_INRO);
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_BALANCE_POINTS_PER_INRO;
 }
 
 function sanitizePositiveNumber(value: unknown, fallback: number) {
@@ -161,7 +161,7 @@ export async function applyOrderLoyalty(orderId: string) {
         type: 'ORDER_EARNED',
         points,
         amountSpent: Number((order as any).totalPrice || 0),
-        currency: String((order as any).currency || 'EUR'),
+        currency: String((order as any).currency || 'INR'),
         description: String((order as any).isGift)
           ? 'Puntos obtenidos por una compra regalo'
           : 'Puntos obtenidos por una compra en la tienda',
@@ -216,7 +216,7 @@ export async function applyOrderLoyaltyRedemption(orderId: string) {
         type: 'ORDER_REDEEMED',
         points: -pointsUsed,
         amountSpent: Number((order as any).loyaltyDiscountAmount || 0),
-        currency: String((order as any).currency || 'EUR'),
+        currency: String((order as any).currency || 'INR'),
         description: 'Puntos canjeados en una compra de la tienda',
       },
     },

@@ -10,7 +10,10 @@ export default function ServerControlPage() {
   const lang = useClientLang();
   const [starting, setStarting] = useState(false);
   const [logs, setLogs] = useState<string>('');
+  const [command, setCommand] = useState<string>('');
+  const [sending, setSending] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
+  const terminalInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,7 +48,36 @@ export default function ServerControlPage() {
     }
   };
 
-  const isSpanish = lang === 'es';
+  const sendCommand = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!command.trim() || sending) return;
+
+    setSending(true);
+    const cmdToHide = command;
+    setCommand('');
+    
+    try {
+      const response = await fetch('/api/send-command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmdToHide })
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
+      
+      setLogs((prev) => prev + `\n> ${cmdToHide}\n`);
+    } catch (error: any) {
+      toast.error(`❌ Failed to send command: ${error.message}`);
+      setLogs((prev) => prev + `\n[System Error] Failed to send: ${cmdToHide}\n`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  
 
   return (
     <div className="space-y-6">
@@ -58,13 +90,11 @@ export default function ServerControlPage() {
                 <FaServer className="text-xl" />
               </div>
               <h2 className="text-xl font-bold dark:text-white text-gray-900">
-                {isSpanish ? 'Control Principal' : 'Main Control'}
+                {'Main Control'}
               </h2>
             </div>
             <p className="text-sm dark:text-gray-400 text-gray-600 max-w-xl">
-              {isSpanish 
-                ? 'Controla el encendido del servidor de Minecraft. Este proceso se ejecutará en segundo plano mediante un entorno seguro en tu máquina anfitriona.' 
-                : 'Control the startup of the Minecraft server. This process will run in the background using a secure environment on your host machine.'}
+              {'Control the startup of the Minecraft server. This process will run in the background using a secure environment on your host machine.'}
             </p>
           </div>
           
@@ -75,7 +105,7 @@ export default function ServerControlPage() {
               className="h-12 px-6 font-bold bg-minecraft-grass hover:bg-minecraft-grass/90 text-white shadow-lg shadow-minecraft-grass/20"
             >
               <FaPlay className={starting ? "animate-pulse" : ""} />
-              <span className="ml-2">{starting ? (isSpanish ? 'Iniciando...' : 'Booting...') : (isSpanish ? 'Arrancar Servidor' : 'Start Server')}</span>
+              <span className="ml-2">{starting ? ('Booting...') : ('Start Server')}</span>
             </Button>
           </div>
         </div>
@@ -98,6 +128,22 @@ export default function ServerControlPage() {
             {logs}
             <div ref={logsEndRef} />
           </div>
+          <form 
+            onSubmit={sendCommand}
+            className="flex items-center gap-2 p-2 px-3 border-t border-[#30363d] bg-[#0d1117]"
+          >
+            <span className="text-minecraft-grass font-bold text-sm">$</span>
+            <input 
+              ref={terminalInputRef}
+              type="text" 
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              placeholder="Type command (e.g. stop, help, admin)..."
+              disabled={sending}
+              className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-sm font-mono text-white placeholder:text-gray-600 disabled:opacity-50"
+            />
+            {sending && <div className="w-4 h-4 border-2 border-minecraft-grass border-t-transparent rounded-full animate-spin" />}
+          </form>
         </Card>
       )}
 
@@ -107,7 +153,7 @@ export default function ServerControlPage() {
           <div className="relative z-10">
             <h3 className="text-lg font-bold flex items-center gap-2 mb-4 dark:text-white text-gray-900">
               <FaTerminal className="text-blue-500" />
-              {isSpanish ? 'Detalles Técnicos' : 'Technical Details'}
+              {'Technical Details'}
             </h3>
             <div className="space-y-4">
               <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-white/5">
@@ -123,9 +169,7 @@ export default function ServerControlPage() {
                   Execution Context
                 </div>
                 <p className="text-sm text-slate-700 dark:text-slate-400">
-                  {isSpanish 
-                    ? 'El script se ejecuta utilizando el módulo built-in child_process de Node.js, aislando el proceso en una sesión terminal oculta que permite reinicios y acceso seguro desde SSH.'
-                    : 'The script runs via Node builtin child_process module, detaching into a hidden terminal session that allows restarts and secure SSH access.'}
+                  {'The script runs via Node builtin child_process module, detaching into a hidden terminal session that allows restarts and secure SSH access.'}
                 </p>
               </div>
               <div className="bg-red-50 dark:bg-red-500/5 rounded-xl p-4 border border-red-100 dark:border-red-500/20">
@@ -133,9 +177,7 @@ export default function ServerControlPage() {
                   Permissions Warning
                 </div>
                 <p className="text-sm text-red-700 dark:text-red-300">
-                  {isSpanish 
-                    ? 'Si el servidor falla al iniciar, asegúrate de que el script tiene permisos globales (chmod 777) en tu máquina Linux para que Node pueda invocarlo.'
-                    : 'If the server fails to start, ensure the script has global execution permissions (chmod 777) on your Linux machine so Node can invoke it.'}
+                  {'If the server fails to start, ensure the script has global execution permissions (chmod 777) on your Linux machine so Node can invoke it.'}
                 </p>
               </div>
             </div>
@@ -147,7 +189,7 @@ export default function ServerControlPage() {
           <div className="relative z-10">
             <h3 className="text-lg font-bold flex items-center gap-2 mb-4 dark:text-white text-gray-900">
               <FaHeartbeat className="text-minecraft-diamond" />
-              {isSpanish ? 'Estadísticas del Host' : 'Host Statistics'}
+              {'Host Statistics'}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
@@ -172,7 +214,7 @@ export default function ServerControlPage() {
                   VanakamSMP Service Node
                 </div>
                 <div className="text-xs text-slate-500 text-center mt-1">
-                  {isSpanish ? 'Todo configurado y listo en la ruta base' : 'All systems configured and ready at base path'}
+                  {'All systems configured and ready at base path'}
                 </div>
               </div>
             </div>

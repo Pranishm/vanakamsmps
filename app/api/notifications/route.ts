@@ -8,13 +8,13 @@ import { localizeNotificationText } from '@/lib/notificationText';
 export const dynamic = 'force-dynamic';
 
 async function resolveUserIdFromSessionUser(user: any) {
-  const direct = typeof user?.id === 'string' && user.id ? user.id : undefined;
+  const direct = typeof user?.id === 'string' && user.id || "" ? user.id || "" : undefined;
   if (direct) return direct;
 
   const alt = typeof user?._id === 'string' && user._id ? user._id : undefined;
   if (alt) return alt;
 
-  const email = typeof user?.email === 'string' ? user.email.toLowerCase() : '';
+  const email = typeof user?.email === 'string' ? user.email || "".toLowerCase() : '';
   if (!email) throw new Error('Unauthorized');
 
   await dbConnect();

@@ -119,7 +119,7 @@ export default function AdminProductsPage() {
       const normalizedPriceText = rawPrice.replace(',', '.');
       const priceValue = Number(normalizedPriceText);
       if (!Number.isFinite(priceValue) || priceValue < 0) {
-        toast.error(lang === 'es' ? 'Precio inválido' : 'Invalid price');
+        toast.error('Invalid price');
         return;
       }
 
@@ -256,15 +256,15 @@ export default function AdminProductsPage() {
         body: fd,
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any).error || (lang === 'es' ? 'Error al subir imagen' : 'Upload error'));
+      if (!res.ok) throw new Error((data as any).error || ('Upload error'));
 
       const url = typeof (data as any).url === 'string' ? (data as any).url : '';
-      if (!url) throw new Error(lang === 'es' ? 'URL inválida' : 'Invalid URL');
+      if (!url) throw new Error('Invalid URL');
 
       setFormData((prev) => ({ ...prev, image: url }));
-      toast.success(lang === 'es' ? 'Imagen subida' : 'Image uploaded');
+      toast.success('Image uploaded');
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : (lang === 'es' ? 'Error al subir imagen' : 'Upload error'));
+      toast.error(e instanceof Error ? e.message : ('Upload error'));
     } finally {
       setUploadingImage(false);
     }
@@ -385,18 +385,18 @@ export default function AdminProductsPage() {
               <div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 dark:border-white/10 dark:bg-white/5">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Oferta limitada' : 'Limited offer'}</div>
+                    <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Limited offer'}</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {lang === 'es' ? 'Configura precio rebajado, contador y etiqueta promocional.' : 'Set a discounted price, countdown, and promo label.'}
+                      {'Set a discounted price, countdown, and promo label.'}
                     </div>
                   </div>
-                  <Badge variant="warning">{lang === 'es' ? 'Flash sale' : 'Flash sale'}</Badge>
+                  <Badge variant="warning">{'Flash sale'}</Badge>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Precio de oferta' : 'Sale price'}
+                      {'Sale price'}
                     </label>
                     <Input
                       type="number"
@@ -410,7 +410,7 @@ export default function AdminProductsPage() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Precio de referencia' : 'Reference price'}
+                      {'Reference price'}
                     </label>
                     <Input
                       type="number"
@@ -424,7 +424,7 @@ export default function AdminProductsPage() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Inicio de oferta' : 'Sale starts'}
+                      {'Sale starts'}
                     </label>
                     <Input
                       type="datetime-local"
@@ -435,7 +435,7 @@ export default function AdminProductsPage() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Fin de oferta' : 'Sale ends'}
+                      {'Sale ends'}
                     </label>
                     <Input
                       type="datetime-local"
@@ -446,12 +446,12 @@ export default function AdminProductsPage() {
 
                   <div className="md:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Etiqueta promocional' : 'Promo label'}
+                      {'Promo label'}
                     </label>
                     <Input
                       value={(formData as any).offerLabel}
                       onChange={(e) => setFormData({ ...(formData as any), offerLabel: e.target.value })}
-                      placeholder={lang === 'es' ? 'Ej: Oferta de fin de semana' : 'e.g. Weekend drop'}
+                      placeholder={'e.g. Weekend drop'}
                     />
                   </div>
                 </div>
@@ -459,15 +459,15 @@ export default function AdminProductsPage() {
 
               <div className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 dark:border-white/10 dark:bg-white/5">
                 <div className="mb-4">
-                  <div className="text-sm font-semibold text-gray-900 dark:text-white">{lang === 'es' ? 'Bonus por recarga' : 'Top-up bonus'}</div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-white">{'Top-up bonus'}</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {lang === 'es' ? 'Añade saldo extra al usuario cuando este producto se pague.' : 'Grant extra store balance when this product is paid.'}
+                    {'Grant extra store balance when this product is paid.'}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {lang === 'es' ? 'Saldo extra (€)' : 'Extra balance (€)'}
+                      {'Extra balance (₹)'}
                     </label>
                     <Input
                       type="number"
@@ -495,7 +495,7 @@ export default function AdminProductsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {lang === 'es' ? 'Imagen del producto' : 'Product image'}
+                  {'Product image'}
                 </label>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -503,12 +503,10 @@ export default function AdminProductsPage() {
                     <Input
                       value={(formData as any).image}
                       onChange={(e) => setFormData({ ...(formData as any), image: e.target.value })}
-                      placeholder={lang === 'es' ? 'URL de la imagen (opcional)' : 'Image URL (optional)'}
+                      placeholder={'Image URL (optional)'}
                     />
                     <p className="text-xs text-gray-500 mt-2">
-                      {lang === 'es'
-                        ? 'Puedes pegar una URL o subir un archivo.'
-                        : 'You can paste a URL or upload a file.'}
+                      {'You can paste a URL or upload a file.'}
                     </p>
                   </div>
 
@@ -528,7 +526,7 @@ export default function AdminProductsPage() {
                         className="whitespace-nowrap"
                       >
                         <FaUpload />
-                        <span>{uploadingImage ? (lang === 'es' ? 'Subiendo…' : 'Uploading…') : (lang === 'es' ? 'Subir' : 'Upload')}</span>
+                        <span>{uploadingImage ? ('Uploading…') : ('Upload')}</span>
                       </Button>
                     </div>
 
@@ -549,7 +547,7 @@ export default function AdminProductsPage() {
                           onClick={() => setFormData({ ...(formData as any), image: '' })}
                         >
                           <FaTrash />
-                          <span>{lang === 'es' ? 'Quitar' : 'Remove'}</span>
+                          <span>{'Remove'}</span>
                         </Button>
                       </div>
                     ) : null}
@@ -618,16 +616,14 @@ export default function AdminProductsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {lang === 'es' ? 'Comandos (entrega automática)' : 'Commands (auto delivery)'}
+                  {'Commands (auto delivery)'}
                 </label>
                 <Textarea
                   value={(formData as any).deliveryCommandsText}
                   onChange={(e) => setFormData({ ...(formData as any), deliveryCommandsText: e.target.value })}
                   rows={4}
                   placeholder={
-                    lang === 'es'
-                      ? '1 comando por línea. Usa {player} o {user} (y opcional {qty}).\nEj: crates key give {user} vote 1 -sf'
-                      : '1 command per line. Use {player} or {user} (and optional {qty}).\nEx: crates key give {user} vote 1 -sf'
+                    '1 command per line. Use {player} or {user} (and optional {qty}).\nEx: crates key give {user} vote 1 -sf'
                   }
                 />
               </div>
@@ -712,7 +708,7 @@ export default function AdminProductsPage() {
                       <Badge variant={product.isActive ? 'success' : 'default'}>
                         {product.isActive ? t(lang, 'admin.products.active') : t(lang, 'admin.products.inactive')}
                       </Badge>
-                      {isOfferActive(product) ? <Badge variant="warning">{product.offerLabel || (lang === 'es' ? 'Oferta activa' : 'Live offer')}</Badge> : null}
+                      {isOfferActive(product) ? <Badge variant="warning">{product.offerLabel || ('Live offer')}</Badge> : null}
                     </div>
                     <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">{product.description}</p>
                   </div>
@@ -822,7 +818,7 @@ export default function AdminProductsPage() {
                           <Badge variant={product.isActive ? 'success' : 'default'}>
                             {product.isActive ? t(lang, 'admin.products.active') : t(lang, 'admin.products.inactive')}
                           </Badge>
-                          {isOfferActive(product) ? <Badge variant="warning">{lang === 'es' ? 'Oferta' : 'Offer'}</Badge> : null}
+                          {isOfferActive(product) ? <Badge variant="warning">{'Offer'}</Badge> : null}
                           {Number(product.bonusBalanceAmount || 0) > 0 ? <Badge variant="success">+{formatPrice(Number(product.bonusBalanceAmount || 0))}</Badge> : null}
                         </div>
                       </td>

@@ -14,7 +14,7 @@ function getRequestIp(request: Request) {
 }
 
 const patchSchema = z.object({
-  // EUR totals; allow 0
+  // INR totals; allow 0
   slotTotalsEur: z.array(z.array(z.coerce.number().min(0)).length(PARTNER_MAX_DAYS)).length(PARTNER_SLOTS),
 
   // VIP totals; allow 0
@@ -50,8 +50,8 @@ export async function PATCH(request: Request) {
     await setPartnerPricingConfig(next);
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'UPDATE_PARTNER_PRICING',
       targetType: 'SETTINGS',
       targetId: 'partnerPricing',

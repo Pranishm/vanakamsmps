@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     if (!voteMap) return NextResponse.json({ error: 'Map not found or inactive' }, { status: 404 });
     
     // Check if user already voted
-    const existingLog = await VoteMapLog.findOne({ userId: session.user.id });
+    const existingLog = await VoteMapLog.findOne({ userId: session.user.id || "" || "" });
     
     if (existingLog) {
       if (existingLog.mapId.toString() === mapId) {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     }
     
     // New vote
-    await VoteMapLog.create({ userId: session.user.id, mapId });
+    await VoteMapLog.create({ userId: session.user.id || "" || "", mapId });
     await VoteMap.updateOne(
       { _id: mapId },
       { $inc: { votesCount: 1 } }

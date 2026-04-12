@@ -211,11 +211,11 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                {lang === 'es' ? 'Código de referido (opcional)' : 'Referral code (optional)'}
+                {'Referral code (optional)'}
               </label>
               <Input
                 type="text"
-                placeholder={lang === 'es' ? 'Ej: PLAYER-ABC12' : 'e.g. PLAYER-ABC12'}
+                placeholder={'e.g. PLAYER-ABC12'}
                 value={formData.referralCode}
                 onChange={(e) => setFormData({ ...formData, referralCode: e.target.value.toUpperCase() })}
               />

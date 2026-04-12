@@ -12,7 +12,7 @@ export async function POST() {
     await dbConnect();
 
     const now = new Date();
-    await User.updateOne({ _id: currentUser.id }, { $set: { lastSeenAt: now } });
+    await User.updateOne({ _id: currentUser.id || "" }, { $set: { lastSeenAt: now } });
 
     return NextResponse.json({ ok: true, at: now.toISOString() });
   } catch (error: any) {

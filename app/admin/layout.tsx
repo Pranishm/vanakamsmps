@@ -69,18 +69,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { key: 'users', name: t(lang, 'admin.menu.users'), href: '/admin/users', icon: FaUsers, group: 'main' },
     { key: 'badges', name: t(lang, 'admin.menu.badges'), href: '/admin/badges', icon: FaAward, group: 'main' },
     { key: 'products', name: t(lang, 'admin.menu.products'), href: '/admin/products', icon: FaShoppingCart, group: 'main' },
-    { key: 'coupons', name: lang === 'es' ? 'Cupones' : 'Coupons', href: '/admin/coupons', icon: FaPercent, group: 'main' },
-    { key: 'referrals', name: lang === 'es' ? 'Referidos' : 'Referrals', href: '/admin/referrals', icon: FaUserFriends, group: 'main' },
+    { key: 'coupons', name: 'Coupons', href: '/admin/coupons', icon: FaPercent, group: 'main' },
+    { key: 'referrals', name: 'Referrals', href: '/admin/referrals', icon: FaUserFriends, group: 'main' },
     { key: 'loyalty', name: t(lang, 'admin.menu.loyalty'), href: '/admin/loyalty', icon: FaAward, group: 'main' },
     { key: 'votemap', name: 'Map Voting', href: '/admin/votemap', icon: FaMap, group: 'main' },
     { key: 'tickets', name: t(lang, 'admin.menu.tickets'), href: '/admin/tickets', icon: FaTicketAlt, group: 'main' },
-    { key: 'applications', name: t(lang, 'admin.menu.applications'), href: '/admin/postulaciones', icon: FaClipboardList, group: 'main' },
-    { key: 'forum', name: t(lang, 'admin.menu.forum'), href: '/admin/foro', icon: FaComments, group: 'content' },
+    { key: 'applications', name: t(lang, 'admin.menu.applications'), href: '/admin/applications', icon: FaClipboardList, group: 'main' },
+    { key: 'forum', name: t(lang, 'admin.menu.forum'), href: '/admin/forum', icon: FaComments, group: 'content' },
     { key: 'blog', name: t(lang, 'admin.menu.blog'), href: '/admin/blog', icon: FaNewspaper, group: 'content' },
     { key: 'partner', name: t(lang, 'admin.menu.partner'), href: '/admin/partner', icon: FaShieldAlt, group: 'content' },
     { key: 'newsletter', name: t(lang, 'admin.menu.newsletter'), href: '/admin/newsletter', icon: FaEnvelope, group: 'system' },
     { key: 'servicesStatus', name: t(lang, 'admin.menu.servicesStatus'), href: '/admin/services-status', icon: FaHeartbeat, group: 'system' },
-    { key: 'server', name: lang === 'es' ? 'Servidor' : 'Server', href: '/admin/server', icon: FaServer, group: 'system' },
+    { key: 'server', name: 'Server', href: '/admin/server', icon: FaServer, group: 'system' },
     { key: 'logs', name: t(lang, 'admin.menu.logs'), href: '/admin/logs', icon: FaHistory, group: 'system' },
     { key: 'settings', name: t(lang, 'admin.menu.settings'), href: '/admin/settings', icon: FaCog, group: 'system' },
   ];
@@ -94,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const activeLabel = (() => {
-    if (pathname.startsWith('/admin/permisos')) return t(lang, 'admin.menu.permissions');
+    if (pathname.startsWith('/admin/permissions')) return t(lang, 'admin.menu.permissions');
     const item = menuItems.find((m) => isActive(m.href));
     return item?.name || t(lang, 'admin.panel.title');
   })();
@@ -110,9 +110,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.startsWith('/admin/loyalty')) return 'loyalty';
     if (pathname.startsWith('/admin/votemap')) return 'votemap';
     if (pathname.startsWith('/admin/tickets')) return 'tickets';
-    if (pathname.startsWith('/admin/postulaciones/chat/')) return 'applicationChat';
-    if (pathname.startsWith('/admin/postulaciones')) return 'applications';
-    if (pathname.startsWith('/admin/foro')) return 'forum';
+    if (pathname.startsWith('/admin/applications/chat/')) return 'applicationChat';
+    if (pathname.startsWith('/admin/applications')) return 'applications';
+    if (pathname.startsWith('/admin/forum')) return 'forum';
     if (pathname.startsWith('/admin/blog')) return 'blog';
     if (pathname.startsWith('/admin/partner')) return 'partner';
     if (pathname.startsWith('/admin/newsletter')) return 'newsletter';
@@ -120,206 +120,179 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.startsWith('/admin/server')) return 'server';
     if (pathname.startsWith('/admin/logs')) return 'logs';
     if (pathname.startsWith('/admin/settings')) return 'settings';
-    if (pathname.startsWith('/admin/permisos')) return 'permissions';
+    if (pathname.startsWith('/admin/permissions')) return 'permissions';
     return 'dashboard';
   })();
 
-  const isSpanish = lang === 'es';
   const sectionBannerMeta = (() => {
     switch (currentSectionKey) {
       case 'dashboard':
         return {
-          eyebrow: isSpanish ? 'Panel administrativo' : 'Admin dashboard',
+          eyebrow: 'Admin dashboard',
           title: t(lang, 'admin.dashboard.title'),
           description: t(lang, 'admin.dashboard.subtitle'),
           icon: <FaHome />,
-          badgeLabel: isSpanish ? 'Resumen' : 'Overview',
+          badgeLabel: 'Overview',
         };
       case 'users':
         return {
-          eyebrow: isSpanish ? 'Gestion de usuarios' : 'User management',
+          eyebrow: 'User management',
           title: t(lang, 'admin.users.title'),
           description: t(lang, 'admin.users.subtitle'),
           icon: <FaUsers />,
-          badgeLabel: isSpanish ? 'Usuarios' : 'Users',
+          badgeLabel: 'Users',
         };
       case 'userDetail':
         return {
-          eyebrow: isSpanish ? 'Perfil administrativo' : 'Admin profile view',
-          title: isSpanish ? 'Detalle de usuario' : 'User detail',
-          description: isSpanish
-            ? 'Revisa y actualiza rol, estado, etiquetas y extras visibles del perfil.'
-            : 'Review and update role, state, tags, and visible profile extras.',
+          eyebrow: 'Admin profile view',
+          title: 'User detail',
+          description: 'Review and update role, state, tags, and visible profile extras.',
           icon: <FaUsers />,
-          badgeLabel: isSpanish ? 'Perfil' : 'Profile',
+          badgeLabel: 'Profile',
         };
       case 'badges':
         return {
-          eyebrow: isSpanish ? 'Identidad del perfil' : 'Profile identity',
-          title: isSpanish ? 'Badges' : 'Badges',
-          description: isSpanish ? 'Crea y administra badges del perfil.' : 'Create and manage profile badges.',
+          eyebrow: 'Profile identity',
+          title: 'Badges',
+          description: 'Create and manage profile badges.',
           icon: <FaAward />,
-          badgeLabel: isSpanish ? 'Badges' : 'Badges',
+          badgeLabel: 'Badges',
         };
       case 'products':
         return {
-          eyebrow: isSpanish ? 'Catalogo de tienda' : 'Store catalog',
+          eyebrow: 'Store catalog',
           title: t(lang, 'admin.products.title'),
           description: t(lang, 'admin.products.subtitle'),
           icon: <FaShoppingCart />,
-          badgeLabel: isSpanish ? 'Tienda' : 'Store',
+          badgeLabel: 'Store',
         };
       case 'coupons':
         return {
-          eyebrow: isSpanish ? 'Descuentos del checkout' : 'Checkout discounts',
-          title: isSpanish ? 'Cupones' : 'Coupons',
-          description: isSpanish
-            ? 'Crea, ajusta y controla cupones de descuento para la tienda.'
-            : 'Create, tune, and control discount coupons for the store.',
+          eyebrow: 'Checkout discounts',
+          title: 'Coupons',
+          description: 'Create, tune, and control discount coupons for the store.',
           icon: <FaPercent />,
-          badgeLabel: isSpanish ? 'Promociones' : 'Promotions',
+          badgeLabel: 'Promotions',
         };
       case 'referrals':
         return {
-          eyebrow: isSpanish ? 'Invitaciones y recompensas' : 'Invites and rewards',
-          title: isSpanish ? 'Referidos' : 'Referrals',
-          description: isSpanish
-            ? 'Gestiona codigos personales, descuentos y automatizaciones de referidos.'
-            : 'Manage personal codes, discounts, and referral automations.',
+          eyebrow: 'Invites and rewards',
+          title: 'Referrals',
+          description: 'Manage personal codes, discounts, and referral automations.',
           icon: <FaUserFriends />,
-          badgeLabel: isSpanish ? 'Referidos' : 'Referrals',
+          badgeLabel: 'Referrals',
         };
       case 'loyalty':
         return {
-          eyebrow: isSpanish ? 'Puntos y recompensas' : 'Points and rewards',
+          eyebrow: 'Points and rewards',
           title: t(lang, 'admin.menu.loyalty'),
-          description: isSpanish
-            ? 'Supervisa saldo, historico y envios manuales del sistema de loyalty.'
-            : 'Monitor balances, history, and manual sends for the loyalty system.',
+          description: 'Monitor balances, history, and manual sends for the loyalty system.',
           icon: <FaAward />,
-          badgeLabel: isSpanish ? 'Loyalty' : 'Loyalty',
+          badgeLabel: 'Loyalty',
         };
       case 'votemap':
         return {
-          eyebrow: isSpanish ? 'Votación de Mapas' : 'Map Voting',
+          eyebrow: 'Map Voting',
           title: 'Map Voting',
-          description: isSpanish
-            ? 'Gestiona mapas de juego y visualiza los votos de usuarios.'
-            : 'Manage game maps and view user map votes.',
+          description: 'Manage game maps and view user map votes.',
           icon: <FaMap />,
-          badgeLabel: isSpanish ? 'Mapas' : 'Maps',
+          badgeLabel: 'Maps',
         };
       case 'tickets':
         return {
-          eyebrow: isSpanish ? 'Soporte y conversaciones' : 'Support and conversations',
+          eyebrow: 'Support and conversations',
           title: t(lang, 'admin.tickets.ticketsLabel'),
           description: t(lang, 'admin.tickets.headerDesc'),
           icon: <FaTicketAlt />,
-          badgeLabel: isSpanish ? 'Soporte' : 'Support',
+          badgeLabel: 'Support',
         };
       case 'applications':
         return {
-          eyebrow: isSpanish ? 'Equipo y reclutamiento' : 'Team and recruiting',
+          eyebrow: 'Team and recruiting',
           title: t(lang, 'admin.menu.applications'),
-          description: isSpanish
-            ? 'Revisa postulaciones, decide estados y conecta cada caso con su seguimiento.'
-            : 'Review applications, decide statuses, and connect each case to follow-up.',
+          description: 'Review applications, decide statuses, and connect each case to follow-up.',
           icon: <FaClipboardList />,
-          badgeLabel: isSpanish ? 'Staff' : 'Staff',
+          badgeLabel: 'Staff',
         };
       case 'applicationChat':
         return {
-          eyebrow: isSpanish ? 'Seguimiento interno' : 'Internal follow-up',
-          title: isSpanish ? 'Chat de postulacion' : 'Application chat',
-          description: isSpanish
-            ? 'Continua la conversacion con el candidato sin salir del panel admin.'
-            : 'Continue the conversation with the candidate without leaving the admin panel.',
+          eyebrow: 'Internal follow-up',
+          title: 'Application chat',
+          description: 'Continue the conversation with the candidate without leaving the admin panel.',
           icon: <FaComments />,
-          badgeLabel: isSpanish ? 'Chat' : 'Chat',
+          badgeLabel: 'Chat',
         };
       case 'forum':
         return {
-          eyebrow: isSpanish ? 'Moderacion de comunidad' : 'Community moderation',
+          eyebrow: 'Community moderation',
           title: t(lang, 'admin.forum.title'),
           description: t(lang, 'admin.forum.subtitle'),
           icon: <FaComments />,
-          badgeLabel: isSpanish ? 'Foro' : 'Forum',
+          badgeLabel: 'Forum',
         };
       case 'blog':
         return {
-          eyebrow: isSpanish ? 'Contenido editorial' : 'Editorial content',
+          eyebrow: 'Editorial content',
           title: t(lang, 'admin.menu.blog'),
-          description: isSpanish
-            ? 'Publica novedades, edita entradas y controla la visibilidad del blog.'
-            : 'Publish updates, edit posts, and control blog visibility.',
+          description: 'Publish updates, edit posts, and control blog visibility.',
           icon: <FaNewspaper />,
-          badgeLabel: isSpanish ? 'Noticias' : 'News',
+          badgeLabel: 'News',
         };
       case 'partner':
         return {
-          eyebrow: isSpanish ? 'Publicidad y alianzas' : 'Ads and partnerships',
+          eyebrow: 'Ads and partnerships',
           title: t(lang, 'admin.menu.partner'),
-          description: isSpanish
-            ? 'Aprueba anuncios, revisa reservas y administra la visibilidad partner.'
-            : 'Approve ads, review bookings, and manage partner visibility.',
+          description: 'Approve ads, review bookings, and manage partner visibility.',
           icon: <FaShieldAlt />,
-          badgeLabel: isSpanish ? 'Partner' : 'Partner',
+          badgeLabel: 'Partner',
         };
       case 'newsletter':
         return {
-          eyebrow: isSpanish ? 'Envios y suscriptores' : 'Mailing and subscribers',
+          eyebrow: 'Mailing and subscribers',
           title: 'Newsletter',
-          description: isSpanish
-            ? 'Gestiona suscriptores, automatizaciones y envios manuales de la newsletter.'
-            : 'Manage subscribers, automations, and manual newsletter sends.',
+          description: 'Manage subscribers, automations, and manual newsletter sends.',
           icon: <FaEnvelope />,
-          badgeLabel: isSpanish ? 'Email' : 'Email',
+          badgeLabel: 'Email',
         };
       case 'servicesStatus':
         return {
-          eyebrow: isSpanish ? 'Monitorizacion tecnica' : 'Technical monitoring',
-          title: isSpanish ? 'Estado de servicios' : 'Services status',
-          description: isSpanish
-            ? 'Configura el reporte automatico del estado de servicios y su webhook.'
-            : 'Configure automatic service status reporting and its webhook.',
+          eyebrow: 'Technical monitoring',
+          title: 'Services status',
+          description: 'Configure automatic service status reporting and its webhook.',
           icon: <FaHeartbeat />,
-          badgeLabel: isSpanish ? 'Estado' : 'Status',
+          badgeLabel: 'Status',
         };
       case 'server':
         return {
-          eyebrow: isSpanish ? 'Control de servidor' : 'Server control',
-          title: isSpanish ? 'Servidor Minecraft' : 'Minecraft Server',
-          description: isSpanish 
-            ? 'Monitorea y arranca el servidor de juego.' 
-            : 'Monitor and start the game server.',
+          eyebrow: 'Server control',
+          title: 'Minecraft Server',
+          description: 'Monitor and start the game server.',
           icon: <FaServer />,
-          badgeLabel: isSpanish ? 'Servidor' : 'Server',
+          badgeLabel: 'Server',
         };
       case 'logs':
         return {
-          eyebrow: isSpanish ? 'Auditoria del panel' : 'Panel auditing',
+          eyebrow: 'Panel auditing',
           title: t(lang, 'admin.menu.logs'),
-          description: isSpanish
-            ? 'Consulta actividad administrativa, filtros de accion y trazabilidad del panel.'
-            : 'Review admin activity, action filters, and panel traceability.',
+          description: 'Review admin activity, action filters, and panel traceability.',
           icon: <FaHistory />,
-          badgeLabel: isSpanish ? 'Auditoria' : 'Audit',
+          badgeLabel: 'Audit',
         };
       case 'settings':
         return {
-          eyebrow: isSpanish ? 'Configuracion del sitio' : 'Site configuration',
+          eyebrow: 'Site configuration',
           title: t(lang, 'admin.settings.title'),
           description: t(lang, 'admin.settings.subtitle'),
           icon: <FaCog />,
-          badgeLabel: isSpanish ? 'Sistema' : 'System',
+          badgeLabel: 'System',
         };
       case 'permissions':
         return {
-          eyebrow: isSpanish ? 'Acceso administrativo' : 'Admin access',
+          eyebrow: 'Admin access',
           title: t(lang, 'admin.permissions.title'),
           description: t(lang, 'admin.permissions.subtitle'),
           icon: <FaKey />,
-          badgeLabel: isSpanish ? 'Permisos' : 'Permissions',
+          badgeLabel: 'Permissions',
         };
       default:
         return null;
@@ -406,10 +379,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {t(lang, 'admin.menu.permissions')}
               </div>
               <Link
-                href="/admin/permisos"
-                className={navLinkClass(isActive('/admin/permisos'))}
+                href="/admin/permissions"
+                className={navLinkClass(isActive('/admin/permissions'))}
               >
-                <span className={navIconClass(isActive('/admin/permisos'))}>
+                <span className={navIconClass(isActive('/admin/permissions'))}>
                   <FaKey />
                 </span>
                 <span className="font-medium truncate">{t(lang, 'admin.menu.permissions')}</span>
@@ -474,11 +447,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {t(lang, 'admin.menu.permissions')}
                   </div>
                   <Link
-                    href="/admin/permisos"
+                    href="/admin/permissions"
                     onClick={() => setSidebarOpen(false)}
-                    className={navLinkClass(isActive('/admin/permisos'))}
+                    className={navLinkClass(isActive('/admin/permissions'))}
                   >
-                    <span className={navIconClass(isActive('/admin/permisos'))}>
+                    <span className={navIconClass(isActive('/admin/permissions'))}>
                       <FaKey />
                     </span>
                     <span className="font-medium truncate">{t(lang, 'admin.menu.permissions')}</span>

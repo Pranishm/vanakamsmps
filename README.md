@@ -156,7 +156,7 @@ Quick guide to find text locations fast.
 
 | Case | Where to edit | Notes |
 |---|---|---|
-| Text that uses `t(lang, '...')` | `lib/i18n.ts` | Always update both `es` and `en` to keep translations consistent. |
+| Text that uses `t(lang, '...')` | `lib/i18n.ts` | The site is English-only. Update `en` dictionary in `DICT`. |
 | Hardcoded JSX text | `app/**/page.tsx` or `components/**/*.tsx` | If it does not use `t(...)`, edit that file or migrate it to i18n. |
 | Global SEO title/description | `app/layout.tsx` | `metadata.title`, `metadata.description`, `openGraph`, `twitter`. |
 | Site name in JSON-LD | `app/layout.tsx` | `orgJsonLd` and `websiteJsonLd` (uses `SITE_NAME` if available). |
@@ -168,7 +168,7 @@ Quick guide to find text locations fast.
 | Navbar labels (Home, Shop, Vote, etc.) | `lib/i18n.ts` | `nav.*` |
 | User menu labels (Admin, Profile, Sign out) | `lib/i18n.ts` | `user.*` |
 | Full footer text | `lib/i18n.ts` | `footer.*` |
-| Language selector labels (Spanish/English) | `lib/i18n.ts` | `lang.*` |
+| Language label (English) | `lib/i18n.ts` | `lang.en` |
 | Common labels (Save, Cancel, etc.) | `lib/i18n.ts` | `common.*` |
 | Navbar component structure/icons/buttons | `components/Navbar.tsx` | UI structure; labels should preferably come from i18n |
 | Footer component | `components/Footer.tsx` | Check for any additional hardcoded text |
@@ -246,7 +246,7 @@ Base file: `lib/i18n.ts`
 1. First check whether the text comes from i18n (`t(lang, '...')`).
 2. If it comes from i18n, edit only `lib/i18n.ts` in both `es` and `en`.
 3. If it is hardcoded, edit the page/component file and consider migrating it to i18n.
-4. Verify the same route in both languages using the selector (`LanguageSwitcher`).
+4. Verify the same route.
 5. If you change admin labels, validate both desktop and mobile (`app/admin/layout.tsx`).
 
 ### 7) Useful Commands for Translation Audits

@@ -33,13 +33,13 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    if (target.id === currentUser.id) {
+    if (target.id === currentUser.id || "") {
       return NextResponse.json({ error: 'No puedes seguirte a ti mismo' }, { status: 400 });
     }
 
     let createdNewFollow = false;
     try {
-      await Follow.create({ followerId: currentUser.id, followingId: target.id });
+      await Follow.create({ followerId: currentUser.id || "", followingId: target.id });
       createdNewFollow = true;
     } catch (err: any) {
       // Duplicate key => already following
@@ -90,7 +90,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    await Follow.deleteOne({ followerId: currentUser.id, followingId: target.id });
+    await Follow.deleteOne({ followerId: currentUser.id || "", followingId: target.id });
 
     const followersCount = await Follow.countDocuments({ followingId: target.id });
     return NextResponse.json({ following: false, followersCount });

@@ -332,7 +332,7 @@ export default function AdminUsersPage() {
                                 const id = normalizeBadgeId(badgeId);
                                 const meta = badgeBySlug.get(id);
                                 if (!meta || !meta.icon) return null;
-                                const label = (lang === 'es' ? meta.labelEs : meta.labelEn) || meta.slug;
+                                const label = meta.labelEn || meta.slug;
                                 return (
                                   <span key={badgeId} title={label} className="inline-flex items-center justify-center">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -348,7 +348,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div className="flex flex-wrap items-center justify-end gap-2 sm:shrink-0">
-                        <Badge variant="info">{lang === 'es' ? `Saldo ${formatPrice(Number(user.balance || 0), 'es-ES')}` : `Balance ${formatPrice(Number(user.balance || 0), 'en-US')}`}</Badge>
+                        <Badge variant="info">{`Balance ${formatPrice(Number(user.balance || 0), 'en-US')}`}</Badge>
                         {getRoleBadge(user.role)}
                         {statusBadge}
                         <Link
@@ -356,7 +356,7 @@ export default function AdminUsersPage() {
                           className="inline-flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
                         >
                           <FaPen className="text-[11px]" />
-                          <span>{lang === 'es' ? 'Editar saldo' : 'Edit balance'}</span>
+                          <span>{'Edit balance'}</span>
                         </Link>
                       </div>
                     </div>

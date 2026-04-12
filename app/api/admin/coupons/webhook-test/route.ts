@@ -39,14 +39,14 @@ export async function POST(request: Request) {
       couponCode,
       discountAmount: 7.5,
       totalPrice: 22.49,
-      currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
-      buyerLabel: `**${admin.name}** (\`${admin.email || 'admin@example.com'}\`)`,
+      currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
+      buyerLabel: `**${admin.name || "Admin"}** (\`${admin.email || "" || 'admin@example.com'}\`)`,
       isTest: true,
     });
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'SEND_COUPON_WEBHOOK_TEST',
       targetType: 'DISCORD',
       targetId: COUPON_WEBHOOK_KEY,

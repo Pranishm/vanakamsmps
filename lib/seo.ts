@@ -45,7 +45,6 @@ export function getDefaultKeywords(): string[] {
 export function getAlternateLanguages(pathname: string): Record<string, string> {
   const path = String(pathname || '/').trim() || '/';
   return {
-    'es-ES': path,
     'en-US': path,
     'x-default': path,
   };
@@ -97,7 +96,6 @@ export function buildPageMetadata(options: BuildPageMetadataOptions): Metadata {
       siteName: getSiteName(),
       type: options.type || 'website',
       locale: 'en_US',
-      alternateLocale: ['es_ES'],
       images,
     },
     twitter: {

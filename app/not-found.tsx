@@ -6,10 +6,10 @@ export default function NotFound() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="text-center">
         <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-        <p className="text-xl text-gray-400 mb-8">Página no encontrada</p>
+        <p className="text-xl text-gray-400 mb-8">Page not found</p>
         <Link href="/">
           <Button variant="primary">
-            Volver al inicio
+            Back to home
           </Button>
         </Link>
       </div>

@@ -36,7 +36,7 @@ export async function GET() {
     const currentUser = await requireAuth();
     await dbConnect();
 
-    const user = await User.findById(currentUser.id).select(
+    const user = await User.findById(currentUser.id || "").select(
       '_id username displayName email role tags badges balance loyaltyPoints loyaltyLifetimePoints loyaltyLastEarnedAt followersCountOverride followingCountOverride avatar banner verified minecraftUsername minecraftUuid minecraftLinkedAt isBanned bannedReason createdAt updatedAt lastLogin presenceStatus lastSeenAt'
     );
 
@@ -69,7 +69,7 @@ export async function GET() {
       id: userId,
       username: user.username,
       displayName: String((user as any).displayName || ''),
-      email: user.email,
+      email: user.email || "",
       role: user.role,
       tags: Array.isArray((user as any).tags) ? (user as any).tags : [],
       badges: Array.isArray((user as any).badges) ? (user as any).badges : [],
@@ -188,7 +188,7 @@ export async function PATCH(request: Request) {
     await dbConnect();
 
     if (typeof updates.username === 'string') {
-      const current = await User.findById(currentUser.id).select('username role usernameLastChangedAt');
+      const current = await User.findById(currentUser.id || "").select('username role usernameLastChangedAt');
       if (!current) {
         return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
       }
@@ -228,7 +228,7 @@ export async function PATCH(request: Request) {
       // Si sigue habiendo username, aquí sí es un cambio real: check de unicidad + timestamp.
       if (typeof updates.username === 'string') {
         const existing = await User.findOne({
-          _id: { $ne: currentUser.id },
+          _id: { $ne: currentUser.id || "" },
           username: { $regex: new RegExp(`^${escapeRegex(updates.username)}$`, 'i') },
         }).select('_id');
 
@@ -240,7 +240,7 @@ export async function PATCH(request: Request) {
       }
     }
 
-    const updated = await User.findByIdAndUpdate(currentUser.id, updates, { returnDocument: 'after', runValidators: true }).select(
+    const updated = await User.findByIdAndUpdate(currentUser.id || "", updates, { returnDocument: 'after', runValidators: true }).select(
       '_id username displayName avatar banner verified presenceStatus'
     );
 

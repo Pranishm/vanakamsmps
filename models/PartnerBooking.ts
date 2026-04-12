@@ -58,7 +58,7 @@ const PartnerBookingSchema = new Schema<IPartnerBooking>(
     kind: { type: String, enum: ['CUSTOM', 'MONTHLY'], required: true },
     days: { type: Number, required: true, min: 1, max: 90 },
 
-    currency: { type: String, default: 'EUR' },
+    currency: { type: String, default: 'INR' },
     dailyPriceEur: { type: Number, required: true, min: 0 },
     discountPct: { type: Number, required: true, min: 0, max: 100 },
     totalPrice: { type: Number, required: true, min: 0 },

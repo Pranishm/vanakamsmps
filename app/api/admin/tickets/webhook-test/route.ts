@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       siteName,
       siteUrl,
       ticketId: `test-${Date.now()}`,
-      username: admin.name,
-      userEmail: admin.email || 'admin@example.com',
+      username: admin.name || "Admin" || 'Admin',
+      userEmail: admin.email || "" || 'admin@example.com',
       subject: '[TEST] Ticket webhook preview',
       category: 'TECHNICAL',
       priority,
@@ -49,8 +49,8 @@ export async function POST(request: Request) {
     });
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'SEND_TICKETS_WEBHOOK_TEST',
       targetType: 'DISCORD',
       targetId: TICKETS_DISCORD_WEBHOOK_KEY,

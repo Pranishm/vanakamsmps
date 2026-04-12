@@ -6,8 +6,15 @@ type KbDoc = {
   content: string;
 };
 
-async function readIfExists(relPath: string): Promise<KbDoc | null> {
+async function readDoc(relPath: string): Promise<KbDoc | null> {
   try {
+    // Restrict reading to specific allowed files or the docs directory
+    // to prevent Next.js from tracing the entire project root.
+    const allowedRoot = ['README.md', 'SETUP.md', 'TROUBLESHOOTING.md'];
+    const isAllowed = allowedRoot.includes(relPath) || relPath.startsWith('docs/');
+    
+    if (!isAllowed) return null;
+
     const abs = path.join(process.cwd(), relPath);
     const content = await fs.readFile(abs, 'utf8');
     return { id: relPath, content };
@@ -98,7 +105,7 @@ export async function getKbSnippets(query: string, opts?: { maxDocs?: number; ma
 
   const docs: KbDoc[] = [];
   for (const p of docPaths) {
-    const d = await readIfExists(p);
+    const d = await readDoc(p);
     if (d) docs.push(d);
   }
 

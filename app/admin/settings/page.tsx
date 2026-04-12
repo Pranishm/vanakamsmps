@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, Button, Input, Textarea, Badge } from '@/components/ui';
-import { FaCheck, FaCog, FaPlus } from 'react-icons/fa';
+import { FaCheck, FaCog, FaPlus, FaSync } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { t } from '@/lib/i18n';
 import { useClientLang } from '@/lib/useClientLang';
+import getSocket from '@/lib/socket';
 
 export default function AdminMaintenancePage() {
   const lang = useClientLang();
@@ -68,7 +69,7 @@ export default function AdminMaintenancePage() {
     const normalized = raw.startsWith('/') ? raw : `/${raw}`;
     const looksOk = normalized === '/' || normalized.startsWith('/');
     if (!looksOk) {
-      toast.error(lang === 'es' ? 'Ruta inválida' : 'Invalid path');
+      toast.error('Invalid path');
       return;
     }
 
@@ -101,6 +102,26 @@ export default function AdminMaintenancePage() {
     void fetchSettings();
   }, [fetchSettings]);
 
+  // ── Socket.io: listen for changes from Flutter ──────────────
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    const handleRemoteChange = (data: Record<string, string> & { updatedBy?: string }) => {
+      const { updatedBy, updatedAt, ...fields } = data as any;
+      setSettings(prev => ({ ...prev, ...fields }));
+      toast.info(
+        `Settings updated by ${updatedBy === 'flutter' ? '📱 Flutter App' : '🌐 Another Client'}`,
+        { autoClose: 3000 }
+      );
+    };
+
+    socket.on('setting_changed', handleRemoteChange);
+    return () => { socket.off('setting_changed', handleRemoteChange); };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -120,6 +141,12 @@ export default function AdminMaintenancePage() {
       if (data?.webhookError) {
         toast.warn(`${t(lang, 'admin.settings.webhookWarn')}: ${data.webhookError}`);
       }
+
+      // ── Broadcast to Flutter (and other connected clients) ──
+      try {
+        const socket = getSocket();
+        socket.emit('update_setting', settings);
+      } catch { /* socket not available */ }
     } catch (error) {
       toast.error(t(lang, 'admin.settings.saveError'));
     } finally {
@@ -174,7 +201,7 @@ export default function AdminMaintenancePage() {
 
             <div className="flex items-center gap-3">
               <Badge variant={settings.maintenance_mode === 'true' ? 'warning' : 'default'}>
-                {settings.maintenance_mode === 'true' ? (lang === 'es' ? 'ACTIVO' : 'ACTIVE') : (lang === 'es' ? 'INACTIVO' : 'INACTIVE')}
+                {settings.maintenance_mode === 'true' ? ('ACTIVE') : ('INACTIVE')}
               </Badge>
 
               <button
@@ -215,7 +242,7 @@ export default function AdminMaintenancePage() {
             <div className="text-gray-900 dark:text-white font-semibold">{t(lang, 'admin.settings.maintenancePathsLabel')}</div>
             <div className="flex items-center gap-3">
               <div className="text-xs text-gray-600 dark:text-gray-400">
-                {selectedMaintenancePaths.size} {lang === 'es' ? 'seleccionadas' : 'selected'}
+                {selectedMaintenancePaths.size} {'selected'}
               </div>
               <Button
                 type="button"
@@ -228,7 +255,7 @@ export default function AdminMaintenancePage() {
                   }))
                 }
               >
-                {lang === 'es' ? 'Seleccionar todo' : 'Select all'}
+                {'Select all'}
               </Button>
               <Button
                 type="button"
@@ -236,7 +263,7 @@ export default function AdminMaintenancePage() {
                 size="sm"
                 onClick={() => setSettings((prev) => ({ ...prev, maintenance_paths: '' }))}
               >
-                {lang === 'es' ? 'Limpiar' : 'Clear'}
+                {'Clear'}
               </Button>
             </div>
           </div>
@@ -273,14 +300,14 @@ export default function AdminMaintenancePage() {
 
           <div className="mt-5">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {lang === 'es' ? 'Añadir ruta personalizada' : 'Add custom path'}
+              {'Add custom path'}
             </div>
             <div className="flex gap-2">
               <Input
                 type="text"
                 value={customPath}
                 onChange={(e) => setCustomPath(e.target.value)}
-                placeholder={lang === 'es' ? '/mi-seccion o /mi-seccion/*' : '/my-section or /my-section/*'}
+                placeholder={'/my-section or /my-section/*'}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -290,13 +317,11 @@ export default function AdminMaintenancePage() {
               />
               <Button type="button" variant="secondary" onClick={addCustomPath}>
                 <FaPlus />
-                <span>{lang === 'es' ? 'Añadir' : 'Add'}</span>
+                <span>{'Add'}</span>
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              {lang === 'es'
-                ? 'Tip: puedes usar * al final para aplicar por prefijo (ej: /foro/*).'
-                : 'Tip: you can use * at the end for prefix matching (e.g. /forum/*).'}
+              {'Tip: you can use * at the end for prefix matching (e.g. /forum/*).'}
             </p>
           </div>
 
@@ -304,7 +329,7 @@ export default function AdminMaintenancePage() {
             <div className="mt-4 rounded-xl border border-gray-200 bg-white p-3 dark:border-white/10 dark:bg-white/5">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  {lang === 'es' ? 'Rutas personalizadas seleccionadas' : 'Selected custom paths'}
+                  {'Selected custom paths'}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">
                   {customSelectedPaths.length}
@@ -319,13 +344,11 @@ export default function AdminMaintenancePage() {
                       <div className="min-w-0">
                         <div className="text-sm text-gray-900 dark:text-white truncate">{p}</div>
                         <div className="text-[11px] text-gray-600 dark:text-gray-400">
-                          {lang === 'es'
-                            ? 'No está en la lista de secciones (arriba).'
-                            : 'Not in the section list (above).'}
+                          {'Not in the section list (above).'}
                         </div>
                       </div>
                       <Button type="button" variant="secondary" size="sm" onClick={() => removeMaintenancePath(p)}>
-                        {lang === 'es' ? 'Quitar' : 'Remove'}
+                        {'Remove'}
                       </Button>
                     </div>
                   ))}
@@ -349,7 +372,7 @@ export default function AdminMaintenancePage() {
 
         <Card className="rounded-2xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-950/25" hover={false}>
           <div className="text-gray-900 dark:text-white font-semibold mb-2">
-            {lang === 'es' ? 'Webhook Discord de regalos' : 'Gift Discord webhook'}
+            {'Gift Discord webhook'}
           </div>
           <Input
             type="text"
@@ -358,9 +381,7 @@ export default function AdminMaintenancePage() {
             placeholder="https://discord.com/api/webhooks/..."
           />
           <p className="text-xs text-gray-500 mt-2">
-            {lang === 'es'
-              ? 'Recibe una notificación en Discord cuando un regalo se entregue al destinatario.'
-              : 'Receive a Discord notification when a gift is delivered to its recipient.'}
+            {'Receive a Discord notification when a gift is delivered to its recipient.'}
           </p>
         </Card>
 

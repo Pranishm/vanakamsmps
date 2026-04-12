@@ -11,166 +11,85 @@ export default async function CookiesPage() {
   const cookieStore = await cookies();
   const lang = getLangFromCookieStore(cookieStore);
 
-  const copy =
-    lang === 'en'
-      ? {
-          title: 'Cookies Policy',
-          desc: 'What cookies we use and how to manage them',
-          summary:
-            'We use cookies to keep the site working, remember preferences, and (if you accept) measure usage with analytics.',
-          sections: [
-            {
-              title: '1. What are cookies?',
-              body: (
-                <p>
-                  Cookies are small pieces of data stored by your browser to remember information between visits (for example, your session or preferences).
-                </p>
-              ),
-            },
-            {
-              title: '2. Types of cookies',
-              body: (
-                <ul>
-                  <li>
-                    <strong>Essential</strong>: required for core functionality (authentication and security).
-                  </li>
-                  <li>
-                    <strong>Preferences</strong>: remember choices like language.
-                  </li>
-                  <li>
-                    <strong>Analytics</strong>: help us understand usage. Only enabled after you accept.
-                  </li>
-                </ul>
-              ),
-            },
-            {
-              title: '3. Cookies we use',
-              body: (
-                <>
-                  <p>Common cookies you may see (names can vary by configuration):</p>
-                  <ul>
-                    <li>
-                      <strong>cookie_consent</strong>: stores your choice (accepted/rejected).
-                    </li>
-                    <li>
-                      <strong>lang</strong>: remembers your language.
-                    </li>
-                    <li>
-                      <strong>NextAuth (session)</strong>: required to keep you signed in.
-                    </li>
-                  </ul>
-                </>
-              ),
-            },
-            {
-              title: '4. How to manage cookies',
-              body: (
-                <>
-                  <p>
-                    You can change your choice anytime using the <strong>Change cookie preferences</strong> button on this page.
-                  </p>
-                  <p>You can also delete cookies from your browser settings.</p>
-                </>
-              ),
-            },
-            {
-              title: '5. Related documents',
-              body: (
-                <ul>
-                  <li>
-                    <Link href="/privacidad" className="underline">
-                      Privacy Policy
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/terminos" className="underline">
-                      Terms & Conditions
-                    </Link>
-                  </li>
-                </ul>
-              ),
-            },
-          ],
-        }
-      : {
-          title: 'Política de Cookies',
-          desc: 'Qué cookies usamos y cómo gestionarlas',
-          summary:
-            'Usamos cookies para que el sitio funcione, recordar preferencias y (si aceptas) medir uso con analytics.',
-          sections: [
-            {
-              title: '1. ¿Qué son las cookies?',
-              body: (
-                <p>
-                  Las cookies son pequeños datos que el navegador guarda para recordar información entre visitas (por ejemplo, tu sesión o preferencias).
-                </p>
-              ),
-            },
-            {
-              title: '2. Tipos de cookies',
-              body: (
-                <ul>
-                  <li>
-                    <strong>Esenciales</strong>: necesarias para el funcionamiento (autenticación y seguridad).
-                  </li>
-                  <li>
-                    <strong>Preferencias</strong>: recuerdan opciones como el idioma.
-                  </li>
-                  <li>
-                    <strong>Analytics</strong>: miden uso del sitio. Solo se activan si aceptas.
-                  </li>
-                </ul>
-              ),
-            },
-            {
-              title: '3. Cookies que usamos',
-              body: (
-                <>
-                  <p>Cookies comunes que puedes ver (los nombres pueden variar según configuración):</p>
-                  <ul>
-                    <li>
-                      <strong>cookie_consent</strong>: guarda tu elección (accepted/rejected).
-                    </li>
-                    <li>
-                      <strong>lang</strong>: recuerda el idioma.
-                    </li>
-                    <li>
-                      <strong>NextAuth (sesión)</strong>: necesarias para mantener tu sesión si inicias sesión.
-                    </li>
-                  </ul>
-                </>
-              ),
-            },
-            {
-              title: '4. Cómo gestionarlas',
-              body: (
-                <>
-                  <p>
-                    Puedes cambiar tu decisión cuando quieras usando el botón <strong>Cambiar preferencias de cookies</strong> en esta página.
-                  </p>
-                  <p>También puedes borrar cookies desde la configuración de tu navegador.</p>
-                </>
-              ),
-            },
-            {
-              title: '5. Documentos relacionados',
-              body: (
-                <ul>
-                  <li>
-                    <Link href="/privacidad" className="underline">
-                      Política de Privacidad
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/terminos" className="underline">
-                      Términos y Condiciones
-                    </Link>
-                  </li>
-                </ul>
-              ),
-            },
-          ],
-        };
+  const copy = {
+    title: 'Cookies Policy',
+    desc: 'What cookies we use and how to manage them',
+    summary:
+      'We use cookies to keep the site working, remember preferences, and (if you accept) measure usage with analytics.',
+    sections: [
+      {
+        title: '1. What are cookies?',
+        body: (
+          <p>
+            Cookies are small pieces of data stored by your browser to remember information between visits (for example, your session or preferences).
+          </p>
+        ),
+      },
+      {
+        title: '2. Types of cookies',
+        body: (
+          <ul>
+            <li>
+              <strong>Essential</strong>: required for core functionality (authentication and security).
+            </li>
+            <li>
+              <strong>Preferences</strong>: remember choices like language.
+            </li>
+            <li>
+              <strong>Analytics</strong>: help us understand usage. Only enabled after you accept.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        title: '3. Cookies we use',
+        body: (
+          <>
+            <p>Common cookies you may see (names can vary by configuration):</p>
+            <ul>
+              <li>
+                <strong>cookie_consent</strong>: stores your choice (accepted/rejected).
+              </li>
+              <li>
+                <strong>lang</strong>: remembers your language.
+              </li>
+              <li>
+                <strong>NextAuth (session)</strong>: required to keep you signed in.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        title: '4. How to manage cookies',
+        body: (
+          <>
+            <p>
+              You can change your choice anytime using the <strong>Change cookie preferences</strong> button on this page.
+            </p>
+            <p>You can also delete cookies from your browser settings.</p>
+          </>
+        ),
+      },
+      {
+        title: '5. Related documents',
+        body: (
+          <ul>
+            <li>
+              <Link href="/privacy" className="underline">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link href="/terms" className="underline">
+                Terms & Conditions
+              </Link>
+            </li>
+          </ul>
+        ),
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen pt-24">
@@ -190,7 +109,7 @@ export default async function CookiesPage() {
                     {copy.summary}
                   </p>
                   <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    {lang === 'en' ? 'Last updated' : 'Última actualización'}: <span className="font-semibold">{updatedAt}</span>
+                    Last updated: <span className="font-semibold">{updatedAt}</span>
                   </p>
                 </div>
 

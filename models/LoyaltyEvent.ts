@@ -42,7 +42,7 @@ const LoyaltyEventSchema = new Schema<ILoyaltyEvent>(
     },
     currency: {
       type: String,
-      default: 'EUR',
+      default: 'INR',
       trim: true,
     },
     description: {

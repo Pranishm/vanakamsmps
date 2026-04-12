@@ -136,7 +136,7 @@ export async function POST(request: Request) {
       loyaltyPointsUsed: pricing.loyalty?.pointsUsed || 0,
       loyaltyDiscountAmount: pricing.loyalty?.discountAmount || 0,
       balanceUsedAmount,
-      currency: process.env.SHOP_CURRENCY || 'EUR',
+      currency: process.env.SHOP_CURRENCY || 'INR',
       status: wantsBalancePayment ? 'PAID' : 'PENDING',
       provider: 'MANUAL',
       paidAt,

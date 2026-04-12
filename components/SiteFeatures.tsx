@@ -44,7 +44,7 @@ export default function SiteFeatures() {
             const audio = new Audio('https://www.myinstants.com/media/sounds/minecraft_level_up.mp3');
             audio.volume = 0.5;
             audio.play();
-          } catch (e) {}
+          } catch (e) { }
           setTimeout(() => setKonamiUnlocked(false), 5000);
           konamiPosition = 0;
         }
@@ -93,7 +93,8 @@ export default function SiteFeatures() {
           <div className="mt-4 text-xs font-bold text-gray-500 tracking-widest uppercase animate-pulse">
             Generating terrain...
           </div>
-          <style dangerouslySetInnerHTML={{__html:`
+          <style dangerouslySetInnerHTML={{
+            __html: `
             @keyframes loadBar { 0% { transform: scaleX(0); } 30% { transform: scaleX(0.4); } 60% { transform: scaleX(0.7); } 100% { transform: scaleX(1); } }
           `}} />
         </div>
@@ -142,13 +143,13 @@ export default function SiteFeatures() {
             <FaHome size={20} />
             <span className="text-[10px] font-bold">Home</span>
           </Link>
-          <Link href="/tienda" className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/tienda' ? 'text-minecraft-diamond' : 'text-gray-500 hover:text-gray-300'}`}>
+          <Link href="/shop" className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/shop' ? 'text-minecraft-diamond' : 'text-gray-500 hover:text-gray-300'}`}>
             <FaStore size={20} />
             <span className="text-[10px] font-bold">Store</span>
           </Link>
           {/* Main Action Button - Play */}
           <div className="relative -top-5">
-            <button 
+            <button
               onClick={() => {
                 navigator.clipboard.writeText('vanakam.me');
                 alert('IP: vanakam.me copied to clipboard!');
@@ -158,7 +159,7 @@ export default function SiteFeatures() {
               <FaGamepad size={24} />
             </button>
           </div>
-          <Link href="/soporte" className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/soporte' ? 'text-minecraft-diamond' : 'text-gray-500 hover:text-gray-300'}`}>
+          <Link href="/support" className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/support' ? 'text-minecraft-diamond' : 'text-gray-500 hover:text-gray-300'}`}>
             <FaQuestionCircle size={20} />
             <span className="text-[10px] font-bold">Support</span>
           </Link>

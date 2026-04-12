@@ -47,8 +47,8 @@ export async function POST(request: Request) {
     const post = await BlogPost.create({
       ...validatedData,
       slug,
-      author: admin.name,
-      authorId: admin.id,
+      author: admin.name || "Admin",
+      authorId: admin.id || "",
       publishedAt: validatedData.isPublished ? new Date() : undefined,
     });
 
@@ -63,8 +63,8 @@ export async function POST(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'CREATE_BLOG_POST',
       targetType: 'BLOG_POST',
       targetId: post._id.toString(),
@@ -126,8 +126,8 @@ export async function PATCH(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'UPDATE_BLOG_POST',
       targetType: 'BLOG_POST',
       targetId: postId,
@@ -173,8 +173,8 @@ export async function DELETE(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'DELETE_BLOG_POST',
       targetType: 'BLOG_POST',
       targetId: postId,

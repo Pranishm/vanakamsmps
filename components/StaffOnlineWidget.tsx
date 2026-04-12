@@ -75,11 +75,11 @@ export default function StaffOnlineWidget({ host, port = 25565 }: StaffOnlineWid
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2 text-white font-medium">
           <FaUsers className="text-minecraft-grass" />
-          <span>{lang === 'es' ? 'Admins online' : 'Admins online'}</span>
+          <span>{'Admins online'}</span>
         </div>
 
         <div className="text-xs text-gray-400">
-          {loading ? (lang === 'es' ? 'Cargando…' : 'Loading…') : `${data?.count ?? 0}`}
+          {loading ? ('Loading…') : `${data?.count ?? 0}`}
         </div>
       </div>
 
@@ -114,9 +114,7 @@ export default function StaffOnlineWidget({ host, port = 25565 }: StaffOnlineWid
         <div className="text-sm text-gray-400">
           {data?.note
             ? data.note
-            : lang === 'es'
-              ? 'No hay admins conectados ahora mismo.'
-              : 'No admins online right now.'}
+            : 'No admins online right now.'}
         </div>
       )}
     </motion.div>

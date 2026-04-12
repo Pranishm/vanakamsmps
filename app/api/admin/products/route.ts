@@ -80,8 +80,8 @@ export async function POST(request: Request) {
     const product = await Product.create(normalizeProductPayload(validatedData as any));
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'CREATE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: product._id.toString(),
@@ -133,8 +133,8 @@ export async function PATCH(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'UPDATE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: productId,
@@ -185,7 +185,7 @@ export async function PATCH(request: Request) {
           message = `${product.name} vuelve a estar disponible.`;
         } else if (shouldNotifyPriceDrop) {
           title = 'Bajada de precio';
-          message = `${product.name} ha bajado a ${nextPrice.toFixed(2)} EUR.`;
+          message = `${product.name} ha bajado a ${nextPrice.toFixed(2)} INR.`;
         }
 
         notificationsByUserId.set(userId, {
@@ -241,8 +241,8 @@ export async function DELETE(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'DELETE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: productId,

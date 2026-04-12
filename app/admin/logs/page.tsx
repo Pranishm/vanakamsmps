@@ -217,11 +217,11 @@ export default function AdminLogsPage() {
 
   const latestLog = logs[0] || null;
   const filterOptions: Array<{ id: ActionFilter; label: string }> = [
-    { id: 'ALL', label: lang === 'es' ? 'Todo' : 'All' },
+    { id: 'ALL', label: 'All' },
     { id: 'CREATE', label: 'Create' },
     { id: 'UPDATE', label: 'Update' },
     { id: 'DELETE', label: 'Delete' },
-    { id: 'OTHER', label: lang === 'es' ? 'Otros' : 'Other' },
+    { id: 'OTHER', label: 'Other' },
   ];
 
   return (
@@ -235,13 +235,11 @@ export default function AdminLogsPage() {
             </div>
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
-                {lang === 'es' ? 'Registro operativo' : 'Operational audit'}
+                {'Operational audit'}
               </div>
               <h1 className="mt-2 truncate text-2xl font-black text-gray-900 dark:text-white md:text-3xl">{t(lang, 'admin.logs.title')}</h1>
               <p className="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-300 md:text-base">
-                {lang === 'es'
-                  ? 'Reconstruido como un feed claro: resumen arriba, filtros visibles y cada entrada separada para revisar cambios sin una tabla pesada.'
-                  : 'Rebuilt as a cleaner feed with summary cards, visible filters, and separated entries instead of a dense table.'}
+                {'Rebuilt as a cleaner feed with summary cards, visible filters, and separated entries instead of a dense table.'}
               </p>
             </div>
           </div>
@@ -260,40 +258,38 @@ export default function AdminLogsPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card hover={false} className="rounded-[26px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Total bruto' : 'Raw total'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Raw total'}</div>
           <div className="mt-3 text-3xl font-black text-gray-900 dark:text-white">{logs.length}</div>
           <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             {latestLog
-              ? `${lang === 'es' ? 'Ultimo evento' : 'Latest event'}: ${formatDateTime(latestLog.createdAt)}`
+              ? `${'Latest event'}: ${formatDateTime(latestLog.createdAt)}`
               : t(lang, 'admin.logs.empty')}
           </div>
         </Card>
 
         <Card hover={false} className="rounded-[26px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Cambios estructurados' : 'Structured changes'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Structured changes'}</div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Badge variant="success">CREATE {totalCounts.create}</Badge>
             <Badge variant="warning">UPDATE {totalCounts.update}</Badge>
             <Badge variant="danger">DELETE {totalCounts.delete}</Badge>
           </div>
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">{lang === 'es' ? `Otros: ${totalCounts.other}` : `Other: ${totalCounts.other}`}</div>
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">{`Other: ${totalCounts.other}`}</div>
         </Card>
 
         <Card hover={false} className="rounded-[26px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Admin mas activo' : 'Most active admin'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Most active admin'}</div>
           <div className="mt-3 truncate text-xl font-black text-gray-900 dark:text-white">{topAdmin?.[0] || '-'}</div>
           <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {topAdmin ? `${topAdmin[1]} ${lang === 'es' ? 'eventos registrados' : 'logged events'}` : lang === 'es' ? 'Sin actividad' : 'No activity'}
+            {topAdmin ? `${topAdmin[1]} ${'logged events'}` : 'No activity'}
           </div>
         </Card>
 
         <Card hover={false} className="rounded-[26px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Vista actual' : 'Current view'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Current view'}</div>
           <div className="mt-3 text-xl font-black text-gray-900 dark:text-white">{filteredLogs.length}</div>
           <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {lang === 'es'
-              ? `Filtro: ${actionFilter === 'ALL' ? 'todo' : actionFilter.toLowerCase()}`
-              : `Filter: ${actionFilter === 'ALL' ? 'all' : actionFilter.toLowerCase()}`}
+            {`Filter: ${actionFilter === 'ALL' ? 'all' : actionFilter.toLowerCase()}`}
           </div>
         </Card>
       </div>
@@ -357,7 +353,7 @@ export default function AdminLogsPage() {
           </div>
 
           <div>
-            <div className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{lang === 'es' ? 'Filtrar por accion' : 'Filter by action'}</div>
+            <div className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{'Filter by action'}</div>
             <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
               {filterOptions.map((option) => (
                 <button
@@ -404,7 +400,7 @@ export default function AdminLogsPage() {
               </div>
               <div className="mt-4 text-lg font-bold text-gray-900 dark:text-white">{t(lang, 'admin.logs.empty')}</div>
               <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Prueba a limpiar la busqueda o cambiar el filtro actual.' : 'Try clearing the search or changing the current filter.'}
+                {'Try clearing the search or changing the current filter.'}
               </div>
             </div>
           </Card>
@@ -430,16 +426,16 @@ export default function AdminLogsPage() {
 
                     <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
                       <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Admin' : 'Admin'}</div>
+                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Admin'}</div>
                         <div className="mt-2 truncate text-sm font-semibold text-gray-900 dark:text-white">{log.adminUsername || '-'}</div>
                       </div>
                       <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Objetivo' : 'Target'}</div>
+                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Target'}</div>
                         <div className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{log.targetType || '-'}</div>
                         <div className="mt-1 truncate text-xs text-gray-500">{log.targetId || '-'}</div>
                       </div>
                       <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Origen' : 'Source'}</div>
+                        <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Source'}</div>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           {getMethodBadge(method)}
                           {path ? <span className="truncate text-xs text-gray-700 dark:text-gray-300">{path}</span> : <span className="text-xs text-gray-500">-</span>}
@@ -454,9 +450,9 @@ export default function AdminLogsPage() {
                     <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                       <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-gray-500">
                         <FaWrench />
-                        <span>{lang === 'es' ? 'Resumen' : 'Summary'}</span>
+                        <span>{'Summary'}</span>
                       </div>
-                      <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">{detailsPreview || (lang === 'es' ? 'Sin detalles' : 'No details')}</div>
+                      <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">{detailsPreview || ('No details')}</div>
                     </div>
                   </div>
 
@@ -474,7 +470,7 @@ export default function AdminLogsPage() {
                       onClick={() => setExpanded((current) => ({ ...current, [log._id]: !current[log._id] }))}
                     >
                       {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-                      <span>{isExpanded ? (lang === 'es' ? 'Ocultar detalle' : 'Hide detail') : (lang === 'es' ? 'Ver detalle' : 'View detail')}</span>
+                      <span>{isExpanded ? ('Hide detail') : ('View detail')}</span>
                     </Button>
                   </div>
                 </div>
@@ -482,7 +478,7 @@ export default function AdminLogsPage() {
                 {isExpanded ? (
                   <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
                     <div className="rounded-[24px] border border-gray-200 bg-gray-50 px-4 py-4 dark:border-white/10 dark:bg-white/5">
-                      <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Detalles' : 'Details'}</div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Details'}</div>
                       <pre className="mt-3 overflow-x-auto whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">
                         {typeof parsedDetails === 'string'
                           ? parsedDetails

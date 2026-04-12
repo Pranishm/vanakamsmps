@@ -112,7 +112,7 @@ const ShopOrderSchema = new Schema<IShopOrder>(
     },
     totalPrice: { type: Number, default: 0 },
     subtotalPrice: { type: Number, default: 0 },
-    currency: { type: String, default: 'EUR' },
+    currency: { type: String, default: 'INR' },
     status: { type: String, enum: ['PENDING', 'PAID', 'DELIVERED', 'CANCELED'], default: 'PENDING' },
     provider: { type: String, enum: ['MANUAL', 'PAYPAL', 'STRIPE'], default: 'MANUAL' },
 

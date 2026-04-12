@@ -1,4 +1,4 @@
-export function formatDate(date: Date | string, locale: string = 'es-ES'): string {
+export function formatDate(date: Date | string, locale: string = 'en-IN'): string {
   const d = new Date(date);
   return d.toLocaleDateString(locale, {
     year: 'numeric',
@@ -7,7 +7,7 @@ export function formatDate(date: Date | string, locale: string = 'es-ES'): strin
   });
 }
 
-export function formatDateTime(date: Date | string, locale: string = 'es-ES'): string {
+export function formatDateTime(date: Date | string, locale: string = 'en-IN'): string {
   const d = new Date(date);
   return d.toLocaleDateString(locale, {
     year: 'numeric',
@@ -18,7 +18,7 @@ export function formatDateTime(date: Date | string, locale: string = 'es-ES'): s
   });
 }
 
-export function formatTimeAgo(date: Date | string, locale: string = 'es-ES'): string {
+export function formatTimeAgo(date: Date | string, locale: string = 'en-IN'): string {
   const d = new Date(date);
   const now = new Date();
   const diffSeconds = Math.round((d.getTime() - now.getTime()) / 1000);
@@ -47,14 +47,14 @@ export function formatTimeAgo(date: Date | string, locale: string = 'es-ES'): st
   return rtf.format(diffYears, 'year');
 }
 
-export function formatPrice(price: number, locale: string = 'es-ES', currency: string = 'EUR'): string {
+export function formatPrice(price: number, locale: string = 'en-IN', currency: string = 'INR'): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
   }).format(price);
 }
 
-export function formatSocialCount(value: number, locale: string = 'es-ES'): string {
+export function formatSocialCount(value: number, locale: string = 'en-IN'): string {
   const n = Number(value || 0);
   if (!Number.isFinite(n)) return '0';
 

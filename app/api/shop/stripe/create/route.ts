@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Total inválido' }, { status: 400 });
     }
 
-    // Stripe has minimum charge amounts (e.g. ~0.50 EUR). If the order is truly free,
+    // Stripe has minimum charge amounts (e.g. ~0.50 INR). If the order is truly free,
     // we bypass Stripe and enqueue delivery immediately.
     if (totalPrice === 0) {
       const first = orderItems[0];
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
         loyaltyPointsUsed: pricing.loyalty?.pointsUsed || 0,
         loyaltyDiscountAmount: pricing.loyalty?.discountAmount || 0,
         balanceUsedAmount: pricing.storeBalance?.appliedBalance || 0,
-        currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
+        currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
         status: 'PAID',
         provider: 'MANUAL',
         paidAt: new Date(),
@@ -192,7 +192,7 @@ export async function POST(request: Request) {
       loyaltyPointsUsed: pricing.loyalty?.pointsUsed || 0,
       loyaltyDiscountAmount: pricing.loyalty?.discountAmount || 0,
       balanceUsedAmount: pricing.storeBalance?.appliedBalance || 0,
-      currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
+      currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
       status: 'PENDING',
       provider: 'STRIPE',
       ip,
@@ -202,15 +202,15 @@ export async function POST(request: Request) {
     const siteUrl = getSiteUrl(request);
 
     const stripe = getStripe();
-    const currency = String((order as any).currency || 'EUR').toLowerCase();
+    const currency = String((order as any).currency || 'INR').toLowerCase();
 
     // Provide a clearer error than Stripe's when below common minimums.
-    // For EUR, Stripe requires at least 0.50.
+    // For INR, Stripe requires at least 0.50.
     if (currency === 'eur') {
       const totalCents = orderItems.reduce((sum, it) => sum + Math.round(Number(it.unitPrice || 0) * 100) * Number(it.quantity || 1), 0);
       if (totalCents > 0 && totalCents < 50) {
         return NextResponse.json(
-          { error: 'Stripe no permite pagos menores de 0,50€. Pon el producto a 0€ (gratis) o sube el precio.' },
+          { error: 'Stripe no permite pagos menores de 0,50₹. Pon el producto a 0₹ (gratis) o sube el precio.' },
           { status: 400 }
         );
       }
@@ -262,7 +262,7 @@ export async function POST(request: Request) {
           orderId: String(order._id),
         },
       },
-      customer_email: user?.email ? String(user.email) : undefined,
+      customer_email: user?.email ? String(user.email || "") : undefined,
       success_url: `${siteUrl}/carrito/stripe/success?orderId=${encodeURIComponent(String(order._id))}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/carrito/stripe/cancel?orderId=${encodeURIComponent(String(order._id))}`,
     });

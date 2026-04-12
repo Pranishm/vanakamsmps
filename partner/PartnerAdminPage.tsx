@@ -939,7 +939,7 @@ export default function PartnerAdminPage() {
                       <td className="py-3 pr-4">
                         {String(b.provider) === 'FREE'
                           ? (lang === 'es' ? 'GRATIS' : 'FREE')
-                          : `${b.provider} • ${formatPrice(Number(b.totalPrice || 0), dateLocale, String(b.currency || 'EUR'))}`}
+                          : `${b.provider} • ${formatPrice(Number(b.totalPrice || 0), dateLocale, String(b.currency || 'INR'))}`}
                       </td>
                       <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400 max-w-[360px]">
                         {String(b.requestNote || '').trim() ? String(b.requestNote).trim() : '—'}
@@ -989,7 +989,7 @@ export default function PartnerAdminPage() {
                   </Select>
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  VIP {Number(pricing.vipTotalsEur?.[pricingDay - 1] || 0)}€ • Slot #1 {Number(pricing.slotTotalsEur?.[0]?.[pricingDay - 1] || 0)}€ • Slot #10 {Number(pricing.slotTotalsEur?.[9]?.[pricingDay - 1] || 0)}€
+                  VIP {Number(pricing.vipTotalsEur?.[pricingDay - 1] || 0)}₹ • Slot #1 {Number(pricing.slotTotalsEur?.[0]?.[pricingDay - 1] || 0)}₹ • Slot #10 {Number(pricing.slotTotalsEur?.[9]?.[pricingDay - 1] || 0)}₹
                 </div>
               </div>
             </div>
@@ -1053,7 +1053,7 @@ export default function PartnerAdminPage() {
           </div>
 
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            {lang === 'es' ? 'Editas el precio total de ese día para VIP y para cada slot (EUR).' : 'You edit the total price of that day for VIP and each slot (EUR).'}
+            {lang === 'es' ? 'Editas el precio total de ese día para VIP y para cada slot (INR).' : 'You edit the total price of that day for VIP and each slot (INR).'}
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">

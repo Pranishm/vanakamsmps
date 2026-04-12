@@ -33,8 +33,8 @@ export async function POST(request: Request) {
     );
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'SEND_SERVICES_STATUS_REPORT',
       targetType: 'DISCORD',
       targetId: 'services_status_discord_webhook',

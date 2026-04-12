@@ -102,7 +102,7 @@ export default async function RootLayout({
     '@type': 'WebSite',
     name: getSiteName(),
     url: siteUrl,
-    inLanguage: ['en', 'es'],
+    inLanguage: ['en'],
   };
 
   return (

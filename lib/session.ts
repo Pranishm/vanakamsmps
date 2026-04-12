@@ -7,6 +7,26 @@ export async function getSession() {
 
 export async function getCurrentUser() {
   const session = await getSession();
+  
+  // Mobile Bridge: If no session cookie, check for trusted headers (Flutter app dev)
+  if (!session?.user) {
+    const { headers } = await import('next/headers');
+    const h = await headers();
+    const email = h.get('x-user-email');
+    const role = h.get('x-user-role');
+    const name = h.get('x-user-name') || email?.split('@')[0];
+    const id = h.get('x-user-id');
+
+    if (email && role) {
+      return { 
+        email, 
+        role, 
+        name: name ?? undefined, 
+        id: id ?? undefined 
+      };
+    }
+  }
+
   return session?.user;
 }
 

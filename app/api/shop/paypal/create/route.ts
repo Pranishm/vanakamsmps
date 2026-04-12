@@ -131,7 +131,7 @@ export async function POST(request: Request) {
         loyaltyPointsUsed: pricing.loyalty?.pointsUsed || 0,
         loyaltyDiscountAmount: pricing.loyalty?.discountAmount || 0,
         balanceUsedAmount: pricing.storeBalance?.appliedBalance || 0,
-        currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
+        currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
         status: 'PAID',
         provider: 'MANUAL',
         paidAt: new Date(),
@@ -191,7 +191,7 @@ export async function POST(request: Request) {
       loyaltyPointsUsed: pricing.loyalty?.pointsUsed || 0,
       loyaltyDiscountAmount: pricing.loyalty?.discountAmount || 0,
       balanceUsedAmount: pricing.storeBalance?.appliedBalance || 0,
-      currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
+      currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
       status: 'PENDING',
       provider: 'PAYPAL',
       ip,
@@ -206,7 +206,7 @@ export async function POST(request: Request) {
 
     const created = await paypalCreateOrder({
       totalPrice,
-      currency: (order as any).currency || 'EUR',
+      currency: (order as any).currency || 'INR',
       description,
       customId: String(order._id),
       returnUrl,

@@ -41,7 +41,7 @@ export async function applyOrderOfferBonuses(orderId: string) {
     const bonus = Math.max(0, Number((product as any).bonusBalanceAmount || 0));
     if (bonus <= 0) continue;
     totalBonus += bonus * quantity;
-    labels.push(`${String((product as any).name || 'Producto')} +${(bonus * quantity).toFixed(2)} EUR`);
+    labels.push(`${String((product as any).name || 'Producto')} +${(bonus * quantity).toFixed(2)} INR`);
   }
 
   totalBonus = Math.round((totalBonus + Number.EPSILON) * 100) / 100;
@@ -56,7 +56,7 @@ export async function applyOrderOfferBonuses(orderId: string) {
     Notification.create({
       userId,
       title: 'Bonus de recarga aplicado',
-      message: `Has recibido ${totalBonus.toFixed(2)} EUR de saldo extra${labels.length ? ` por ${labels.join(', ')}` : ''}.`,
+      message: `Has recibido ${totalBonus.toFixed(2)} INR de saldo extra${labels.length ? ` por ${labels.join(', ')}` : ''}.`,
       href: '/perfil/recompensas',
       type: 'SUCCESS',
     }).catch(() => null),

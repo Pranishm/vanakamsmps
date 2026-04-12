@@ -10,11 +10,11 @@ export async function GET() {
     await dbConnect();
 
     const ensured = await ensureReferralProfileForUser({
-      id: String(user.id || ''),
-      username: String(user.name || user.email || 'USER'),
+      id: String(user.id || "" || ''),
+      username: String(user.name || "User" || user.email || "" || 'USER'),
     });
 
-    const profile = await ReferralProfile.findOne({ userId: String(user.id || '') }).lean();
+    const profile = await ReferralProfile.findOne({ userId: String(user.id || "" || '') }).lean();
 
     return NextResponse.json({
       code: String((profile as any)?.code || (ensured as any)?.code || ''),

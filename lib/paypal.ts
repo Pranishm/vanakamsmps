@@ -122,7 +122,7 @@ export async function paypalCreateOrder(params: {
       purchase_units: [
         {
           amount: {
-            currency_code: String(params.currency || 'EUR').toUpperCase(),
+            currency_code: String(params.currency || 'INR').toUpperCase(),
             value: toAmountValue(params.totalPrice),
           },
           description: params.description,

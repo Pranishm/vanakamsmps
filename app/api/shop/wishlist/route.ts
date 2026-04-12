@@ -7,13 +7,13 @@ import ShopWishlistItem from '@/models/ShopWishlistItem';
 import User from '@/models/User';
 
 async function resolveUserIdFromSessionUser(user: any) {
-  const direct = typeof user?.id === 'string' && user.id ? user.id : '';
+  const direct = typeof user?.id === 'string' && user.id || "" ? user.id || "" : '';
   if (direct) return direct;
 
   const alt = typeof user?._id === 'string' && user._id ? user._id : '';
   if (alt) return alt;
 
-  const email = typeof user?.email === 'string' ? user.email.toLowerCase() : '';
+  const email = typeof user?.email === 'string' ? user.email || "".toLowerCase() : '';
   if (!email) throw new Error('Unauthorized');
 
   const found = await User.findOne({ email }, { _id: 1 }).lean();

@@ -1,0 +1,16 @@
+# Vercel Ignore File
+# Exclude the Flutter mirror app completely (it's inside app/ for structure but shouldn't be deployed)
+app/
+flutter_mirror_app/
+react-native-widget/
+
+# Exclude standard build/dependency folders
+node_modules/
+.next/
+out/
+build/
+dist/
+.vercel
+.vscode
+.git
+.DS_Store

@@ -20,6 +20,8 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Enable GPU acceleration for scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -59,6 +61,24 @@ html {
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+
+/* Custom scrollbar for leaderboard widget */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Minecraft block pattern background */
@@ -107,6 +127,65 @@ html {
   }
 }
 
+/* Smooth scroll reveal animations */
+@keyframes scrollRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollRevealLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scrollRevealRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scrollRevealScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Leaderboard glow animation */
+@keyframes leaderboardGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(249, 229, 71, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(249, 229, 71, 0.25);
+  }
+}
+
+.leaderboard-glow {
+  animation: leaderboardGlow 3s ease-in-out infinite;
+}
+
 /* Toast container styles */
 .Toastify__toast-container {
   z-index: 9999;
@@ -152,6 +231,36 @@ html {
   100% {
     background-position: 0% 50%;
   }
+}
+
+/* Floating animation */
+@keyframes floatSmooth {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float-smooth {
+  animation: floatSmooth 3s ease-in-out infinite;
+}
+
+/* Pulse glow */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
 }
 
 .shimmer {

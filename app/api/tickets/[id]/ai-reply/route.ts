@@ -87,7 +87,7 @@ export async function POST(
     }
 
     const isStaff = isStaffRole((user as any)?.role);
-    const isOwner = (ticket as any).userId === user.id;
+    const isOwner = (ticket as any).userId === user.id || "";
     if (!isStaff && !isOwner) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }

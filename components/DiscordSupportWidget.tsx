@@ -28,18 +28,16 @@ export default function DiscordSupportWidget() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-white font-medium">
             <FaDiscord className="text-minecraft-diamond" />
-            <span>{lang === 'es' ? 'Soporte en Discord' : 'Discord support'}</span>
+            <span>{'Discord support'}</span>
           </div>
           <p className="text-sm text-gray-400 mt-2">
-            {lang === 'es'
-              ? '¿Necesitas ayuda? Abre ticket o pregunta en Discord.'
-              : 'Need help? Open a ticket or ask on Discord.'}
+            {'Need help? Open a ticket or ask on Discord.'}
           </p>
         </div>
 
         <Button variant="secondary" className="shrink-0" disabled={!discordUrl} onClick={openDiscord}>
           <FaExternalLinkAlt />
-          <span>{lang === 'es' ? 'Unirse' : 'Join'}</span>
+          <span>{'Join'}</span>
         </Button>
       </div>
     </motion.div>

@@ -179,12 +179,12 @@ export async function middleware(request: NextRequest) {
       return finalizeResponse(request, NextResponse.redirect(new URL('/', request.url)), pathname, nonce);
     }
 
-    // OWNER can access everything.
-    if (token.role !== 'OWNER') {
-      // /admin/permisos is OWNER-only
-      if (pathname.startsWith('/admin/permisos')) {
-        return finalizeResponse(request, NextResponse.redirect(new URL('/admin', request.url)), pathname, nonce);
-      }
+      // OWNER can access everything.
+      if (token.role !== 'OWNER') {
+        // /admin/permissions is OWNER-only
+        if (pathname.startsWith('/admin/permissions')) {
+          return finalizeResponse(request, NextResponse.redirect(new URL('/admin', request.url)), pathname, nonce);
+        }
 
       // Restrict ADMIN users by configured section permissions.
       if (token.role === 'ADMIN' && (token as any).adminSectionsConfigured) {
@@ -201,7 +201,7 @@ export async function middleware(request: NextRequest) {
                   ? 'tickets'
                   : pathname.startsWith('/admin/blog')
                     ? 'blog'
-                    : pathname.startsWith('/admin/postulaciones')
+                    : pathname.startsWith('/admin/applications')
                       ? 'applications'
                       : pathname.startsWith('/admin/newsletter')
                         ? 'newsletter'

@@ -96,8 +96,8 @@ export async function PATCH(request: Request) {
     }
 
     await AdminLog.create({
-      adminId: admin.id,
-      adminUsername: admin.name,
+      adminId: admin.id || "",
+      adminUsername: admin.name || "Admin",
       action: 'NEWSLETTER_SUBSCRIBER_UPDATE',
       targetType: 'NEWSLETTER',
       targetId: id,

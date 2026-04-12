@@ -149,7 +149,7 @@ export default function NewsletterPopup() {
                 <button
                   type="button"
                   onClick={() => setLangMenuOpen((v) => !v)}
-                  aria-label={lang === 'es' ? 'Idioma de la newsletter' : 'Newsletter language'}
+                  aria-label={'Newsletter language'}
                   aria-haspopup="menu"
                   aria-expanded={langMenuOpen}
                   className="group relative h-10 w-10 inline-flex items-center justify-center leading-none rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10 transition-[color,background-color,border-color,transform] duration-200 hover:scale-[1.08] hover:-translate-y-0.5"
@@ -161,11 +161,11 @@ export default function NewsletterPopup() {
                 {langMenuOpen && (
                   <div
                     role="menu"
-                    aria-label={lang === 'es' ? 'Idioma de la newsletter' : 'Newsletter language'}
+                    aria-label={'Newsletter language'}
                     className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200 dark:bg-black/95 dark:border-minecraft-grass/20 rounded-md overflow-hidden shadow-lg"
                   >
                     <div className="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-minecraft-grass/10">
-                      {lang === 'es' ? 'Idioma de la newsletter' : 'Newsletter language'}
+                      {'Newsletter language'}
                     </div>
                     <div className="py-1">
                       {([
@@ -206,37 +206,35 @@ export default function NewsletterPopup() {
 
         <div className="px-5 py-5">
           <div className="text-sm text-gray-700 dark:text-gray-200">
-            {lang === 'es'
-              ? 'Recibe un resumen semanal con novedades, eventos y cambios importantes del servidor.'
-              : 'Get a weekly summary with news, events, and important server updates.'}
+            {'Get a weekly summary with news, events, and important server updates.'}
           </div>
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-sm text-gray-800 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
               <div className="flex items-center gap-2 font-bold">
                 <FaBolt className="text-minecraft-diamond" />
-                <span>{lang === 'es' ? 'Novedades' : 'Updates'}</span>
+                <span>{'Updates'}</span>
               </div>
               <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Lo último del servidor y la web.' : 'Latest server & site news.'}
+                {'Latest server & site news.'}
               </div>
             </div>
             <div className="rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-sm text-gray-800 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
               <div className="flex items-center gap-2 font-bold">
                 <FaGift className="text-minecraft-grass" />
-                <span>{lang === 'es' ? 'Eventos' : 'Events'}</span>
+                <span>{'Events'}</span>
               </div>
               <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Fechas, premios y avisos.' : 'Dates, rewards, and notices.'}
+                {'Dates, rewards, and notices.'}
               </div>
             </div>
             <div className="rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-sm text-gray-800 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
               <div className="flex items-center gap-2 font-bold">
                 <FaCheckCircle className="text-minecraft-grass" />
-                <span>{lang === 'es' ? 'Sin spam' : 'No spam'}</span>
+                <span>{'No spam'}</span>
               </div>
               <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Baja con 1 clic.' : 'Unsubscribe with 1 click.'}
+                {'Unsubscribe with 1 click.'}
               </div>
             </div>
           </div>
@@ -256,12 +254,10 @@ export default function NewsletterPopup() {
 
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              {lang === 'es'
-                ? 'Te enviaremos como máximo 1 email por semana. Puedes darte de baja cuando quieras.'
-                : 'We will send at most 1 email per week. Unsubscribe anytime.'}
+              {'We will send at most 1 email per week. Unsubscribe anytime.'}
             </div>
             <Button type="button" variant="secondary" size="sm" onClick={close} disabled={loading}>
-              {lang === 'es' ? 'Ahora no' : 'Not now'}
+              {'Not now'}
             </Button>
           </div>
 

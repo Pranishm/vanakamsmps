@@ -58,7 +58,7 @@ async function sendDiscordWebhook(webhookUrl: string, payload: Record<string, un
 }
 
 function money(amount: number, currency: string) {
-  return `${Number(amount || 0).toFixed(2)} ${String(currency || 'EUR').toUpperCase()}`;
+  return `${Number(amount || 0).toFixed(2)} ${String(currency || 'INR').toUpperCase()}`;
 }
 
 export async function sendCouponUsedWebhook(input: CouponWebhookInput) {

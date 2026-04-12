@@ -27,9 +27,9 @@ export async function POST(request: Request) {
 
     await dbConnect();
 
-    const existingAd = await PartnerAd.findOne({ userId: user.id }).lean();
+    const existingAd = await PartnerAd.findOne({ userId: user.id || "" }).lean();
 
-    const ownerUsername = String((user as any).name || user.email || '');
+    const ownerUsername = String((user as any).name || user.email || "" || '');
 
     const nextData = {
       ownerUsername,
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     if (!existingAd) {
       const created = await PartnerAd.create({
-        userId: user.id,
+        userId: user.id || "",
         ...nextData,
         status: 'PENDING_REVIEW',
         rejectionReason: '',
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     const nextStatus = String(current.status) === 'APPROVED' && !changed ? 'APPROVED' : 'PENDING_REVIEW';
 
     await PartnerAd.updateOne(
-      { _id: current._id, userId: user.id },
+      { _id: current._id, userId: user.id || "" },
       {
         $set: {
           ...nextData,

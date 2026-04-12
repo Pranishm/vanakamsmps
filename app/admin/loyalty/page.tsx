@@ -80,7 +80,7 @@ export default function AdminLoyaltyPage() {
         setEditLifetimePoints(String(first.loyaltyLifetimePoints || 0));
       }
     } catch (error: any) {
-      toast.error(error?.message || (lang === 'es' ? 'Error al cargar loyalty' : 'Failed to load loyalty'));
+      toast.error(error?.message || ('Failed to load loyalty'));
       setPayload(null);
     } finally {
       setLoading(false);
@@ -137,11 +137,11 @@ export default function AdminLoyaltyPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error((data as any).error || 'Error');
 
-      toast.success(lang === 'es' ? 'Loyalty actualizada' : 'Loyalty updated');
+      toast.success('Loyalty updated');
       setNote('');
       await fetchData();
     } catch (error: any) {
-      toast.error(error?.message || (lang === 'es' ? 'No se pudo guardar' : 'Could not save'));
+      toast.error(error?.message || ('Could not save'));
     } finally {
       setSaving(false);
     }
@@ -152,7 +152,7 @@ export default function AdminLoyaltyPage() {
 
     const pointsToSend = Math.max(1, Math.floor(Number(sendPoints || 0)));
     if (!Number.isFinite(pointsToSend) || pointsToSend <= 0) {
-      toast.error(lang === 'es' ? 'Cantidad inválida' : 'Invalid amount');
+      toast.error('Invalid amount');
       return;
     }
 
@@ -171,12 +171,12 @@ export default function AdminLoyaltyPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error((data as any).error || 'Error');
 
-      toast.success(lang === 'es' ? 'Puntos enviados' : 'Points sent');
+      toast.success('Points sent');
       setSendPoints('100');
       setNote('');
       await fetchData();
     } catch (error: any) {
-      toast.error(error?.message || (lang === 'es' ? 'No se pudieron enviar los puntos' : 'Could not send points'));
+      toast.error(error?.message || ('Could not send points'));
     } finally {
       setSaving(false);
     }
@@ -197,10 +197,10 @@ export default function AdminLoyaltyPage() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error((data as any).error || 'Error');
-      toast.success(lang === 'es' ? 'Configuración loyalty guardada' : 'Loyalty configuration saved');
+      toast.success('Loyalty configuration saved');
       await fetchData();
     } catch (error: any) {
-      toast.error(error?.message || (lang === 'es' ? 'No se pudo guardar la configuración' : 'Could not save configuration'));
+      toast.error(error?.message || ('Could not save configuration'));
     } finally {
       setSaving(false);
     }
@@ -216,41 +216,39 @@ export default function AdminLoyaltyPage() {
             </div>
             <div>
               <div className="text-xs uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
-                {lang === 'es' ? 'Control loyalty' : 'Loyalty control'}
+                {'Loyalty control'}
               </div>
               <h1 className="mt-2 text-2xl font-black text-gray-900 dark:text-white md:text-3xl">
-                {lang === 'es' ? 'Loyalty points' : 'Loyalty points'}
+                {'Loyalty points'}
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-300">
-                {lang === 'es'
-                  ? 'Administra saldos, revisa actividad reciente y ajusta puntos desde una sola vista.'
-                  : 'Manage balances, review recent activity, and adjust points from a single view.'}
+                {'Manage balances, review recent activity, and adjust points from a single view.'}
               </p>
             </div>
           </div>
 
           <Button type="button" variant="secondary" onClick={fetchData} disabled={refreshing} className="rounded-2xl">
             <FaSyncAlt />
-            <span>{refreshing ? (lang === 'es' ? 'Actualizando...' : 'Refreshing...') : (lang === 'es' ? 'Actualizar' : 'Refresh')}</span>
+            <span>{refreshing ? ('Refreshing...') : ('Refresh')}</span>
           </Button>
         </div>
       </Card>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos vivos' : 'Live points'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Live points'}</div>
           <div className="mt-3 text-3xl font-black text-gray-900 dark:text-white">{summary.totalPoints}</div>
         </Card>
         <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Histórico total' : 'Lifetime total'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Lifetime total'}</div>
           <div className="mt-3 text-3xl font-black text-gray-900 dark:text-white">{summary.totalLifetimePoints}</div>
         </Card>
         <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Usuarios con puntos' : 'Users with points'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Users with points'}</div>
           <div className="mt-3 text-3xl font-black text-gray-900 dark:text-white">{summary.usersWithPoints}</div>
         </Card>
         <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
-          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Eventos recientes' : 'Recent events'}</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Recent events'}</div>
           <div className="mt-3 text-3xl font-black text-gray-900 dark:text-white">{summary.totalEvents}</div>
         </Card>
       </div>
@@ -259,24 +257,24 @@ export default function AdminLoyaltyPage() {
         <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <div className="text-sm font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Usuarios' : 'Users'}</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{'Users'}</div>
               <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {lang === 'es' ? 'Selecciona a quién quieres ajustar.' : 'Select a user to adjust.'}
+                {'Select a user to adjust.'}
               </div>
             </div>
             <div className="w-full max-w-xs">
               <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <Input value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" placeholder={lang === 'es' ? 'Buscar usuario...' : 'Search user...'} />
+                <Input value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" placeholder={'Search user...'} />
               </div>
             </div>
           </div>
 
           <div className="mt-4 space-y-2 max-h-[30rem] overflow-y-auto pr-1">
             {loading ? (
-              <div className="text-sm text-gray-500">{lang === 'es' ? 'Cargando...' : 'Loading...'}</div>
+              <div className="text-sm text-gray-500">{'Loading...'}</div>
             ) : filteredUsers.length === 0 ? (
-              <div className="text-sm text-gray-500">{lang === 'es' ? 'No hay usuarios' : 'No users found'}</div>
+              <div className="text-sm text-gray-500">{'No users found'}</div>
             ) : (
               filteredUsers.map((user) => (
                 <button
@@ -297,8 +295,8 @@ export default function AdminLoyaltyPage() {
                     <Badge variant="info">{user.role}</Badge>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300">
-                    <span>{lang === 'es' ? 'Actual' : 'Current'}: {user.loyaltyPoints} pts</span>
-                    <span>{lang === 'es' ? 'Histórico' : 'Lifetime'}: {user.loyaltyLifetimePoints} pts</span>
+                    <span>{'Current'}: {user.loyaltyPoints} pts</span>
+                    <span>{'Lifetime'}: {user.loyaltyLifetimePoints} pts</span>
                   </div>
                 </button>
               ))
@@ -310,59 +308,57 @@ export default function AdminLoyaltyPage() {
           <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Configuración de loyalty' : 'Loyalty configuration'}</div>
+                <div className="text-sm font-bold text-gray-900 dark:text-white">{'Loyalty configuration'}</div>
                 <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {lang === 'es'
-                    ? 'Ajusta cuánto se gana, cuánto cuesta canjear y cuánto cuesta convertir puntos a saldo de tienda.'
-                    : 'Adjust earning, redemption, and points-to-store-balance conversion from one place.'}
+                  {'Adjust earning, redemption, and points-to-store-balance conversion from one place.'}
                 </div>
               </div>
-              <Badge variant="warning">{lang === 'es' ? 'Global' : 'Global'}</Badge>
+              <Badge variant="warning">{'Global'}</Badge>
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
-                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos ganados por 1€' : 'Points earned per €1'}</label>
+                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Points earned per ₹1'}</label>
                 <Input type="number" min={1} step={1} value={earningPointsPerEuro} onChange={(e) => setEarningPointsPerEuro(e.target.value)} />
               </div>
               <div>
-                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos para canjear 1€' : 'Points to redeem €1'}</label>
+                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Points to redeem ₹1'}</label>
                 <Input type="number" min={1} step={1} value={redemptionPointsPerEuro} onChange={(e) => setRedemptionPointsPerEuro(e.target.value)} />
               </div>
               <div>
-                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos para convertir 1€ a saldo' : 'Points to convert €1 to balance'}</label>
+                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Points to convert ₹1 to balance'}</label>
                 <Input type="number" min={1} step={1} value={balancePointsPerEuro} onChange={(e) => setBalancePointsPerEuro(e.target.value)} />
               </div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
               <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                {lang === 'es' ? `Compra de 10€ = ${Math.max(1, Math.floor(Number(earningPointsPerEuro || 0) || 0)) * 10} puntos` : `€10 order = ${Math.max(1, Math.floor(Number(earningPointsPerEuro || 0) || 0)) * 10} points`}
+                {`₹10 order = ${Math.max(1, Math.floor(Number(earningPointsPerEuro || 0) || 0)) * 10} points`}
               </div>
               <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                {lang === 'es' ? `${Math.max(1, Math.floor(Number(redemptionPointsPerEuro || 0) || 0))} puntos = 1€ de descuento` : `${Math.max(1, Math.floor(Number(redemptionPointsPerEuro || 0) || 0))} points = €1 discount`}
+                {`${Math.max(1, Math.floor(Number(redemptionPointsPerEuro || 0) || 0))} points = ₹1 discount`}
               </div>
               <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                {lang === 'es' ? `${Math.max(1, Math.floor(Number(balancePointsPerEuro || 0) || 0))} puntos = 1€ de saldo` : `${Math.max(1, Math.floor(Number(balancePointsPerEuro || 0) || 0))} points = €1 balance`}
+                {`${Math.max(1, Math.floor(Number(balancePointsPerEuro || 0) || 0))} points = ₹1 balance`}
               </div>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
               <Button type="button" onClick={saveConfig} disabled={saving} className="rounded-2xl">
                 <FaCoins />
-                <span>{saving ? (lang === 'es' ? 'Guardando...' : 'Saving...') : (lang === 'es' ? 'Guardar configuración' : 'Save configuration')}</span>
+                <span>{saving ? ('Saving...') : ('Save configuration')}</span>
               </Button>
             </div>
           </Card>
 
           <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
             {!selectedUser ? (
-              <div className="text-sm text-gray-500">{lang === 'es' ? 'Selecciona un usuario para editar loyalty.' : 'Select a user to edit loyalty.'}</div>
+              <div className="text-sm text-gray-500">{'Select a user to edit loyalty.'}</div>
             ) : (
               <>
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Editor de puntos' : 'Points editor'}</div>
+                    <div className="text-sm font-bold text-gray-900 dark:text-white">{'Points editor'}</div>
                     <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                       {selectedUser.username} · {selectedUser.email}
                     </div>
@@ -375,23 +371,23 @@ export default function AdminLoyaltyPage() {
 
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos actuales' : 'Current points'}</label>
+                    <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Current points'}</label>
                     <Input type="number" min={0} step={1} value={editPoints} onChange={(e) => setEditPoints(e.target.value)} />
                   </div>
                   <div>
-                    <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Puntos históricos' : 'Lifetime points'}</label>
+                    <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Lifetime points'}</label>
                     <Input type="number" min={0} step={1} value={editLifetimePoints} onChange={(e) => setEditLifetimePoints(e.target.value)} />
                   </div>
                 </div>
 
                 <div className="mt-4">
-                  <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Nota del ajuste' : 'Adjustment note'}</label>
-                  <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder={lang === 'es' ? 'Ej: bonus por evento, corrección manual...' : 'e.g. event bonus, manual correction...'} />
+                  <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Adjustment note'}</label>
+                  <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder={'e.g. event bonus, manual correction...'} />
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                    <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Último abono' : 'Last reward'}</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Last reward'}</div>
                     <div className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{selectedUser.loyaltyLastEarnedAt ? formatDateTime(selectedUser.loyaltyLastEarnedAt) : '-'}</div>
                   </div>
                   <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
@@ -399,7 +395,7 @@ export default function AdminLoyaltyPage() {
                     <div className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{Math.max(0, Math.floor(Number(editPoints || 0))) - selectedUser.loyaltyPoints} pts</div>
                   </div>
                   <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">
-                    <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Delta histórico' : 'Lifetime delta'}</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-gray-500">{'Lifetime delta'}</div>
                     <div className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">{Math.max(Math.max(0, Math.floor(Number(editPoints || 0))), Math.floor(Number(editLifetimePoints || 0))) - selectedUser.loyaltyLifetimePoints} pts</div>
                   </div>
                 </div>
@@ -407,7 +403,7 @@ export default function AdminLoyaltyPage() {
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Button type="button" onClick={saveUser} disabled={saving} className="rounded-2xl">
                     <FaCoins />
-                    <span>{saving ? (lang === 'es' ? 'Guardando...' : 'Saving...') : (lang === 'es' ? 'Guardar ajuste' : 'Save adjustment')}</span>
+                    <span>{saving ? ('Saving...') : ('Save adjustment')}</span>
                   </Button>
                   <Button
                     type="button"
@@ -420,39 +416,35 @@ export default function AdminLoyaltyPage() {
                       setNote('');
                     }}
                   >
-                    {lang === 'es' ? 'Restablecer formulario' : 'Reset form'}
+                    {'Reset form'}
                   </Button>
                 </div>
 
                 <div className="mt-6 rounded-[24px] border border-minecraft-gold/20 bg-minecraft-gold/5 p-4">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div>
-                      <div className="text-sm font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Enviar puntos' : 'Send points'}</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">{'Send points'}</div>
                       <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        {lang === 'es'
-                          ? 'Usa esto para regalar o compensar puntos sin tocar el ajuste manual completo.'
-                          : 'Use this to grant or compensate points without editing the full balance manually.'}
+                        {'Use this to grant or compensate points without editing the full balance manually.'}
                       </div>
                     </div>
-                    <Badge variant="warning">{lang === 'es' ? 'Suma directa' : 'Direct grant'}</Badge>
+                    <Badge variant="warning">{'Direct grant'}</Badge>
                   </div>
 
                   <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[180px_1fr]">
                     <div>
-                      <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{lang === 'es' ? 'Cantidad' : 'Amount'}</label>
+                      <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-gray-500">{'Amount'}</label>
                       <Input type="number" min={1} step={1} value={sendPoints} onChange={(e) => setSendPoints(e.target.value)} />
                     </div>
                     <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                      {lang === 'es'
-                        ? `Se añadirán ${Math.max(1, Math.floor(Number(sendPoints || 0) || 0))} puntos al saldo actual y también al histórico del usuario.`
-                        : `${Math.max(1, Math.floor(Number(sendPoints || 0) || 0))} points will be added to the user's current and lifetime totals.`}
+                      {`${Math.max(1, Math.floor(Number(sendPoints || 0) || 0))} points will be added to the user's current and lifetime totals.`}
                     </div>
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-3">
                     <Button type="button" variant="secondary" onClick={sendPointsToUser} disabled={saving} className="rounded-2xl">
                       <FaGift />
-                      <span>{saving ? (lang === 'es' ? 'Enviando...' : 'Sending...') : (lang === 'es' ? 'Enviar puntos' : 'Send points')}</span>
+                      <span>{saving ? ('Sending...') : ('Send points')}</span>
                     </Button>
                   </div>
                 </div>
@@ -463,12 +455,12 @@ export default function AdminLoyaltyPage() {
           <Card hover={false} className="rounded-[28px] dark:border-white/10 dark:bg-gray-950/25">
             <div className="flex items-center gap-3">
               <FaGift className="text-minecraft-gold" />
-              <div className="text-sm font-bold text-gray-900 dark:text-white">{lang === 'es' ? 'Actividad reciente de loyalty' : 'Recent loyalty activity'}</div>
+              <div className="text-sm font-bold text-gray-900 dark:text-white">{'Recent loyalty activity'}</div>
             </div>
 
             <div className="mt-4 space-y-3">
               {recentEvents.length === 0 ? (
-                <div className="text-sm text-gray-500">{lang === 'es' ? 'No hay actividad reciente.' : 'No recent activity.'}</div>
+                <div className="text-sm text-gray-500">{'No recent activity.'}</div>
               ) : (
                 recentEvents.map((event) => (
                   <div key={event._id} className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-white/5">

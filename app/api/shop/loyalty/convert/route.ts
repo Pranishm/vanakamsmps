@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     await dbConnect();
     const loyaltyConfig = await getLoyaltyConfig();
 
-    const user = await User.findById(currentUser.id).select('username loyaltyPoints balance').lean();
+    const user = await User.findById(currentUser.id || "").select('username loyaltyPoints balance').lean();
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const nextBalance = Math.round(((Number((user as any).balance || 0) + balanceAmount) + Number.EPSILON) * 100) / 100;
 
     await User.updateOne(
-      { _id: currentUser.id },
+      { _id: currentUser.id || "" },
       {
         $inc: {
           loyaltyPoints: -points,
@@ -51,11 +51,11 @@ export async function POST(request: Request) {
     );
 
     await LoyaltyEvent.create({
-      userId: currentUser.id,
+      userId: currentUser.id || "",
       type: 'POINTS_CONVERTED_TO_BALANCE',
       points: -points,
       amountSpent: balanceAmount,
-      currency: String(process.env.SHOP_CURRENCY || 'EUR').toUpperCase(),
+      currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
       description: `Conversión de ${points} puntos loyalty a saldo de tienda`,
       meta: {
         balanceAmount,

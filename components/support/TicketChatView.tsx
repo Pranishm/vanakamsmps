@@ -243,10 +243,10 @@ export default function TicketChatView({
 
   const getSlaBadge = (ticket: Ticket) => {
     const state = getTicketSlaState(ticket);
-    if (state === 'BREACHED') return <Badge variant="danger">{lang === 'es' ? 'SLA vencido' : 'SLA breached'}</Badge>;
-    if (state === 'RESOLVED_LATE') return <Badge variant="warning">{lang === 'es' ? 'Fuera de SLA' : 'Resolved late'}</Badge>;
-    if (state === 'RESOLVED') return <Badge variant="success">{lang === 'es' ? 'En plazo' : 'On time'}</Badge>;
-    return <Badge variant="info">{lang === 'es' ? 'En seguimiento' : 'In SLA'}</Badge>;
+    if (state === 'BREACHED') return <Badge variant="danger">{'SLA breached'}</Badge>;
+    if (state === 'RESOLVED_LATE') return <Badge variant="warning">{'Resolved late'}</Badge>;
+    if (state === 'RESOLVED') return <Badge variant="success">{'On time'}</Badge>;
+    return <Badge variant="info">{'In SLA'}</Badge>;
   };
 
   const getStatusBadge = (s: string) => {
@@ -363,13 +363,13 @@ export default function TicketChatView({
               <>
                 <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-black/20">
-                    <div className="text-xs text-gray-500">{lang === 'es' ? 'Asignado a' : 'Assigned to'}</div>
+                    <div className="text-xs text-gray-500">{'Assigned to'}</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-white mt-1">
-                      {ticketDetails.ticket.assignedStaffName || (lang === 'es' ? 'Pendiente' : 'Pending')}
+                      {ticketDetails.ticket.assignedStaffName || ('Pending')}
                     </div>
                   </div>
                   <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-black/20">
-                    <div className="text-xs text-gray-500">{lang === 'es' ? 'Primer reply antes de' : 'First reply due'}</div>
+                    <div className="text-xs text-gray-500">{'First reply due'}</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-white mt-1">
                       {ticketDetails.ticket.responseDueAt
                         ? new Date(ticketDetails.ticket.responseDueAt).toLocaleString(getDateLocale(lang))
@@ -377,7 +377,7 @@ export default function TicketChatView({
                     </div>
                   </div>
                   <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-black/20">
-                    <div className="text-xs text-gray-500">{lang === 'es' ? 'Resolución objetivo' : 'Resolution due'}</div>
+                    <div className="text-xs text-gray-500">{'Resolution due'}</div>
                     <div className="text-sm font-semibold text-gray-900 dark:text-white mt-1">
                       {ticketDetails.ticket.resolutionDueAt
                         ? new Date(ticketDetails.ticket.resolutionDueAt).toLocaleString(getDateLocale(lang))

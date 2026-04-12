@@ -50,7 +50,7 @@ export async function GET(request: Request) {
         }
         throw e;
       }
-      const followingDocs = await Follow.find({ followerId: user.id }).select('followingId -_id').lean();
+      const followingDocs = await Follow.find({ followerId: user.id || "" }).select('followingId -_id').lean();
       const followingIds = Array.isArray(followingDocs)
         ? followingDocs.map((d: any) => String(d.followingId || '')).filter(Boolean)
         : [];
@@ -159,8 +159,8 @@ export async function POST(request: Request) {
       title,
       content,
       category,
-      authorId: user.id,
-      authorUsername: user.name,
+      authorId: user.id || "",
+      authorUsername: user.name || "User",
       media,
       parentId: null,
       repostOf: null,
@@ -170,18 +170,18 @@ export async function POST(request: Request) {
     // Notificar solo a seguidores del autor (si los hay).
     // Importante: si falla, no bloqueamos la creación del post.
     try {
-      const cursor = Follow.find({ followingId: user.id }).select('followerId -_id').lean().cursor();
+      const cursor = Follow.find({ followingId: user.id || "" }).select('followerId -_id').lean().cursor();
       let ops: any[] = [];
       for await (const doc of cursor as any) {
         const followerId = typeof doc?.followerId === 'string' ? doc.followerId : '';
-        if (!followerId || followerId === user.id) continue;
+        if (!followerId || followerId === user.id || "") continue;
 
         ops.push({
           insertOne: {
             document: {
               userId: followerId,
               title: 'Nuevo post en el foro',
-              message: `${user.name} publicó: ${title}`,
+              message: `${user.name || "User"} publicó: ${title}`,
               href: `/foro/${created._id.toString()}`,
               type: 'INFO',
             },

@@ -51,7 +51,7 @@ export async function GET() {
     const user = await requireAuth();
     await dbConnect();
     
-    const tickets = await Ticket.find({ userId: user.id }).sort({ createdAt: -1 });
+    const tickets = await Ticket.find({ userId: user.id || "" }).sort({ createdAt: -1 });
     
     return NextResponse.json(tickets);
   } catch (error: any) {
@@ -80,9 +80,9 @@ export async function POST(request: Request) {
     const slaDates = buildTicketSlaDates(ticketPriority, new Date());
     
     const ticket = await Ticket.create({
-      userId: user.id,
-      username: user.name,
-      email: user.email,
+      userId: user.id || "",
+      username: user.name || "User",
+      email: user.email || "",
       responseDueAt: slaDates.responseDueAt,
       resolutionDueAt: slaDates.resolutionDueAt,
       ...validatedData,
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
               document: {
                 userId: String(u._id),
                 title: 'Nuevo ticket de soporte',
-                message: `Nuevo ticket creado por ${user.name}.`,
+                message: `Nuevo ticket creado por ${user.name || "User"}.`,
                 href: '/admin/tickets',
                 type: 'INFO',
               },
@@ -118,8 +118,8 @@ export async function POST(request: Request) {
     try {
       await notifyDiscordNewTicket({
         ticketId: String(ticket._id),
-        username: user.name,
-        userEmail: user.email,
+        username: user.name || "User",
+        userEmail: user.email || "",
         subject: ticket.subject,
         category: ticket.category,
         priority: ticket.priority,

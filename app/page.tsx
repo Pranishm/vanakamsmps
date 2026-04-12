@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { FaPlay, FaShoppingCart, FaUsers, FaShieldAlt, FaFire, FaGem, FaTree, FaCrosshairs, FaCloudSun, FaCopy } from 'react-icons/fa';
+import { useEffect, useState, useRef } from 'react';
+import { FaPlay, FaShoppingCart, FaUsers, FaShieldAlt, FaFire, FaGem, FaTree, FaCrosshairs, FaCloudSun, FaCopy, FaCheck, FaMobileAlt, FaGamepad, FaArrowDown, FaChevronDown } from 'react-icons/fa';
 import ServerStatusWidget from '@/components/ServerStatusWidget';
 import StaffOnlineWidget from '@/components/StaffOnlineWidget';
 import DiscordSupportWidget from '@/components/DiscordSupportWidget';
@@ -16,16 +16,58 @@ import { t } from '@/lib/i18n';
 import { useClientLang } from '@/lib/useClientLang';
 import { toast } from 'react-toastify';
 
+// Stagger container animation
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
 export default function HomePage() {
   const lang = useClientLang();
   const [staffForm, setStaffForm] = useState({ username: '', discord: '', about: '' });
   const [sendingStaff, setSendingStaff] = useState(false);
-  const [heroScrollOffset, setHeroScrollOffset] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const bgY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 80]), {
+    stiffness: 100,
+    damping: 30,
+  });
 
   const serverHost = process.env.NEXT_PUBLIC_MINECRAFT_SERVER_IP || 'marketing-great.gl.joinmc.link';
   const serverPort = Number(process.env.NEXT_PUBLIC_MINECRAFT_SERVER_PORT || 25565);
   const serverAddress = `${serverHost}:${Number.isFinite(serverPort) ? serverPort : 25565}`;
   const serverDisplayAddress = serverHost;
+
+  // Bedrock Edition
+  const bedrockHost = 'waltz-compound.gl.at.ply.gg';
+  const bedrockPort = 6920;
+  const [bedrockCopied, setBedrockCopied] = useState(false);
 
   const handlePlayNow = async () => {
     try {
@@ -37,28 +79,31 @@ export default function HomePage() {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     const isSafari = /^((?!chrome|chromium|android).)*safari/i.test(ua);
 
-    // Safari tends to show “invalid address” for unknown URI schemes.
     if (isSafari) {
-      toast.info(
-        lang === 'es'
-          ? `IP copiada: ${serverDisplayAddress}. Pégala en Multijugador > Añadir servidor.`
-          : `IP copied: ${serverDisplayAddress}. Paste it in Multiplayer > Add server.`
-      );
+      toast.info(`IP copied: ${serverDisplayAddress}. Paste it in Multiplayer > Add server.`);
       return;
     }
 
-    // Best-effort deep link (not supported on all devices/browsers)
     const javaUrl = `minecraft://connect?server=${encodeURIComponent(serverHost)}&port=${
       Number.isFinite(serverPort) ? serverPort : 25565
     }`;
 
-    toast.info(
-      lang === 'es'
-        ? `IP copiada: ${serverDisplayAddress}. Intentando abrir Minecraft…`
-        : `IP copied: ${serverDisplayAddress}. Trying to open Minecraft…`
-    );
-
+    toast.info(`IP copied: ${serverDisplayAddress}. Trying to open Minecraft…`);
     window.location.href = javaUrl;
+  };
+
+  const handleBedrockPlay = async () => {
+    try {
+      await navigator.clipboard.writeText(`${bedrockHost}:${bedrockPort}`);
+    } catch {
+      // ignore
+    }
+    setBedrockCopied(true);
+    setTimeout(() => setBedrockCopied(false), 2500);
+
+    const bedrockUrl = `minecraft://?addExternalServer=VANAKAMSMPs|${bedrockHost}:${bedrockPort}`;
+    toast.info(`Bedrock IP copied: ${bedrockHost}:${bedrockPort}. Opening Minecraft…`);
+    window.location.href = bedrockUrl;
   };
 
   const [staffOpen, setStaffOpen] = useState(process.env.NEXT_PUBLIC_STAFF_APPLICATIONS_OPEN === 'true');
@@ -74,18 +119,7 @@ export default function HomePage() {
         // ignore
       }
     };
-
     loadStaffOpen();
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      setHeroScrollOffset(Math.min(window.scrollY * 0.18, 90));
-    };
-
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const submitStaffApplication = async () => {
@@ -168,13 +202,20 @@ export default function HomePage() {
     },
   ];
 
+  const scrollToContent = () => {
+    const el = document.getElementById('community-dashboard');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen overflow-x-clip">
       {/* Hero Section */}
-      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
         <div aria-hidden className="absolute inset-0 z-0 overflow-hidden">
           <motion.div
-            style={{ y: heroScrollOffset }}
+            style={{ y: bgY }}
             className="absolute inset-x-[-4%] -top-32 bottom-[-4%]"
           >
             <Image
@@ -190,88 +231,161 @@ export default function HomePage() {
           <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#020814] dark:to-[#02050f]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl items-center px-4 pb-14 pt-24 text-center sm:px-6 sm:pb-16 lg:px-8">
+        <motion.div
+          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+          className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl items-center px-4 pb-14 pt-24 text-center sm:px-6 sm:pb-16 lg:px-8"
+        >
           <div className="w-full">
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <HeroPlayerBadge host={serverHost} port={Number.isFinite(serverPort) ? serverPort : 25565} />
-            <h1
-              className="mb-5 bg-[linear-gradient(90deg,#fde7ee_0%,#f2b9cf_34%,#d58eaf_66%,#fff2f6_100%)] bg-[length:200%_200%] bg-clip-text text-3xl md:text-5xl lg:text-6xl font-bold text-transparent [text-shadow:0_0_24px_rgba(242,185,207,0.18)] font-[family-name:var(--font-press-start)]"
-              style={{
-                animation: 'home-title-gradient 8s ease-in-out infinite',
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              VANAKAMSMPs
-            </h1>
-            <p className="mx-auto mb-8 max-w-3xl text-base leading-7 text-gray-700 dark:text-gray-300 sm:text-lg md:text-xl">
-              {t(lang, 'home.hero.subtitle')}
-            </p>
-          </motion.div>
+              <HeroPlayerBadge host={serverHost} port={Number.isFinite(serverPort) ? serverPort : 25565} />
+              <h1
+                className="mb-5 bg-[linear-gradient(90deg,#fde7ee_0%,#f2b9cf_34%,#d58eaf_66%,#fff2f6_100%)] bg-[length:200%_200%] bg-clip-text text-3xl md:text-5xl lg:text-6xl font-bold text-transparent [text-shadow:0_0_24px_rgba(242,185,207,0.18)] font-[family-name:var(--font-press-start)]"
+                style={{
+                  animation: 'home-title-gradient 8s ease-in-out infinite',
+                }}
+              >
+                VANAKAMSMPs
+              </h1>
+              <p className="mx-auto mb-8 max-w-3xl text-base leading-7 text-gray-700 dark:text-gray-300 sm:text-lg md:text-xl">
+                {t(lang, 'home.hero.subtitle')}
+              </p>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mb-12 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
-          >
-            <Button size="lg" className="w-full sm:w-auto overflow-hidden whitespace-nowrap" type="button" onClick={handlePlayNow}>
-              <FaCopy className="shrink-0" />
-              <span className="truncate">{t(lang, 'home.hero.playNow')} (IP: vanakam.me)</span>
-            </Button>
-            <Link href="/tienda" className="w-full sm:w-auto">
-              <Button variant="secondary" size="lg" className="w-full sm:min-w-[200px] sm:w-auto">
-                <FaShoppingCart />
-                <span>{t(lang, 'home.hero.viewShop')}</span>
-              </Button>
-            </Link>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="mx-auto max-w-2xl"
+            >
+              <div className="space-y-3">
+                {/* Java Edition Server Status */}
+                <ServerStatusWidget 
+                  host={serverHost}
+                  port={Number.isFinite(serverPort) ? serverPort : 25565}
+                />
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mx-auto max-w-2xl"
-          >
-            <div className="space-y-3">
-              <ServerStatusWidget 
-                host={serverHost}
-                port={Number.isFinite(serverPort) ? serverPort : 25565}
-              />
+                {/* Bedrock Edition Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="relative overflow-hidden bg-gradient-to-br from-[#8B5CF6]/10 via-gray-900/50 to-[#06B6D4]/10 backdrop-blur-sm border border-[#8B5CF6]/20 rounded-lg p-4"
+                >
+                  {/* Decorative glow */}
+                  <div className="absolute -top-8 -right-8 w-24 h-24 bg-[#8B5CF6]/15 rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-[#06B6D4]/15 rounded-full blur-2xl pointer-events-none" />
+                  
+                  <div className="relative flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#8B5CF6]/20 border border-[#8B5CF6]/30">
+                        <FaGamepad className="text-[#8B5CF6] text-lg" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-[#8B5CF6]">Bedrock Edition</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#8B5CF6]/20 text-[#A78BFA] border border-[#8B5CF6]/30">Mobile/PC</span>
+                        </div>
+                        <div className="text-white font-mono text-sm mt-0.5 break-all">{bedrockHost}:{bedrockPort}</div>
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <StaffOnlineWidget host={serverHost} port={Number.isFinite(serverPort) ? serverPort : 25565} />
-                <DiscordSupportWidget />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${bedrockHost}:${bedrockPort}`).catch(() => {});
+                          setBedrockCopied(true);
+                          setTimeout(() => setBedrockCopied(false), 2000);
+                        }}
+                        aria-label={bedrockCopied ? 'Copied' : 'Copy Bedrock IP'}
+                        title={bedrockCopied ? 'Copied!' : 'Copy Bedrock IP'}
+                        className="inline-flex items-center justify-center p-2 rounded-md bg-[#8B5CF6]/20 text-[#A78BFA] hover:bg-[#8B5CF6]/30 transition-colors"
+                      >
+                        {bedrockCopied ? <FaCheck className="text-green-400" /> : <FaCopy />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleBedrockPlay}
+                        aria-label="Open Minecraft Bedrock"
+                        title="Open Minecraft"
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-[#8B5CF6]/30 text-white hover:bg-[#8B5CF6]/50 transition-colors font-semibold text-sm border border-[#8B5CF6]/30"
+                      >
+                        <FaMobileAlt />
+                        <span className="hidden sm:inline">Open MC</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.0 }}
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                >
+                  <StaffOnlineWidget host={serverHost} port={Number.isFinite(serverPort) ? serverPort : 25565} />
+                  <DiscordSupportWidget />
+                </motion.div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+        >
+          <motion.button
+            onClick={scrollToContent}
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex flex-col items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <span className="text-xs font-semibold tracking-wider uppercase">Scroll</span>
+            <FaChevronDown className="text-sm" />
+          </motion.button>
+        </motion.div>
       </section>
 
       {/* Community Dashboard (Leaderboards, Patch Notes, Ranks) */}
-      <AnimatedSection>
-        <CommunityDashboard />
-      </AnimatedSection>
+      <div id="community-dashboard">
+        <AnimatedSection>
+          <CommunityDashboard />
+        </AnimatedSection>
+      </div>
 
       {/* Features Section */}
       <AnimatedSection>
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-          <div className="mb-12 text-center sm:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-12 text-center sm:mb-16"
+          >
             <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">{t(lang, 'home.why.title')}</h2>
             <p className="text-base text-gray-600 dark:text-gray-400 sm:text-lg">{t(lang, 'home.why.subtitle')}</p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6"
+          >
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                variants={staggerItem}
               >
                 <Card hover className="h-full flex flex-col items-center rounded-[28px] text-center transform transition-all duration-300 hover:-translate-y-2 hover:border-minecraft-grass/50 hover:shadow-[0_8px_30px_rgba(81,200,98,0.15)]">
                   <div className="mb-4 flex justify-center">{feature.icon}</div>
@@ -280,96 +394,129 @@ export default function HomePage() {
                 </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
       </AnimatedSection>
 
       {/* Game Modes Section */}
-      <AnimatedSection>
+      <AnimatedSection direction="left">
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-          <div className="mb-10 text-center sm:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-10 text-center sm:mb-12"
+          >
             <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">{t(lang, 'home.modes.title')}</h2>
             <p className="text-base text-gray-600 dark:text-gray-400 sm:text-lg">{t(lang, 'home.modes.subtitle')}</p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+            className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6"
+          >
             {gameModes.map((mode, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
+                variants={staggerItem}
               >
                 <Card hover className="h-full flex flex-col items-center rounded-[28px] text-center transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                   <div className="text-6xl mb-4">{mode.icon}</div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{mode.name}</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">{mode.description}</p>
                   <Button variant="secondary" className="w-full mt-auto" onClick={handlePlayNow}>
-                    {lang === 'es' ? `Jugar ${mode.name}` : `Play ${mode.name}`}
+                    {`Play ${mode.name}`}
                   </Button>
                 </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
       </AnimatedSection>
 
       {/* Screenshot Gallery Section */}
-      <AnimatedSection>
+      <AnimatedSection direction="right">
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-          <div className="mb-10 text-center sm:mb-12">
-            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">{lang === 'es' ? 'Galería del Servidor' : 'In-Game Server Gallery'}</h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-10 text-center sm:mb-12"
+          >
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">In-Game Server Gallery</h2>
             <p className="text-base text-gray-600 dark:text-gray-400 sm:text-lg">
-              {lang === 'es' ? 'Echa un vistazo a lo que te espera dentro del servidor.' : 'Take a look at what awaits you inside the server.'}
+              Take a look at what awaits you inside the server.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            <motion.div variants={staggerItem} className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
               <Image src="/fondo.png" alt="Gallery 1" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'El Spawn' : 'The Spawn'}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <span className="text-white font-bold text-lg tracking-wider">OneBlock</span>
+                  <p className="text-gray-300 text-sm mt-1">Start on a single block</p>
+                </div>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
+            <motion.div variants={staggerItem} className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group">
               <Image src="/fondo.png" alt="Gallery 2" fill className="object-cover object-bottom transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'Zonas de Economía' : 'Economy Zones'}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <span className="text-white font-bold text-lg tracking-wider">SkyBlock</span>
+                  <p className="text-gray-300 text-sm mt-1">Your island awaits</p>
+                </div>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group md:col-span-2 lg:col-span-1">
+            <motion.div variants={staggerItem} className="relative h-64 overflow-hidden rounded-[24px] shadow-lg group md:col-span-2 lg:col-span-1">
               <Image src="/fondo.png" alt="Gallery 3" fill className="object-cover object-left transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white font-bold tracking-wider">{lang === 'es' ? 'Eventos PvP' : 'PvP Events'}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                <div>
+                  <span className="text-white font-bold text-lg tracking-wider">PvP Events</span>
+                  <p className="text-gray-300 text-sm mt-1">Weekly tournaments</p>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="mt-8 text-center text-sm text-gray-500">
-            {lang === 'es' ? '(Reemplaza estas imágenes en la carpeta public)' : '(Replace these placeholder images in the public folder)'}
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
       </AnimatedSection>
 
-      {/* Staff Form (closed) */}
+      {/* Staff Form */}
       <AnimatedSection>
         <section className="mx-auto max-w-4xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
-          <div className="mb-8 text-center sm:mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 text-center sm:mb-10"
+          >
             <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-5xl">{t(lang, 'home.staffForm.title')}</h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
               {staffOpen ? t(lang, 'home.staffForm.openDesc') : t(lang, 'home.staffForm.subtitle')}
             </p>
-          </div>
+          </motion.div>
 
           <Card hover={false} className="rounded-[30px] border-gray-200 dark:border-gray-800">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                {staffOpen ? t(lang, 'home.staffForm.openTitle') : (lang === 'es' ? 'Aplicaciones cerradas' : 'Applications currently closed')}
+                {staffOpen ? t(lang, 'home.staffForm.openTitle') : 'Applications currently closed'}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {staffOpen ? t(lang, 'home.staffForm.openDesc') : (lang === 'es' ? 'Nuestras peticiones de moderador volverán a abrir en Mayo. ¡Mantente atento a nuestro canal de Discord para futuras aperturas!' : 'Our staff applications will open again in May. Stay tuned to our Discord for future openings!')}
+                {staffOpen ? t(lang, 'home.staffForm.openDesc') : 'Our staff applications will open again in May. Stay tuned to our Discord for future openings!'}
               </p>
             </div>
 
@@ -395,26 +542,6 @@ export default function HomePage() {
               />
               <Button disabled={!staffOpen || sendingStaff} variant="secondary" onClick={submitStaffApplication} className="w-full sm:w-auto">
                 <span>{t(lang, 'home.staffForm.send')}</span>
-              </Button>
-            </div>
-          </Card>
-        </section>
-      </AnimatedSection>
-
-      {/* CTA Section */}
-      <AnimatedSection>
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-          <Card className="rounded-[34px] text-center bg-gradient-to-r from-minecraft-grass/20 to-minecraft-diamond/20 border-minecraft-grass">
-            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-              {t(lang, 'home.cta.title')}
-            </h2>
-            <p className="mb-8 text-base text-gray-700 dark:text-gray-300 sm:text-lg">
-              {t(lang, 'home.cta.subtitle')}
-            </p>
-            <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
-              <Button size="lg" className="w-full sm:w-auto">
-                <FaPlay />
-                <span>{t(lang, 'home.cta.startPlaying')}</span>
               </Button>
             </div>
           </Card>
