@@ -22,11 +22,11 @@ export async function GET() {
 
     const now = new Date();
     await PartnerBooking.updateMany(
-      { userId: user.id || "", status: 'ACTIVE', endsAt: { $lt: now } },
+      { userId: user.id, status: 'ACTIVE', endsAt: { $lt: now } },
       { $set: { status: 'EXPIRED', slotActiveKey: '' } }
     );
 
-    const ad = await PartnerAd.findOne({ userId: user.id || "" }).lean();
+    const ad = await PartnerAd.findOne({ userId: user.id }).lean();
     const bookings = ad
       ? await PartnerBooking.find({ adId: String((ad as any)._id) })
           .select('slot kind days status startsAt endsAt provider totalPrice currency createdAt requestNote')
@@ -54,14 +54,14 @@ export async function POST(request: Request) {
 
     await dbConnect();
 
-    const existing = await PartnerAd.findOne({ userId: user.id || "" }).select('_id').lean();
+    const existing = await PartnerAd.findOne({ userId: user.id }).select('_id').lean();
     if (existing) {
       return NextResponse.json({ error: 'Ya tienes un anuncio creado' }, { status: 400 });
     }
 
     const created = await PartnerAd.create({
-      userId: user.id || "",
-      ownerUsername: String((user as any).name || user.email || "" || ''),
+      userId: user.id,
+      ownerUsername: String((user as any).name || user.email || ''),
       ...parsed.data,
       status: 'PENDING_REVIEW',
       rejectionReason: '',
@@ -86,7 +86,7 @@ export async function PATCH(request: Request) {
 
     await dbConnect();
 
-    const ad = await PartnerAd.findOne({ userId: user.id || "" }).select('_id status').lean();
+    const ad = await PartnerAd.findOne({ userId: user.id }).select('_id status').lean();
     if (!ad) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
 
     const currentStatus = String((ad as any).status || 'PENDING_REVIEW');
@@ -94,12 +94,12 @@ export async function PATCH(request: Request) {
 
     if (nextStatus === 'PENDING_REVIEW') {
       await PartnerAd.updateOne(
-        { _id: (ad as any)._id, userId: user.id || "" },
+        { _id: (ad as any)._id, userId: user.id },
         { $set: { ...parsed.data, status: nextStatus, rejectionReason: '' } }
       );
     } else {
       await PartnerAd.updateOne(
-        { _id: (ad as any)._id, userId: user.id || "" },
+        { _id: (ad as any)._id, userId: user.id },
         { $set: { ...parsed.data, status: nextStatus } }
       );
     }
@@ -117,7 +117,7 @@ export async function DELETE() {
     const user = await requireAuth();
     await dbConnect();
 
-    const ad = await PartnerAd.findOne({ userId: user.id || "" }).select('_id').lean();
+    const ad = await PartnerAd.findOne({ userId: user.id }).select('_id').lean();
     if (!ad) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
 
     const adId = String((ad as any)._id);
@@ -133,7 +133,7 @@ export async function DELETE() {
       { $set: { status: 'EXPIRED', endsAt: now, slotActiveKey: '' } }
     );
 
-    await PartnerAd.deleteOne({ _id: adId, userId: user.id || "" });
+    await PartnerAd.deleteOne({ _id: adId, userId: user.id });
 
     return NextResponse.json({ ok: true });
   } catch (error: any) {

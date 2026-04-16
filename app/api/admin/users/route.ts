@@ -91,8 +91,8 @@ export async function POST(request: Request) {
     });
 
     await AdminLog.create({
-      adminId: owner.id,
-      adminUsername: owner.name,
+      adminId: owner.id || '',
+      adminUsername: owner.name || 'Owner',
       action: 'CREATE_USER',
       targetType: 'USER',
       targetId: created._id.toString(),
@@ -354,7 +354,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'userId requerido' }, { status: 400 });
     }
 
-    if (admin.id || "" === userId) {
+    if (admin.id === userId) {
       return NextResponse.json({ error: 'No puedes eliminar tu propia cuenta' }, { status: 400 });
     }
 

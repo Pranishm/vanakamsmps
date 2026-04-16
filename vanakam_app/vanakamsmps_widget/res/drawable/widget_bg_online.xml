@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    widget_bg_online.xml
+    Place in: android/app/src/main/res/drawable/
+    Dark blue/purple gradient background for the ONLINE card
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base dark navy gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#0E1535"
+                android:centerColor="#0A0D28"
+                android:endColor="#110820" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Subtle blue border -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1.5dp"
+                android:color="#2850B4FF" />
+            <corners android:radius="20dp" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+</layer-list>

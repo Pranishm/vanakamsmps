@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Offline X icon: circle with X mark -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#26C82828" />
+            <stroke android:width="2dp" android:color="#66DC3C3C" />
+            <size android:width="36dp" android:height="36dp" />
+        </shape>
+    </item>
+</layer-list>

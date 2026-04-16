@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    x_circle_bg.xml
+    Place in: android/app/src/main/res/drawable/
+    Dark red circular background behind the X mark icon
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#26C82828" />
+    <stroke android:width="1.5dp" android:color="#66DC3C3C" />
+</shape>

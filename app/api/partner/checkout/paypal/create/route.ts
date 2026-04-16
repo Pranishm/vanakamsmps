@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Slot no disponible' }, { status: 409 });
     }
 
-    const existingAd = await PartnerAd.findOne({ userId: user.id || "" }).lean();
+    const existingAd = await PartnerAd.findOne({ userId: user.id }).lean();
 
     const nextData = {
       serverName: parsed.data.serverName,
@@ -63,12 +63,12 @@ export async function POST(request: Request) {
       banner: parsed.data.banner || '',
     };
 
-    const ownerUsername = String((user as any).name || user.email || "" || '');
+    const ownerUsername = String((user as any).name || user.email || '');
 
     let adId = '';
     if (!existingAd) {
       const createdAd = await PartnerAd.create({
-        userId: user.id || "",
+        userId: user.id,
         ownerUsername,
         ...nextData,
         status: 'PENDING_REVIEW',
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
 
       const nextStatus = String(current.status) === 'APPROVED' && !changed ? 'APPROVED' : 'PENDING_REVIEW';
       await PartnerAd.updateOne(
-        { _id: current._id, userId: user.id || "" },
+        { _id: current._id, userId: user.id },
         {
           $set: {
             ownerUsername,
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
     try {
       const created = await PartnerBooking.create({
         adId,
-        userId: user.id || "",
+        userId: user.id,
         slot: parsed.data.slot,
         kind,
         days: pricing.days,

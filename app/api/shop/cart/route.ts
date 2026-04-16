@@ -18,7 +18,7 @@ export async function GET() {
     const user = await requireAuth();
     await dbConnect();
 
-    const cart = await ShopCart.findOne({ userId: user.id || "" }).lean();
+    const cart = await ShopCart.findOne({ userId: user.id }).lean();
     return NextResponse.json({ items: (cart as any)?.items || [] });
   } catch (error: any) {
     const message = String(error?.message || 'Unauthorized');
@@ -46,8 +46,8 @@ export async function PUT(request: Request) {
 
     await dbConnect();
     await ShopCart.findOneAndUpdate(
-      { userId: user.id || "" },
-      { $set: { userId: user.id || "", items } },
+      { userId: user.id },
+      { $set: { userId: user.id, items } },
       { upsert: true, returnDocument: 'after' }
     );
 

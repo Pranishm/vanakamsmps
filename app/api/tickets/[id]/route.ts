@@ -21,7 +21,7 @@ export async function GET(
     }
 
     const isStaff = user.role === 'ADMIN' || user.role === 'STAFF' || user.role === 'OWNER';
-    if (!isStaff && ticket.userId !== user.id || "") {
+    if (!isStaff && ticket.userId !== user.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
@@ -55,7 +55,7 @@ export async function PATCH(
     }
 
     const isStaff = user.role === 'ADMIN' || user.role === 'STAFF' || user.role === 'OWNER';
-    const isOwner = ticket.userId === user.id || "";
+    const isOwner = ticket.userId === user.id;
     if (!isStaff && !isOwner) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
@@ -70,7 +70,7 @@ export async function PATCH(
       }
       await ticket.save();
 
-      if (isStaff && ticket.userId && ticket.userId !== user.id || "") {
+      if (isStaff && ticket.userId && ticket.userId !== user.id) {
         await Notification.create({
           userId: String(ticket.userId),
           title: 'Ticket cerrado',

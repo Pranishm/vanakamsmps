@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     const user = await getCurrentUser().catch(() => null);
     const orderUserId = String((order as any).userId || '');
-    if (orderUserId && user?.id && String(user.id || "") !== orderUserId) {
+    if (orderUserId && user?.id && String(user.id) !== orderUserId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 

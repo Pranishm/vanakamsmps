@@ -80,7 +80,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     const staff = access.staff;
 
     await TicketPresence.updateOne(
-      { ticketId: id, userId: String(user.id || "") },
+      { ticketId: id, userId: String(user.id) },
       {
         $set: {
           username: user?.name || 'User',
@@ -113,7 +113,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
       return NextResponse.json({ error: access.error }, { status: access.status });
     }
 
-    await TicketPresence.deleteOne({ ticketId: id, userId: String(user.id || "") });
+    await TicketPresence.deleteOne({ ticketId: id, userId: String(user.id) });
     return NextResponse.json({ ok: true });
   } catch (error: any) {
     if (error.message === 'Unauthorized') {

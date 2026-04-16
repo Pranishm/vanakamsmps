@@ -9,7 +9,7 @@ export async function GET() {
     const currentUser = await requireAuth();
     await dbConnect();
 
-    const user = await User.findById(currentUser.id || "")
+    const user = await User.findById(currentUser.id)
       .select('_id minecraftUsername minecraftUuid minecraftLinkedAt')
       .lean();
 
@@ -42,7 +42,7 @@ export async function PATCH(request: Request) {
 
     if (unlink) {
       const updated = await User.findByIdAndUpdate(
-        currentUser.id || "",
+        currentUser.id,
         { $set: { minecraftUsername: '', minecraftUuid: '', minecraftLinkedAt: null } },
         { returnDocument: 'after' }
       ).select('_id minecraftUsername minecraftUuid minecraftLinkedAt');
@@ -65,7 +65,7 @@ export async function PATCH(request: Request) {
     }
 
     const existing = await User.findOne({
-      _id: { $ne: currentUser.id || "" },
+      _id: { $ne: currentUser.id },
       minecraftUuid: resolved.uuid,
     }).select('_id username');
 
@@ -77,7 +77,7 @@ export async function PATCH(request: Request) {
     }
 
     const updated = await User.findByIdAndUpdate(
-      currentUser.id || "",
+      currentUser.id,
       {
         $set: {
           minecraftUsername: resolved.username,

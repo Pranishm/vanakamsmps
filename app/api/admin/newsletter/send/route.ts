@@ -44,8 +44,8 @@ export async function POST(request: Request) {
     );
 
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'MANUAL_NEWSLETTER_WEEKLY',
       targetType: 'EMAIL',
       targetId: 'newsletter',

@@ -80,8 +80,8 @@ export async function POST(request: Request) {
     const product = await Product.create(normalizeProductPayload(validatedData as any));
     
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'CREATE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: product._id.toString(),
@@ -133,8 +133,8 @@ export async function PATCH(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'UPDATE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: productId,
@@ -241,8 +241,8 @@ export async function DELETE(request: Request) {
     }
     
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'DELETE_PRODUCT',
       targetType: 'PRODUCT',
       targetId: productId,

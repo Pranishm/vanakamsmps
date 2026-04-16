@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ic_x_mark.xml
+    Place in: android/app/src/main/res/drawable/
+    X mark icon shown inside the red circle on the offline card
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+
+    <!-- Diagonal line: top-left to bottom-right -->
+    <path
+        android:pathData="M3,3 L15,15"
+        android:strokeColor="#FF4444"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+
+    <!-- Diagonal line: top-right to bottom-left -->
+    <path
+        android:pathData="M15,3 L3,15"
+        android:strokeColor="#FF4444"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+
+</vector>

@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       appliesToProductIds: Array.isArray(parsed.data.appliesToProductIds)
         ? parsed.data.appliesToProductIds.map((id) => String(id).trim()).filter(Boolean).slice(0, 1)
         : [],
-      createdBy: String(admin.id || "" || ''),
+      createdBy: String(admin.id || ''),
       startsAt: parsed.data.startsAt ? new Date(parsed.data.startsAt) : undefined,
       expiresAt: parsed.data.expiresAt ? new Date(parsed.data.expiresAt) : undefined,
     });

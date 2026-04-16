@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- pill_label_online.xml — "SERVER STATUS" label background (online card) -->
+<!-- Place in: android/app/src/main/res/drawable/ -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#59000000" />
+    <stroke android:width="1dp" android:color="#1AFFFFFF" />
+    <corners android:radius="20dp" />
+</shape>

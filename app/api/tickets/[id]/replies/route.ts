@@ -29,7 +29,7 @@ export async function POST(
     }
 
     const isStaff = user.role === 'ADMIN' || user.role === 'STAFF' || user.role === 'OWNER';
-    const isOwner = ticket.userId === user.id || "";
+    const isOwner = ticket.userId === user.id;
     if (!isStaff && !isOwner) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
@@ -46,7 +46,7 @@ export async function POST(
       isStaff,
     });
 
-    if (isStaff && ticket.userId && ticket.userId !== user.id || "") {
+    if (isStaff && ticket.userId && ticket.userId !== user.id) {
       await Notification.create({
         userId: String(ticket.userId),
         title: 'Respuesta en tu ticket',
@@ -63,8 +63,8 @@ export async function POST(
     }
     if (isStaff) {
       if (!(ticket as any).assignedStaffId) {
-        (ticket as any).assignedStaffId = String(user.id || "" || '');
-        (ticket as any).assignedStaffName = String(user.name || "User" || 'Staff');
+        (ticket as any).assignedStaffId = String(user.id || '');
+        (ticket as any).assignedStaffName = String(user.name || 'Staff');
         (ticket as any).assignedAt = now;
       }
       if (!(ticket as any).firstStaffReplyAt) {

@@ -202,8 +202,8 @@ export async function PATCH(request: Request) {
     }
 
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: parsed.data.action === 'APPROVE' ? 'APPROVE_PARTNER_AD' : 'REJECT_PARTNER_AD',
       targetType: 'PARTNER_AD',
       targetId: parsed.data.adId,

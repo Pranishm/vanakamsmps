@@ -262,7 +262,7 @@ export async function POST(request: Request) {
           orderId: String(order._id),
         },
       },
-      customer_email: user?.email ? String(user.email || "") : undefined,
+      customer_email: user?.email ? String(user.email) : undefined,
       success_url: `${siteUrl}/carrito/stripe/success?orderId=${encodeURIComponent(String(order._id))}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/carrito/stripe/cancel?orderId=${encodeURIComponent(String(order._id))}`,
     });

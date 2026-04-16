@@ -92,7 +92,7 @@ export async function GET() {
       users: userList.map((user) => ({
         _id: String(user._id),
         username: String(user.username || ''),
-        email: String(user.email || "" || ''),
+        email: String(user.email || ''),
         role: String(user.role || 'USER'),
         loyaltyPoints: Number(user.loyaltyPoints || 0),
         loyaltyLifetimePoints: Number(user.loyaltyLifetimePoints || 0),
@@ -146,8 +146,8 @@ export async function PATCH(request: Request) {
       );
 
       await AdminLog.create({
-        adminId: admin.id || "",
-        adminUsername: admin.name || "Admin",
+        adminId: admin.id,
+        adminUsername: admin.name,
         action: 'UPDATE_LOYALTY_CONFIG',
         targetType: 'SETTINGS',
         targetId: 'loyalty',
@@ -243,8 +243,8 @@ export async function PATCH(request: Request) {
           ? `Envio manual de ${pointsDelta} puntos loyalty`
           : `Ajuste manual de loyalty: ${previousPoints} -> ${nextPoints}${lifetimeDelta !== 0 ? ` | historico: ${previousLifetimePoints} -> ${nextLifetimePoints}` : ''}`),
       meta: {
-        adminId: admin.id || "",
-        adminUsername: admin.name || "Admin",
+        adminId: admin.id,
+        adminUsername: admin.name,
         action,
         previousPoints,
         nextPoints,
@@ -255,8 +255,8 @@ export async function PATCH(request: Request) {
     }).catch(() => null);
 
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: actionLabel,
       targetType: 'USER',
       targetId: userId,

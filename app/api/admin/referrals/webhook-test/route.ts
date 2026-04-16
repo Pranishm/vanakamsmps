@@ -40,14 +40,14 @@ export async function POST(request: Request) {
       buyerDiscountAmount: 3.25,
       rewardAmount: 2,
       currency: String(process.env.SHOP_CURRENCY || 'INR').toUpperCase(),
-      referrerLabel: `**${admin.name || "Admin"}** (\`${admin.email || "" || 'admin@example.com'}\`)`,
+      referrerLabel: `**${admin.name}** (\`${admin.email || 'admin@example.com'}\`)`,
       referredLabel: '**NewPlayer123** (`newplayer@example.com`)',
       isTest: true,
     });
 
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'SEND_REFERRAL_WEBHOOK_TEST',
       targetType: 'DISCORD',
       targetId: REFERRAL_WEBHOOK_KEY,

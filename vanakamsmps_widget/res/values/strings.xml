@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml
+    Place in: android/app/src/main/res/values/
+    All text strings used by the VANAKAMSMPS home screen widget.
+    Update player_count and last_seen dynamically from Flutter
+    using the home_widget package (HomeWidget.saveWidgetData).
+-->
+<resources>
+
+    <!-- ── WIDGET METADATA ── -->
+    <string name="widget_name">VANAKAMSMPS Status</string>
+    <string name="widget_description">Live server status for VANAKAMSMPS Minecraft SMP</string>
+
+    <!-- ── SERVER IDENTITY ── -->
+    <string name="server_name">VANAKAMSMPS</string>
+    <string name="server_tagline">SURVIVAL • SMP • COMMUNITY</string>
+    <string name="server_address">vanakam.me</string>
+    <string name="server_port">Port 25565</string>
+    <string name="server_edition">Java Edition</string>
+
+    <!-- ── STATUS LABELS ── -->
+    <string name="server_status_label">SERVER STATUS</string>
+    <string name="status_online">ONLINE</string>
+    <string name="status_offline">OFFLINE</string>
+    <string name="status_pinging">PINGING</string>
+
+    <!-- ── PLAYERS (updated at runtime via home_widget) ── -->
+    <string name="players_online_label">PLAYERS ONLINE</string>
+    <string name="player_count">143</string>
+    <string name="player_max">/ 1000</string>
+
+    <!-- ── BUTTONS ── -->
+    <string name="btn_online">✓ ONLINE</string>
+    <string name="btn_offline">✕ OFFLINE</string>
+
+    <!-- ── ONLINE TAGLINES ── -->
+    <string name="adventure_tagline">YOUR ADVENTURE AWAITS..</string>
+
+    <!-- ── OFFLINE MESSAGES ── -->
+    <string name="last_seen">LAST SEEN: 2 HOURS AGO</string>
+    <string name="unable_to_connect">UNABLE TO CONNECT</string>
+    <string name="offline_desc">The server is currently offline. Please try again later.</string>
+    <string name="retry_text">RETRYING IN 30 SECONDS…</string>
+    <string name="offline_tagline">CHECK BACK SOON – THE ADVENTURE CONTINUES ♥</string>
+
+    <!-- ── ACCESSIBILITY ── -->
+    <string name="dot_online_desc">Server online indicator</string>
+    <string name="dot_offline_desc">Server offline indicator</string>
+    <string name="x_icon_desc">Server offline X mark</string>
+    <string name="retry_spinner_desc">Retrying connection</string>
+
+</resources>

@@ -50,8 +50,8 @@ export async function PATCH(request: Request) {
     await setPartnerPricingConfig(next);
 
     await AdminLog.create({
-      adminId: admin.id || "",
-      adminUsername: admin.name || "Admin",
+      adminId: admin.id,
+      adminUsername: admin.name,
       action: 'UPDATE_PARTNER_PRICING',
       targetType: 'SETTINGS',
       targetId: 'partnerPricing',

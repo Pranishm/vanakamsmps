@@ -1,7 +1,4 @@
-# Vercel Ignore File
-# Exclude the Flutter mirror app completely (it's inside app/ for structure but shouldn't be deployed)
-app/
-flutter_mirror_app/
+# Exclude specific non-web subprojects (keep the main Next.js app/ folder!)
 react-native-widget/
 
 # Exclude standard build/dependency folders

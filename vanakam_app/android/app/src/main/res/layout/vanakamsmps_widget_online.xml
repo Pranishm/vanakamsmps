@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    VANAKAMSMPS – Online State Widget Layout
+    Place in: android/app/src/main/res/layout/
+    Used by: VanakamSMPWidgetProvider via Flutter home_widget package
+-->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root_online"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg_online"
+    android:padding="0dp"
+    android:clipToPadding="false">
+
+    <!-- ── TOP BAR ── -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Server Label Pill -->
+        <LinearLayout
+            android:id="@+id/server_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pill_label_online"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <!-- Pulsing green dot -->
+            <ImageView
+                android:id="@+id/status_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/dot_online" />
+
+            <TextView
+                android:id="@+id/label_server_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server_status_label"
+                android:textColor="@color/label_text"
+                android:textSize="9sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- ONLINE pill -->
+        <LinearLayout
+            android:id="@+id/status_pill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pill_status_online"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/pill_dot"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/dot_online_sm" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_online"
+                android:textColor="@color/online_green"
+                android:textSize="9sp"
+                android:letterSpacing="0.10"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-black" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ── SERVER TITLE ── -->
+    <TextView
+        android:id="@+id/tv_server_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_bar"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/server_name"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="-0.01"
+        android:maxLines="1" />
+
+    <!-- ── TAGLINE ── -->
+    <TextView
+        android:id="@+id/tv_tagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_server_title"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="1dp"
+        android:text="@string/server_tagline"
+        android:textColor="@color/tagline_text"
+        android:textSize="8sp"
+        android:letterSpacing="0.15"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-medium" />
+
+    <!-- ── PLAYER COUNT BLOCK ── -->
+    <LinearLayout
+        android:id="@+id/players_block"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_tagline"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_players_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/players_online_label"
+            android:textColor="@color/players_label"
+            android:textSize="7sp"
+            android:letterSpacing="0.12"
+            android:textAllCaps="true"
+            android:fontFamily="sans-serif-medium" />
+
+        <!-- Count row: "143 / 1000" -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="1dp">
+
+            <TextView
+                android:id="@+id/tv_player_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/player_count"
+                android:textColor="@color/online_green"
+                android:textSize="28sp"
+                android:fontFamily="sans-serif-black"
+                android:lineHeight="28sp" />
+
+            <TextView
+                android:id="@+id/tv_player_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/player_max"
+                android:textColor="@color/player_max_text"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ── RIGHT SIDE: ONLINE BUTTON + SERVER INFO ── -->
+    <LinearLayout
+        android:id="@+id/right_side"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/players_block"
+        android:layout_alignTop="@id/tv_tagline"
+        android:layout_marginEnd="14dp"
+        android:orientation="vertical"
+        android:gravity="end|bottom">
+
+        <TextView
+            android:id="@+id/tv_online_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_online"
+            android:text="@string/btn_online"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:textAllCaps="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+    </LinearLayout>
+
+    <!-- ── BOTTOM TAGLINE BAR ── -->
+    <LinearLayout
+        android:id="@+id/tagline_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_bar_bg"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="&#9889;"
+            android:textColor="@color/tagline_bar_text"
+            android:textSize="10sp"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/tv_adventure_tagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adventure_tagline"
+            android:textColor="@color/tagline_bar_text"
+            android:textSize="8sp"
+            android:letterSpacing="0.18"
+            android:textAllCaps="true"
+            android:fontFamily="sans-serif-bold" />
+    </LinearLayout>
+
+</RelativeLayout>

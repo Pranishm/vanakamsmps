@@ -68,11 +68,11 @@ export async function POST(request: Request) {
     }
 
     const user: any = await User.findOne({ email }).select('_id emailVerifiedAt emailVerificationRequestedAt');
-    if (!user || user.email || ""VerifiedAt) {
+    if (!user || user.emailVerifiedAt) {
       return NextResponse.json({ ok: true });
     }
 
-    const lastReq = user.email || ""VerificationRequestedAt ? Date.parse(String(user.email || ""VerificationRequestedAt)) : NaN;
+    const lastReq = user.emailVerificationRequestedAt ? Date.parse(String(user.emailVerificationRequestedAt)) : NaN;
     if (Number.isFinite(lastReq) && Date.now() - lastReq < 2 * 60_000) {
       return NextResponse.json({ ok: true });
     }
