@@ -547,17 +547,6 @@ export default function TiendaPage() {
         icon={<FaShoppingCart className="text-6xl text-minecraft-gold" />}
       />
 
-      <Link
-        href="/memberships"
-        className="mb-8 flex flex-col gap-1 rounded-2xl border border-rose-300/20 bg-gradient-to-r from-rose-950/20 via-fuchsia-950/10 to-amber-950/20 px-5 py-4 text-gray-900 transition hover:border-rose-300/40 dark:text-white sm:flex-row sm:items-center sm:justify-between"
-      >
-        <span>
-          <span className="block font-bold">Compare VKP, VKP+ and VKP++ benefits</span>
-          <span className="mt-1 block text-sm text-gray-600 dark:text-gray-400">See membership terms and upcoming one-time collections.</span>
-        </span>
-        <span className="mt-2 text-sm font-bold text-rose-700 dark:text-rose-200 sm:mt-0">View membership guide →</span>
-      </Link>
-
       {/* Gate: Require Minecraft username before showing shop */}
       {!shopUnlocked ? (
         <div className="mx-auto max-w-3xl">
