@@ -32,7 +32,12 @@ const membershipFallbacks = [
 ];
 
 type MembershipPrice = { term: string; price: number; listPrice?: number };
-type Membership = (typeof membershipFallbacks)[number] & {
+type Membership = {
+  name: string;
+  label: string;
+  accent: string;
+  group: string;
+  featured?: boolean;
   prices: MembershipPrice[];
   benefits: string[];
 };
