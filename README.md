@@ -466,3 +466,5 @@ Additional documentation:
 - If a secret leaks, rotate credentials immediately.
 - Vulnerability reporting: see [SECURITY.md](SECURITY.md).
 
+
+Join the server: `vanakamsmps.duckdns.org` (Java 1.8-26.3, Bedrock port 19132)
