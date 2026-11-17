@@ -36,9 +36,9 @@ const verification: Metadata['verification'] = {
 
 export const metadata: Metadata = {
   ...buildPageMetadata({
-    title: '- Minecraft Server',
+    title: 'VANAKAMSMPs - Free Minecraft Server (Java 1.8-26.3 + Bedrock)',
     description:
-      'Minecraft server and community with official store, forum, news, support and events. Built for players, search engines and AI assistants.',
+      'Free Minecraft server in India: Survival SMP, Skyblock, OneBlock, BedWars, Duels and minigames. Java 1.8-26.3 and Bedrock, cracked OK. IP: vanakamsmps.duckdns.org',
     path: '/',
     keywords: getDefaultKeywords(),
   }),
@@ -105,6 +105,24 @@ export default async function RootLayout({
     inLanguage: ['en'],
   };
 
+  const gameServerJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'GameServer',
+    name: `${getSiteName()} Minecraft Server`,
+    url: siteUrl,
+    description:
+      'Free Minecraft server hosted in Mumbai, India. Java Edition 1.8-26.3 and Bedrock Edition (crossplay), premium and cracked players welcome. Survival SMP, Skyblock, OneBlock, BedWars, SkyWars, Duels and minigames. Join: vanakamsmps.duckdns.org (Java port 25565, Bedrock port 19132).',
+    serverStatus: 'https://schema.org/Online',
+    game: {
+      '@type': 'VideoGame',
+      name: 'Minecraft',
+      gamePlatform: ['Java Edition', 'Bedrock Edition'],
+    },
+    isAccessibleForFree: true,
+    keywords:
+      'minecraft server, free minecraft server, indian minecraft server, minecraft server india, java bedrock crossplay, cracked minecraft server, tlauncher server, smp, skyblock, oneblock, bedwars, skywars, duels, 26.3',
+  };
+
   return (
     <html lang={lang} className="dark" suppressHydrationWarning>
       <head>
@@ -112,6 +130,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <SeoJsonLd data={orgJsonLd} />
         <SeoJsonLd data={websiteJsonLd} />
+        <SeoJsonLd data={gameServerJsonLd} />
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
